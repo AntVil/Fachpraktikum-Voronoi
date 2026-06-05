@@ -1,0 +1,4 @@
+# numba-cuda needs to be installed with specific CUDA version to work correctly
+# example: numba-cuda[cu13]
+imageio
+matplotlib
