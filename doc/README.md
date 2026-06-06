@@ -7,9 +7,11 @@
 
 ---
 
-# Aufgabe 1 - Beschreibung des Problem
+# Aufgabe 1 - Beschreibung des Problems
 
 _Was ist das Problem?_
+
+_2–3 wissenschaftliche Quellen_
 
 _Was sind verwandte Probleme die nicht berücksichtigt werden?_
 
@@ -51,13 +53,15 @@ _Welche Parameter haben den größten Einfluss auf die Performance und wieso?_
 
 _Welche Optimierungen können bei der Distanz-Prüfung problemlos gemacht werden und warum?_
 
-_Welchen Einfluss hat `fastmasth` und wieso?_
+_Welchen Einfluss hat `fastmath` und wieso?_
 
 _Welchen Einfluss hat `hypot` und wieso?_
 
 _Welchen Einfluss hat schlicht $a^2 + b^2$ und wieso?_
 
 _Welchen Einfluss hat ein approximiertes `if` vor der Distanz-Prüfung und wieso?_
+
+_Welchen Einfluss hat die **Manhattan-Distanz** als alternative Metrik, und wie verändert sich das visuelle Ergebnis?_
 
 # Aufgabe 5 - Effizienteres Laden von Daten
 
@@ -71,7 +75,17 @@ _Welchen Einfluss hat das Laden der Daten in einen Warp und das Verarbeiten mit 
 
 _Welchen Einfluss hat ein Loop-Unrolling_
 
-# Aufgabe 6 - Ergebnisse
+# Aufgabe 6 - Alternativer Ansatz: Jump Flooding Algorithmus (JFA)
+
+_Wie funktioniert der Algorithmus?_
+
+_Wo liegen die Unterschiede zum Ansatz der vorherigen Implementierung? (Komplexität)_
+
+_Können Optimierungen durchgeführt werden? wieso Ja/ Nein?_
+
+_Gibt es Qualitätsunterschiede (Pixelfehler) im Diagramm?_
+
+# Aufgabe 7 - Ergebnisse
 
 _Welche der Optimierungen hat den größten Laufzeit-gewinn erbracht?_
 
@@ -80,3 +94,5 @@ _Wie viel schneller ist die Finale Implementation im Vergleich zur Naiven Implem
 _Welchen Durchsatz haben die verschiedenen Implementationen?_
 
 _Ab welcher Eingabe-Größe erreicht die GPU ihre Sättigung?_
+
+_Was liefern die Profiling-Tools?_
