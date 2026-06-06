@@ -11,7 +11,7 @@
 
 _Was ist das Problem?_
 
-_2–3 wissenschaftliche Quellen_
+_2-3 wissenschaftliche Quellen_
 
 _Was sind verwandte Probleme die nicht berücksichtigt werden?_
 
