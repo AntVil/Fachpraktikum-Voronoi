@@ -40,6 +40,22 @@ def main() -> None:
         )
         plt.imshow(image)
         plt.show()
+    elif command is None or command == "compare":
+        point_count = 100
+        resolution = 1024
+
+        points = generate_uniform_points(point_count=point_count)
+
+        image1 = voroni_euclidean_hypot(
+            points=points,
+            resolution=resolution
+        )
+        image2 = voroni_manhattan(
+            points=points,
+            resolution=resolution
+        )
+        plt.imshow(np.hstack((image1, image2)))
+        plt.show()
     elif command == "visualization-euclidean":
         # NOTE: gif only supports up to 256 colors
         point_count = 256
