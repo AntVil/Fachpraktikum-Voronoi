@@ -1,8 +1,12 @@
 from numba import cuda
 import numpy as np
+import imageio.v3 as imageio
 from matplotlib import pyplot as plt
+import os
 
+from constants import DATA_FOLDER
 from utils import (
+    get_argument,
     generate_uniform_points,
     make_empty_voronoi_output,
     make_grid_configuration,
@@ -13,15 +17,46 @@ from utils import (
 
 
 def main() -> None:
-    image = voroni_euclidean(
-        points=generate_uniform_points(point_count=2_000),
-        resolution=1024
-    )
-    plt.imshow(image)
-    plt.show()
+    command = get_argument()
+
+    if command is None or command == "image":
+        point_count = 2_000
+        resolution = 1024
+
+        image = voroni_euclidean_hypot(
+            points=generate_uniform_points(point_count=point_count),
+            resolution=resolution
+        )
+        plt.imshow(image)
+        plt.show()
+    elif command == "visualization":
+        # NOTE: gif only supports up to 256 colors
+        point_count = 256
+        resolution = 1024
+
+        points = generate_uniform_points(point_count=point_count)
+
+        # MARK: animation
+        frames: list[np.ndarray] = []
+
+        print("Generating individual Frames")
+        for i in range(1, point_count):
+            print(f"[{i} / {point_count}] Processing frame", end="\r")
+            frame = voroni_euclidean_hypot(
+                points=points[:i],
+                resolution=resolution
+            )
+
+            frames.append(frame)
+
+        print("Generating Gif")
+        imageio.imwrite(os.path.join(DATA_FOLDER, "task3_visualization.gif"), frames)
+    else:
+        print(f"Error: unknown command '{command}'")
+        exit(1)
 
 
-def voroni_euclidean(
+def voroni_euclidean_hypot(
     points: cuda.devicearray.DeviceNDArray,
     resolution: int
 ) -> np.ndarray:
@@ -32,7 +67,7 @@ def voroni_euclidean(
         threads_per_dimension=16
     )
 
-    _voroni_euclidean_kernel_naive[blocks_per_grid, threads_per_block](
+    _voroni_euclidean_hypot_kernel[blocks_per_grid, threads_per_block](
         points,
         out_image
     )
@@ -41,12 +76,12 @@ def voroni_euclidean(
 
 
 @cuda.jit("void(float64[:, :], int32[:, :])")
-def _voroni_euclidean_kernel_naive(
+def _voroni_euclidean_hypot_kernel(
     in_points: cuda.devicearray.DeviceNDArray,
     out_image: cuda.devicearray.DeviceNDArray
 ) -> None:
     closest_index = 0
-    closest_distance = float("inf")
+    closest_distance = np.inf
 
     (x_index, y_index, x_coordinate, y_coordinate) = get_thread_position(image=out_image)
 

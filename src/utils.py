@@ -1,5 +1,23 @@
 from numba import cuda
 import numpy as np
+import sys
+
+
+def get_argument() -> str | None:
+    """
+    Most basic sub-command parsing
+    """
+
+    argument_count = len(sys.argv)
+    if argument_count > 2:
+        print("Error: Too many arguments")
+        exit(1)
+
+    if argument_count == 1:
+        return None
+
+    if argument_count == 2:
+        return sys.argv[1]
 
 
 def generate_uniform_points(point_count: int) -> cuda.devicearray.DeviceNDArray:
@@ -137,7 +155,7 @@ def calculate_euclidean_distance_with_sqrt_fast(
     point_y_coordinate: float
 ) -> float:
     return cuda.libdevice.sqrt(
-        calculate_square_euclidean_distance(
+        calculate_square_euclidean_distance_fast(
             x_coordinate=x_coordinate,
             y_coordinate=y_coordinate,
             point_x_coordinate=point_x_coordinate,
