@@ -12,14 +12,15 @@ from utils import (
     make_grid_configuration,
     get_thread_position,
     is_outside_image,
-    calculate_euclidean_distance_with_hypot
+    calculate_euclidean_distance_with_hypot,
+    calculate_manhattan_distance
 )
 
 
 def main() -> None:
     command = get_argument()
 
-    if command is None or command == "image":
+    if command is None or command == "euclidean":
         point_count = 2_000
         resolution = 1024
 
@@ -29,7 +30,17 @@ def main() -> None:
         )
         plt.imshow(image)
         plt.show()
-    elif command == "visualization":
+    elif command is None or command == "manhattan":
+        point_count = 2_000
+        resolution = 1024
+
+        image = voroni_euclidean_hypot(
+            points=generate_uniform_points(point_count=point_count),
+            resolution=resolution
+        )
+        plt.imshow(image)
+        plt.show()
+    elif command == "visualization-euclidean":
         # NOTE: gif only supports up to 256 colors
         point_count = 256
         resolution = 1024
@@ -48,9 +59,33 @@ def main() -> None:
             )
 
             frames.append(frame)
+        print()
 
         print("Generating Gif")
-        imageio.imwrite(os.path.join(DATA_FOLDER, "task3_visualization.gif"), frames)
+        imageio.imwrite(os.path.join(DATA_FOLDER, "task3_euclidean_visualization.gif"), frames)
+    elif command == "visualization-manhattan":
+        # NOTE: gif only supports up to 256 colors
+        point_count = 256
+        resolution = 1024
+
+        points = generate_uniform_points(point_count=point_count)
+
+        # MARK: animation
+        frames: list[np.ndarray] = []
+
+        print("Generating individual Frames")
+        for i in range(1, point_count):
+            print(f"[{i} / {point_count}] Processing frame", end="\r")
+            frame = voroni_manhattan(
+                points=points[:i],
+                resolution=resolution
+            )
+
+            frames.append(frame)
+        print()
+
+        print("Generating Gif")
+        imageio.imwrite(os.path.join(DATA_FOLDER, "task3_manhattan_visualization.gif"), frames)
     else:
         print(f"Error: unknown command '{command}'")
         exit(1)
@@ -92,6 +127,55 @@ def _voroni_euclidean_hypot_kernel(
         (point_x_coordinate, point_y_coordinate) = in_points[index]
 
         distance = calculate_euclidean_distance_with_hypot(
+            x_coordinate = x_coordinate,
+            y_coordinate = y_coordinate,
+            point_x_coordinate = point_x_coordinate,
+            point_y_coordinate = point_y_coordinate
+        )
+
+        if distance < closest_distance:
+            closest_distance = distance
+            closest_index = index
+
+    out_image[x_index, y_index] = closest_index
+
+
+def voroni_manhattan(
+    points: cuda.devicearray.DeviceNDArray,
+    resolution: int
+) -> np.ndarray:
+    out_image = make_empty_voronoi_output(resolution=resolution)
+
+    blocks_per_grid, threads_per_block = make_grid_configuration(
+        resolution=resolution,
+        threads_per_dimension=16
+    )
+
+    _voroni_manhattan_kernel[blocks_per_grid, threads_per_block](
+        points,
+        out_image
+    )
+
+    return out_image.copy_to_host()
+
+
+@cuda.jit("void(float64[:, :], int32[:, :])")
+def _voroni_manhattan_kernel(
+    in_points: cuda.devicearray.DeviceNDArray,
+    out_image: cuda.devicearray.DeviceNDArray
+) -> None:
+    closest_index = 0
+    closest_distance = np.inf
+
+    (x_index, y_index, x_coordinate, y_coordinate) = get_thread_position(image=out_image)
+
+    if is_outside_image(x_index=x_index, y_index=y_index, image=out_image):
+        return
+
+    for index in range(0, in_points.shape[0]):
+        (point_x_coordinate, point_y_coordinate) = in_points[index]
+
+        distance = calculate_manhattan_distance(
             x_coordinate = x_coordinate,
             y_coordinate = y_coordinate,
             point_x_coordinate = point_x_coordinate,
