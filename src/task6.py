@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from numba import cuda
+from typing import Any
 import imageio.v3 as imageio
 from matplotlib import pyplot as plt
 
@@ -30,11 +31,13 @@ def main() -> None:
 
     # Naive Euclidean and Manhattan JFA
     seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
-    image_euclidean = jfa_naive_euclidean(
+    image_euclidean = jfa_naive_host(
+        kernel=_jfa_pass_naive_euclidean_kernel,
         seeds=seeds,
         resolution=RESOLUTION,
     )
-    image_manhattan = jfa_naive_manhattan(
+    image_manhattan = jfa_naive_host(
+        kernel=_jfa_pass_naive_manhattan_kernel,
         seeds=seeds,
         resolution=RESOLUTION,
     )
@@ -45,23 +48,30 @@ def main() -> None:
 
     # Generate GIFs for visualisation
     seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT_VISU, resolution=RESOLUTION)
-    jfa_naive_euclidean(
+    jfa_naive_host(
+        kernel=_jfa_pass_naive_euclidean_kernel,
         seeds=seeds,
         resolution=RESOLUTION,
-        visualize=True,
+        gif_path=os.path.join(DATA_FOLDER, "task6_euclidean_jfa_visualization.gif"),
     )
-    jfa_naive_manhattan(
+    jfa_naive_host(
+        kernel=_jfa_pass_naive_manhattan_kernel,
         seeds=seeds,
         resolution=RESOLUTION,
-        visualize=True,
+        gif_path=os.path.join(DATA_FOLDER, "task6_manhattan_jfa_visualization.gif"),
     )
 
 
-def jfa_naive_euclidean(
-    seeds: cuda.devicearray.DeviceNDArray, resolution: int, visualize: bool = False
+def jfa_naive_host(
+    kernel: Any,  # TODO: Specify typiing
+    seeds: cuda.devicearray.DeviceNDArray,
+    resolution: int,
+    gif_path: str = None,
 ) -> np.ndarray:
     """
-    Host function that sets everything up for the naive JFA using the Euclidean distance calculation.
+    Host function that sets everything up for the naive JFA using the provided kernel (e. g. euclidean kernel).
+
+    If a path for a GIF visualisation is provided, a GIF will be generated. If not, nothing will be generated.
     """
 
     # GPU grid allocation for the ping pong
@@ -79,14 +89,19 @@ def jfa_naive_euclidean(
     k: int = resolution // 2
     while k >= 1:
         # Kernel launch
-        _jfa_pass_naive_euclidean_kernel[blocks_per_grid, threads_per_block](
-            grid_in, grid_out, k, resolution
-        )
+        kernel[blocks_per_grid, threads_per_block](grid_in, grid_out, k, resolution)
 
-        if visualize:
+        # Ping Pong: Swap the grids so that the previous result becomes the new input
+        grid_in, grid_out = grid_out, grid_in
+
+        # Divide further
+        k //= 2
+
+        if gif_path:
             # Synchronize and copy current JFA state to host
+            # grid_in holds the result output data of the last iteration due to swapping
             cuda.synchronize()
-            frame = grid_out.copy_to_host()
+            frame = grid_in.copy_to_host()
 
             # Map 2D seed coordinates (x, y) to a unique 1D ID per seed
             raw = frame[:, :, 0] + frame[:, :, 1] * resolution
@@ -95,19 +110,13 @@ def jfa_naive_euclidean(
             normalized = ((raw / raw.max()) * 255).astype(np.uint8)
             step_frames.append(normalized)
 
-        # Ping Pong: Swap the grids so that the previous result becomes the new input
-        grid_in, grid_out = grid_out, grid_in
-
-        # Divide further
-        k //= 2
-
     # Retrieve the final result
     # Since the values are swapped at the end of the loop, grid_in contains the data from the last iteration
     out_image = grid_in.copy_to_host()
 
-    if visualize:
+    if gif_path:
         imageio.imwrite(
-            os.path.join(DATA_FOLDER, "task6_euclidean_jfa_visualization.gif"),
+            gif_path,
             step_frames,
             duration=1000,
             # loop=0,
@@ -141,7 +150,7 @@ def _jfa_pass_naive_euclidean_kernel(grid_in, grid_out, step_size, size) -> None
     best_seed_y = grid_in[pixel_y, pixel_x, 1]
 
     # Calculate initial distance
-    best_dist: float = np.float32(float("inf"))
+    best_dist = np.inf
 
     # Only update distance if the current pixel already knows a valid seed
     if best_seed_x != -1 and best_seed_y != -1:
@@ -183,51 +192,6 @@ def _jfa_pass_naive_euclidean_kernel(grid_in, grid_out, step_size, size) -> None
     grid_out[pixel_y, pixel_x, 1] = best_seed_y
 
 
-def jfa_naive_manhattan(
-    seeds: cuda.devicearray.DeviceNDArray, resolution: int, visualize: bool = False
-) -> np.ndarray:
-    """
-    Host function that sets everything up for the naive JFA using the Manhattan distance calculation.
-    """
-
-    grid_in = cuda.to_device(generate_grid_jfa(seeds=seeds, resolution=resolution))
-    grid_out = cuda.device_array_like(grid_in)
-
-    blocks_per_grid, threads_per_block = make_grid_configuration(
-        resolution=resolution, threads_per_dimension=16
-    )
-
-    # Jump Flooding Loop (Ping Pong)
-    step_frames: list[np.ndarray] = []
-    k: int = resolution // 2
-    while k >= 1:
-        _jfa_pass_naive_manhattan_kernel[blocks_per_grid, threads_per_block](
-            grid_in, grid_out, k, resolution
-        )
-
-        if visualize:
-            cuda.synchronize()
-            frame = grid_out.copy_to_host()
-            raw = frame[:, :, 0] + frame[:, :, 1] * resolution
-            normalized = ((raw / raw.max()) * 255).astype(np.uint8)
-            step_frames.append(normalized)
-
-        grid_in, grid_out = grid_out, grid_in
-        k //= 2
-
-    out_image = grid_in.copy_to_host()
-
-    if visualize:
-        imageio.imwrite(
-            os.path.join(DATA_FOLDER, "task6_manhattan_jfa_visualization.gif"),
-            step_frames,
-            duration=1000,
-            # loop=0,
-        )
-
-    return out_image[:, :, 0] + out_image[:, :, 1] * resolution
-
-
 @cuda.jit("void(int32[:,:,:], int32[:,:,:], int32, int32)")
 def _jfa_pass_naive_manhattan_kernel(grid_in, grid_out, step_size, size) -> None:
     """
@@ -240,7 +204,7 @@ def _jfa_pass_naive_manhattan_kernel(grid_in, grid_out, step_size, size) -> None
 
     best_seed_x = grid_in[pixel_y, pixel_x, 0]
     best_seed_y = grid_in[pixel_y, pixel_x, 1]
-    best_dist: float = np.float32(float("inf"))
+    best_dist = np.inf
     if best_seed_x != -1 and best_seed_y != -1:
         best_dist = calculate_manhattan_distance(
             pixel_x, pixel_y, best_seed_x, best_seed_y
