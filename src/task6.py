@@ -7,15 +7,18 @@ from matplotlib import pyplot as plt
 
 from constants import DATA_FOLDER
 from utils import (
+    generate_grid_jfa,
+    generate_random_seeds_jfa,
     make_grid_configuration,
     calculate_square_euclidean_distance,
+    calculate_manhattan_distance,
 )
 
 # Resolution of the image containing the voronoi diagram
 RESOLUTION: int = 512  # 1024
 
 # The number of seeds (points) in the diagram
-SEED_COUNT: int = 200  # 2000
+SEED_COUNT: int = 100  # 2000
 
 
 def main() -> None:
@@ -24,45 +27,23 @@ def main() -> None:
     Test the implementations and generate example diagrams for the Jump Flooding Algorithm (JFA).
     """
 
+    seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
+
     # Naive Euclidean JFA
-    image = jfa_naive_euclidean(
-        seeds=generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION),
+    image_euclidean = jfa_naive_euclidean(
+        seeds=seeds,
         resolution=RESOLUTION,
     )
-    plt.imshow(image)
+    plt.imshow(image_euclidean)  # , cmap="prism")
     plt.show()
 
-
-def generate_random_seeds_jfa(seed_count: int, resolution: int) -> np.ndarray:
-    """
-    Generate a random array of seed positions within the resolution range.
-    The array contains seed_count entries, with each entry representing the x and y position of a seed within the grid (integer).
-    """
-
-    return np.random.randint(low=0, high=resolution, size=(seed_count, 2))
-
-
-def generate_grid_jfa(seeds: np.ndarray, resolution: int) -> np.ndarray:
-    """
-    Generate a grid data structure for the JFA.
-    Each pixel in the grid represents the x and y position of the nearest seed. During initialisation,
-    each pixel is given a default value of '-1', indicating that no seed position has been set.
-    At the start, each seed knows its position and is therefore set directly in the grid configuration.
-    """
-
-    # Construct and initialize a grid: Each pixel stores the position of the closest seed (seed_x, seed_y)
-    # Initialization of '-1' means: "No seed known yet"
-    grid: np.ndarray = np.full(
-        shape=(resolution, resolution, 2), fill_value=-1, dtype=np.int32
+    # Naive Manhattan JFA
+    image_manhattan = jfa_naive_manhattan(
+        seeds=seeds,
+        resolution=RESOLUTION,
     )
-
-    # Set the positions of the seeds in the grid
-    # Each seed knows its own position at the start
-    for seed_x, seed_y in seeds:
-        grid[seed_y, seed_x, 0] = seed_x
-        grid[seed_y, seed_x, 1] = seed_y
-
-    return grid
+    plt.imshow(image_manhattan)  # , cmap="prism")
+    plt.show()
 
 
 def jfa_naive_euclidean(
@@ -86,7 +67,7 @@ def jfa_naive_euclidean(
     k: int = resolution // 2
     while k >= 1:
         # Kernel launch
-        _jfa_pass_naive_kernel[blocks_per_grid, threads_per_block](
+        _jfa_pass_naive_euclidean_kernel[blocks_per_grid, threads_per_block](
             grid_in, grid_out, k, resolution
         )
 
@@ -105,7 +86,7 @@ def jfa_naive_euclidean(
 
 
 @cuda.jit("void(int32[:,:,:], int32[:,:,:], int32, int32)")
-def _jfa_pass_naive_kernel(grid_in, grid_out, step_size, size) -> None:
+def _jfa_pass_naive_euclidean_kernel(grid_in, grid_out, step_size, size) -> None:
     """
     Executes a single pass of the Jump Flooding Algorithm (JFA) on the GPU.
 
@@ -128,7 +109,7 @@ def _jfa_pass_naive_kernel(grid_in, grid_out, step_size, size) -> None:
     best_seed_y = grid_in[pixel_y, pixel_x, 1]
 
     # Calculate initial distance
-    best_dist: float = float("inf")
+    best_dist: float = np.float32(float("inf"))
 
     # Only update distance if the current pixel already knows a valid seed
     if best_seed_x != -1 and best_seed_y != -1:
@@ -170,11 +151,78 @@ def _jfa_pass_naive_kernel(grid_in, grid_out, step_size, size) -> None:
     grid_out[pixel_y, pixel_x, 1] = best_seed_y
 
 
+def jfa_naive_manhattan(
+    seeds: cuda.devicearray.DeviceNDArray, resolution: int
+) -> np.ndarray:
+    """
+    Host function that sets everything up for the naive JFA using the Manhattan distance calculation.
+    """
+
+    grid_in = cuda.to_device(generate_grid_jfa(seeds=seeds, resolution=resolution))
+    grid_out = cuda.device_array_like(grid_in)
+
+    blocks_per_grid, threads_per_block = make_grid_configuration(
+        resolution=resolution, threads_per_dimension=16
+    )
+
+    # Jump Flooding Loop (Ping Pong)
+    k: int = resolution // 2
+    while k >= 1:
+        _jfa_pass_naive_manhattan_kernel[blocks_per_grid, threads_per_block](
+            grid_in, grid_out, k, resolution
+        )
+        grid_in, grid_out = grid_out, grid_in
+        k //= 2
+
+    out_image = grid_in.copy_to_host()
+    return out_image[:, :, 0] + out_image[:, :, 1] * resolution
+
+
+@cuda.jit("void(int32[:,:,:], int32[:,:,:], int32, int32)")
+def _jfa_pass_naive_manhattan_kernel(grid_in, grid_out, step_size, size) -> None:
+    """
+    Executes a single pass of the Jump Flooding Algorithm (JFA) on the GPU (using Manhattan distance).
+    """
+
+    pixel_x, pixel_y = cuda.grid(2)
+    if pixel_x >= size or pixel_y >= size:
+        return
+
+    best_seed_x = grid_in[pixel_y, pixel_x, 0]
+    best_seed_y = grid_in[pixel_y, pixel_x, 1]
+    best_dist: float = np.float32(float("inf"))
+    if best_seed_x != -1 and best_seed_y != -1:
+        best_dist = calculate_manhattan_distance(
+            pixel_x, pixel_y, best_seed_x, best_seed_y
+        )
+
+    # Look for all eight neighbours with the current step size k
+    for dy in (-1, 0, 1):
+        for dx in (-1, 0, 1):
+            neighbour_x = pixel_x + dx * step_size
+            neighbour_y = pixel_y + dy * step_size
+
+            if (0 <= neighbour_x < size) and (0 <= neighbour_y < size):
+                seed_x = grid_in[neighbour_y, neighbour_x, 0]
+                seed_y = grid_in[neighbour_y, neighbour_x, 1]
+
+                # Check if the neighbour already knows a seed
+                if seed_x != -1 and seed_y != -1:
+                    dist = calculate_manhattan_distance(
+                        pixel_x, pixel_y, seed_x, seed_y
+                    )
+
+                    # Check whether the newly found seed is closer than the last one saved
+                    if dist < best_dist:
+                        best_dist = dist
+                        best_seed_x = seed_x
+                        best_seed_y = seed_y
+
+    grid_out[pixel_y, pixel_x, 0] = best_seed_x
+    grid_out[pixel_y, pixel_x, 1] = best_seed_y
+
+
 def jfa_ping_pong_loop():
-    pass
-
-
-def jfa_naive_manhattan():
     pass
 
 

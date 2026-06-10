@@ -29,6 +29,38 @@ def generate_uniform_points(point_count: int) -> cuda.devicearray.DeviceNDArray:
     return cuda.to_device(points)
 
 
+def generate_random_seeds_jfa(seed_count: int, resolution: int) -> np.ndarray:
+    """
+    Generate a random array of seed positions within the resolution range.
+    The array contains seed_count entries, with each entry representing the x and y position of a seed within the grid (integer).
+    """
+
+    return np.random.randint(low=0, high=resolution, size=(seed_count, 2))
+
+
+def generate_grid_jfa(seeds: np.ndarray, resolution: int) -> np.ndarray:
+    """
+    Generate a grid data structure for the JFA.
+    Each pixel in the grid represents the x and y position of the nearest seed. During initialisation,
+    each pixel is given a default value of '-1', indicating that no seed position has been set.
+    At the start, each seed knows its position and is therefore set directly in the grid configuration.
+    """
+
+    # Construct and initialize a grid: Each pixel stores the position of the closest seed (seed_x, seed_y)
+    # Initialization of '-1' means: "No seed known yet"
+    grid: np.ndarray = np.full(
+        shape=(resolution, resolution, 2), fill_value=-1, dtype=np.int32
+    )
+
+    # Set the positions of the seeds in the grid
+    # Each seed knows its own position at the start
+    for seed_x, seed_y in seeds:
+        grid[seed_y, seed_x, 0] = seed_x
+        grid[seed_y, seed_x, 1] = seed_y
+
+    return grid
+
+
 def make_empty_voronoi_output(resolution: int, fill_value: int | None = None) -> cuda.devicearray.DeviceNDArray:
     """
     An empty voronoi diagram on the device
