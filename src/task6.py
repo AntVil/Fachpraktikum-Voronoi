@@ -15,10 +15,11 @@ from utils import (
 )
 
 # Resolution of the image containing the voronoi diagram
-RESOLUTION: int = 512  # 1024
+RESOLUTION: int = 1024
 
 # The number of seeds (points) in the diagram
-SEED_COUNT: int = 100  # 2000
+SEED_COUNT: int = 2000
+SEED_COUNT_VISU: int = 256
 
 
 def main() -> None:
@@ -27,27 +28,37 @@ def main() -> None:
     Test the implementations and generate example diagrams for the Jump Flooding Algorithm (JFA).
     """
 
+    # Naive Euclidean and Manhattan JFA
     seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
-
-    # Naive Euclidean JFA
     image_euclidean = jfa_naive_euclidean(
         seeds=seeds,
         resolution=RESOLUTION,
     )
-    plt.imshow(image_euclidean)  # , cmap="prism")
-    plt.show()
-
-    # Naive Manhattan JFA
     image_manhattan = jfa_naive_manhattan(
         seeds=seeds,
         resolution=RESOLUTION,
     )
-    plt.imshow(image_manhattan)  # , cmap="prism")
+    plt.imshow(image_euclidean)
     plt.show()
+    plt.imshow(image_manhattan)
+    plt.show()
+
+    # Generate GIFs for visualisation
+    seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT_VISU, resolution=RESOLUTION)
+    jfa_naive_euclidean(
+        seeds=seeds,
+        resolution=RESOLUTION,
+        visualize=True,
+    )
+    jfa_naive_manhattan(
+        seeds=seeds,
+        resolution=RESOLUTION,
+        visualize=True,
+    )
 
 
 def jfa_naive_euclidean(
-    seeds: cuda.devicearray.DeviceNDArray, resolution: int
+    seeds: cuda.devicearray.DeviceNDArray, resolution: int, visualize: bool = False
 ) -> np.ndarray:
     """
     Host function that sets everything up for the naive JFA using the Euclidean distance calculation.
@@ -64,12 +75,25 @@ def jfa_naive_euclidean(
 
     # Jump Flooding Loop (Ping Pong)
     # The step size starts at N/2 and is halved with each step until it reaches 1
+    step_frames: list[np.ndarray] = []
     k: int = resolution // 2
     while k >= 1:
         # Kernel launch
         _jfa_pass_naive_euclidean_kernel[blocks_per_grid, threads_per_block](
             grid_in, grid_out, k, resolution
         )
+
+        if visualize:
+            # Synchronize and copy current JFA state to host
+            cuda.synchronize()
+            frame = grid_out.copy_to_host()
+
+            # Map 2D seed coordinates (x, y) to a unique 1D ID per seed
+            raw = frame[:, :, 0] + frame[:, :, 1] * resolution
+
+            # Normalize IDs to 0...255 grayscale range for visual output (GIF)
+            normalized = ((raw / raw.max()) * 255).astype(np.uint8)
+            step_frames.append(normalized)
 
         # Ping Pong: Swap the grids so that the previous result becomes the new input
         grid_in, grid_out = grid_out, grid_in
@@ -81,7 +105,15 @@ def jfa_naive_euclidean(
     # Since the values are swapped at the end of the loop, grid_in contains the data from the last iteration
     out_image = grid_in.copy_to_host()
 
-    # Each seed is assigned a unique ID
+    if visualize:
+        imageio.imwrite(
+            os.path.join(DATA_FOLDER, "task6_euclidean_jfa_visualization.gif"),
+            step_frames,
+            duration=1000,
+            # loop=0,
+        )
+
+    # Each seed is assigned a unique ID (ID = x + y*resolution)
     return out_image[:, :, 0] + out_image[:, :, 1] * resolution
 
 
@@ -152,7 +184,7 @@ def _jfa_pass_naive_euclidean_kernel(grid_in, grid_out, step_size, size) -> None
 
 
 def jfa_naive_manhattan(
-    seeds: cuda.devicearray.DeviceNDArray, resolution: int
+    seeds: cuda.devicearray.DeviceNDArray, resolution: int, visualize: bool = False
 ) -> np.ndarray:
     """
     Host function that sets everything up for the naive JFA using the Manhattan distance calculation.
@@ -166,15 +198,33 @@ def jfa_naive_manhattan(
     )
 
     # Jump Flooding Loop (Ping Pong)
+    step_frames: list[np.ndarray] = []
     k: int = resolution // 2
     while k >= 1:
         _jfa_pass_naive_manhattan_kernel[blocks_per_grid, threads_per_block](
             grid_in, grid_out, k, resolution
         )
+
+        if visualize:
+            cuda.synchronize()
+            frame = grid_out.copy_to_host()
+            raw = frame[:, :, 0] + frame[:, :, 1] * resolution
+            normalized = ((raw / raw.max()) * 255).astype(np.uint8)
+            step_frames.append(normalized)
+
         grid_in, grid_out = grid_out, grid_in
         k //= 2
 
     out_image = grid_in.copy_to_host()
+
+    if visualize:
+        imageio.imwrite(
+            os.path.join(DATA_FOLDER, "task6_manhattan_jfa_visualization.gif"),
+            step_frames,
+            duration=1000,
+            # loop=0,
+        )
+
     return out_image[:, :, 0] + out_image[:, :, 1] * resolution
 
 
