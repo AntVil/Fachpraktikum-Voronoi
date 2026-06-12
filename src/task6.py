@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from numba import cuda
-from typing import Any
+from typing import Any, Literal
 import imageio.v3 as imageio
 from matplotlib import pyplot as plt
 
@@ -60,6 +60,18 @@ def main() -> None:
         resolution=RESOLUTION,
         gif_path=os.path.join(DATA_FOLDER, "task6_manhattan_jfa_visualization.gif"),
     )
+
+    # JFA+1 and JFA+2
+    plt.imshow(
+        jfa_plusX_voronoi(
+            seeds=generate_random_seeds_jfa(
+                seed_count=SEED_COUNT, resolution=RESOLUTION
+            ),
+            resolution=RESOLUTION,
+            mode="jfa+1",
+        )
+    )
+    plt.show()
 
 
 def jfa_naive_host(
@@ -123,6 +135,61 @@ def jfa_naive_host(
         )
 
     # Each seed is assigned a unique ID (ID = x + y*resolution)
+    return out_image[:, :, 0] + out_image[:, :, 1] * resolution
+
+
+def jfa_plusX_voronoi(
+    seeds: cuda.devicearray.DeviceNDArray,
+    resolution: int,
+    mode: Literal["standard", "jfa+1", "jfa+2"] = "standard",
+) -> np.ndarray:
+    """
+    Host function to calculate the voronoi diagram using the Jump Flood Algorithm on the GPU.
+
+    Parameters:
+        seeds: The input array containing the seed coordinates.
+        resolution: The image resolution.
+        mode: The JFA variant ('standard', 'JFA+1', or 'JFA+2').
+    """
+
+    # Determine the additional steps based on the parameter
+    if mode == "standard":
+        extra_steps = []
+    elif mode == "jfa+1":
+        extra_steps = [1]
+    elif mode == "jfa+2":
+        extra_steps = [2, 1]
+    else:
+        raise ValueError(
+            f"Unbekannter JFA-Modus: {mode}. Erlaubt sind 'standard', 'jfa+1', 'jfa+2'."
+        )
+
+    # Initialization
+    grid_in = cuda.to_device(generate_grid_jfa(seeds=seeds, resolution=resolution))
+    grid_out = cuda.device_array_like(grid_in)
+    blocks_per_grid, threads_per_block = make_grid_configuration(
+        resolution=resolution, threads_per_dimension=16
+    )
+
+    # Main JFA loop
+    k: int = resolution // 2
+    while k >= 1:
+        _jfa_pass_naive_euclidean_kernel[blocks_per_grid, threads_per_block](
+            grid_in, grid_out, k, resolution
+        )
+        grid_in, grid_out = grid_out, grid_in
+        k //= 2
+
+    # Additional Steps (JFA+1/JFA+2):
+    # If the 'extra_steps' field is empty for the 'standard', this loop is skipped
+    for step_size in extra_steps:
+        _jfa_pass_naive_euclidean_kernel[blocks_per_grid, threads_per_block](
+            grid_in, grid_out, step_size, resolution
+        )
+        grid_in, grid_out = grid_out, grid_in
+
+    # Retrieve data and calculate UIDs
+    out_image = grid_in.copy_to_host()
     return out_image[:, :, 0] + out_image[:, :, 1] * resolution
 
 
@@ -234,18 +301,6 @@ def _jfa_pass_naive_manhattan_kernel(grid_in, grid_out, step_size, size) -> None
 
     grid_out[pixel_y, pixel_x, 0] = best_seed_x
     grid_out[pixel_y, pixel_x, 1] = best_seed_y
-
-
-def jfa_ping_pong_loop():
-    pass
-
-
-def jfa_plus1_naive_euclidean():
-    pass
-
-
-def jfa_plus2_naive_euclidean():
-    pass
 
 
 if __name__ == "__main__":
