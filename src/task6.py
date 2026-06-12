@@ -31,12 +31,12 @@ def main() -> None:
 
     # Naive Euclidean and Manhattan JFA
     seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
-    image_euclidean = jfa_naive_host(
+    image_euclidean = jfa_voronoi_host(
         kernel=_jfa_pass_naive_euclidean_kernel,
         seeds=seeds,
         resolution=RESOLUTION,
     )
-    image_manhattan = jfa_naive_host(
+    image_manhattan = jfa_voronoi_host(
         kernel=_jfa_pass_naive_manhattan_kernel,
         seeds=seeds,
         resolution=RESOLUTION,
@@ -46,45 +46,75 @@ def main() -> None:
     plt.imshow(image_manhattan)
     plt.show()
 
-    # Generate GIFs for visualisation
-    seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT_VISU, resolution=RESOLUTION)
-    jfa_naive_host(
-        kernel=_jfa_pass_naive_euclidean_kernel,
-        seeds=seeds,
-        resolution=RESOLUTION,
-        gif_path=os.path.join(DATA_FOLDER, "task6_euclidean_jfa_visualization.gif"),
-    )
-    jfa_naive_host(
-        kernel=_jfa_pass_naive_manhattan_kernel,
-        seeds=seeds,
-        resolution=RESOLUTION,
-        gif_path=os.path.join(DATA_FOLDER, "task6_manhattan_jfa_visualization.gif"),
-    )
-
     # JFA+1 and JFA+2
     plt.imshow(
-        jfa_plusX_voronoi(
-            seeds=generate_random_seeds_jfa(
-                seed_count=SEED_COUNT, resolution=RESOLUTION
-            ),
+        jfa_voronoi_host(
+            kernel=_jfa_pass_naive_euclidean_kernel,
+            seeds=seeds,
             resolution=RESOLUTION,
             mode="jfa+1",
         )
     )
     plt.show()
 
+    # Generate GIFs for visualisation
+    seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT_VISU, resolution=RESOLUTION)
+    jfa_voronoi_host(
+        kernel=_jfa_pass_naive_euclidean_kernel,
+        seeds=seeds,
+        resolution=RESOLUTION,
+        gif_path=os.path.join(DATA_FOLDER, "task6_euclidean_jfa_visualization.gif"),
+    )
+    jfa_voronoi_host(
+        kernel=_jfa_pass_naive_manhattan_kernel,
+        seeds=seeds,
+        resolution=RESOLUTION,
+        gif_path=os.path.join(DATA_FOLDER, "task6_manhattan_jfa_visualization.gif"),
+    )
 
-def jfa_naive_host(
+
+
+def jfa_voronoi_host(
     kernel: Any,  # TODO: Specify typiing
-    seeds: cuda.devicearray.DeviceNDArray,
+    seeds: np.ndarray,
     resolution: int,
-    gif_path: str = None,
+    mode: Literal["standard", "jfa+1", "jfa+2"] = "standard",
+    gif_path: str | None = None,
 ) -> np.ndarray:
     """
-    Host function that sets everything up for the naive JFA using the provided kernel (e. g. euclidean kernel).
+    Host function that sets everything up for the naive JFA.
 
-    If a path for a GIF visualisation is provided, a GIF will be generated. If not, nothing will be generated.
+    Parameters:
+        kernel: The JFA kernel, used for each iteration of the JFA loop (e. g. euclidean kernel).
+        seeds: The input array containing the seed coordinates.
+        resolution: The image resolution.
+        mode: The JFA variant ('standard', 'JFA+1', or 'JFA+2').
+        gif_path: If a path for a GIF visualisation is provided, a GIF will be generated. If not, nothing will be generated.
     """
+
+    # Determine all step sizes once before the entire run
+    steps: list[int] = []
+
+    # Standard JFA steps
+    # The step size starts at N/2 and is halved with each step until it reaches 1
+    step_size: int = resolution // 2
+    while step_size >= 1:
+        steps.append(step_size)
+
+        # Divide further
+        step_size //= 2
+
+    # Determine additional setps at the end (JFA+1/JFA+2)
+    if mode == "standard":
+        pass
+    elif mode == "jfa+1":
+        steps.extend([1])
+    elif mode == "jfa+2":
+        steps.extend([2, 1])
+    else:
+        raise ValueError(
+            f"Unknown JFA mode: {mode}. Valid values are 'standard', 'jfa+1', and 'jfa+2'."
+        )
 
     # GPU grid allocation for the ping pong
     grid_in = cuda.to_device(generate_grid_jfa(seeds=seeds, resolution=resolution))
@@ -95,20 +125,16 @@ def jfa_naive_host(
         resolution=resolution, threads_per_dimension=16
     )
 
-    # Jump Flooding Loop (Ping Pong)
-    # The step size starts at N/2 and is halved with each step until it reaches 1
+    # Jump Flooding Loop over ALL calculated steps (Ping Pong)
     step_frames: list[np.ndarray] = []
-    k: int = resolution // 2
-    while k >= 1:
+    for step_size in steps:
         # Kernel launch
-        kernel[blocks_per_grid, threads_per_block](grid_in, grid_out, k, resolution)
+        kernel[blocks_per_grid, threads_per_block](grid_in, grid_out, step_size, resolution)
 
         # Ping Pong: Swap the grids so that the previous result becomes the new input
         grid_in, grid_out = grid_out, grid_in
 
-        # Divide further
-        k //= 2
-
+        # Optional frame capture for the GIF
         if gif_path:
             # Synchronize and copy current JFA state to host
             # grid_in holds the result output data of the last iteration due to swapping
@@ -126,6 +152,7 @@ def jfa_naive_host(
     # Since the values are swapped at the end of the loop, grid_in contains the data from the last iteration
     out_image = grid_in.copy_to_host()
 
+    # Save as a GIF
     if gif_path:
         imageio.imwrite(
             gif_path,
@@ -135,61 +162,6 @@ def jfa_naive_host(
         )
 
     # Each seed is assigned a unique ID (ID = x + y*resolution)
-    return out_image[:, :, 0] + out_image[:, :, 1] * resolution
-
-
-def jfa_plusX_voronoi(
-    seeds: cuda.devicearray.DeviceNDArray,
-    resolution: int,
-    mode: Literal["standard", "jfa+1", "jfa+2"] = "standard",
-) -> np.ndarray:
-    """
-    Host function to calculate the voronoi diagram using the Jump Flood Algorithm on the GPU.
-
-    Parameters:
-        seeds: The input array containing the seed coordinates.
-        resolution: The image resolution.
-        mode: The JFA variant ('standard', 'JFA+1', or 'JFA+2').
-    """
-
-    # Determine the additional steps based on the parameter
-    if mode == "standard":
-        extra_steps = []
-    elif mode == "jfa+1":
-        extra_steps = [1]
-    elif mode == "jfa+2":
-        extra_steps = [2, 1]
-    else:
-        raise ValueError(
-            f"Unbekannter JFA-Modus: {mode}. Erlaubt sind 'standard', 'jfa+1', 'jfa+2'."
-        )
-
-    # Initialization
-    grid_in = cuda.to_device(generate_grid_jfa(seeds=seeds, resolution=resolution))
-    grid_out = cuda.device_array_like(grid_in)
-    blocks_per_grid, threads_per_block = make_grid_configuration(
-        resolution=resolution, threads_per_dimension=16
-    )
-
-    # Main JFA loop
-    k: int = resolution // 2
-    while k >= 1:
-        _jfa_pass_naive_euclidean_kernel[blocks_per_grid, threads_per_block](
-            grid_in, grid_out, k, resolution
-        )
-        grid_in, grid_out = grid_out, grid_in
-        k //= 2
-
-    # Additional Steps (JFA+1/JFA+2):
-    # If the 'extra_steps' field is empty for the 'standard', this loop is skipped
-    for step_size in extra_steps:
-        _jfa_pass_naive_euclidean_kernel[blocks_per_grid, threads_per_block](
-            grid_in, grid_out, step_size, resolution
-        )
-        grid_in, grid_out = grid_out, grid_in
-
-    # Retrieve data and calculate UIDs
-    out_image = grid_in.copy_to_host()
     return out_image[:, :, 0] + out_image[:, :, 1] * resolution
 
 
