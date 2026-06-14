@@ -154,6 +154,9 @@ def make_grid_configuration(resolution: int, threads_per_dimension: int = 16) ->
     return (blocks_per_grid, threads_per_block)
 
 
+# MARK: Device-Functions
+
+
 @cuda.jit(device=True, inline=True)
 def get_thread_position(image: cuda.devicearray.DeviceNDArray) -> tuple[int, int, float, float]:
     """
@@ -169,6 +172,26 @@ def get_thread_position(image: cuda.devicearray.DeviceNDArray) -> tuple[int, int
     y_coordinate = float(y_index) / float(image.shape[1])
 
     return (x_index, y_index, x_coordinate, y_coordinate)
+
+
+@cuda.jit(device=True, inline=True)
+def get_thread_grid_stride_start() -> tuple[int, int]:
+    """
+    Get the indices for indexing into the points array for each block in a grid-stride-loop.
+
+    `stride_offset_point`: The initial point this thread should load, aka the offset inside the grid-stride-loop
+    `stride_offset_dimension`: The dimension of the point this thread will take care of.
+
+    For every point there will be two threads, where the first loads `x` and the seconds loads `y` from global memory.
+    """
+
+    # Unique index inside a block
+    thread_index: int = cuda.threadIdx.y * cuda.blockDim.x + cuda.threadIdx.x
+
+    stride_offset_point = thread_index // 2
+    stride_offset_dimension = thread_index % 2
+
+    return (stride_offset_point, stride_offset_dimension)
 
 
 @cuda.jit(device=True, inline=True)

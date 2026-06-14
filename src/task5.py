@@ -1,0 +1,118 @@
+from numba import cuda
+import numpy as np
+from matplotlib import pyplot as plt
+
+from utils import (
+    get_argument,
+    generate_uniform_points,
+    make_empty_voronoi_output,
+    make_grid_configuration,
+    get_thread_position,
+    is_outside_image,
+    calculate_square_euclidean_distance,
+    get_thread_grid_stride_start
+)
+
+
+GRID_STRIDE_SIZE = 128
+"""
+Number of points which will be loaded inside grid-stride-loop (be aware that each point consists of 2 values)
+"""
+
+
+def main() -> None:
+    command = get_argument()
+
+    point_count = 2_000
+    resolution = 1024
+
+    if command == "euclidean-grid-stride":
+        image = voronoi_euclidean_grid_stride(
+            points=generate_uniform_points(point_count=point_count),
+            resolution=resolution
+        )
+        plt.imshow(image)
+        plt.show()
+    else:
+        print(f"Error: unknown command '{command}'")
+        exit(1)
+
+
+def voronoi_euclidean_grid_stride(
+    points: cuda.devicearray.DeviceNDArray,
+    resolution: int
+) -> np.ndarray:
+    out_image = make_empty_voronoi_output(resolution=resolution)
+
+    blocks_per_grid, threads_per_block = make_grid_configuration(
+        resolution=resolution,
+        threads_per_dimension=16
+    )
+
+    assert np.prod(threads_per_block) > GRID_STRIDE_SIZE, f"threads_per_block={threads_per_block} and GRID_STRIDE_SIZE={GRID_STRIDE_SIZE} are incompatible, points would be missed, either increase threads_per_block or decrease GRID_STRIDE_SIZE."
+
+    _voroni_euclidean_grid_stride_kernel[blocks_per_grid, threads_per_block](
+        points,
+        out_image
+    )
+
+    return out_image.copy_to_host()
+
+
+@cuda.jit("void(float64[:, :], int32[:, :])")
+def _voroni_euclidean_grid_stride_kernel(
+    in_points: cuda.devicearray.DeviceNDArray,
+    out_image: cuda.devicearray.DeviceNDArray
+) -> None:
+    closest_index = 0
+    closest_distance = np.inf
+
+    (x_index, y_index, x_coordinate, y_coordinate) = get_thread_position(image=out_image)
+
+    (stride_offset_point, stride_offset_dimension) = get_thread_grid_stride_start()
+
+    # NOTE: local buffer with same characteristics like `in_points`, just smaller
+    shared_buffer: cuda.devicearray.DeviceNDArray = cuda.shared.array(shape=(GRID_STRIDE_SIZE, 2), dtype=np.float64)
+
+    for stride_index in range(0, in_points.shape[0], GRID_STRIDE_SIZE):
+        # NOTE: check if thread is inside `shared_buffer`
+        if stride_offset_point < GRID_STRIDE_SIZE:
+            global_point_index = stride_index + stride_offset_point
+
+            # NOTE: check if point exists
+            if global_point_index < in_points.shape[0]:
+                shared_buffer[stride_offset_point, stride_offset_dimension] = in_points[global_point_index, stride_offset_dimension]
+            else:
+                # NOTE: default value for missing points
+                shared_buffer[stride_offset_point, stride_offset_dimension] = np.inf
+
+        cuda.syncthreads()
+
+        # NOTE: Go through shared memory and do the actual algorithm
+        for index in range(0, GRID_STRIDE_SIZE):
+            (point_x_coordinate, point_y_coordinate) = shared_buffer[index]
+
+            distance = calculate_square_euclidean_distance(
+                x_coordinate = x_coordinate,
+                y_coordinate = y_coordinate,
+                point_x_coordinate = point_x_coordinate,
+                point_y_coordinate = point_y_coordinate
+            )
+
+            if distance < closest_distance:
+                closest_distance = distance
+                global_point_index = stride_index + index
+                closest_index = global_point_index
+
+        cuda.syncthreads()
+
+    # NOTE: this cannot be done earlier as each thread now has more responsibilities
+    # (A thread might be outside the image, but still is required for loading data)
+    if is_outside_image(x_index=x_index, y_index=y_index, image=out_image):
+        return
+
+    out_image[x_index, y_index] = closest_index
+
+
+if __name__ == "__main__":
+    main()
