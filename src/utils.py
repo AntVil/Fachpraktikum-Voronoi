@@ -3,6 +3,13 @@ import numpy as np
 import sys
 
 
+# Numpy will use same random values across executions
+np.random.seed(42)
+
+
+DISTANCE_FIELD_CONTRAST_FACTOR = 4
+
+
 def get_argument() -> str | None:
     """
     Most basic sub-command parsing
@@ -79,6 +86,56 @@ def make_empty_voronoi_output(resolution: int, fill_value: int | None = None) ->
                 dtype=np.int32
             )
         )
+
+
+def make_empty_distance_field_output(resolution: int, fill_value: float | None = None) -> cuda.devicearray.DeviceNDArray:
+    """
+    An empty distance field diagram on the device
+    """
+
+    if fill_value == None:
+        return cuda.device_array(
+            shape=(resolution, resolution),
+            dtype=np.float64
+        )
+    else:
+        return cuda.to_device(
+            np.full(
+                shape=(resolution, resolution),
+                fill_value=fill_value,
+                dtype=np.float64
+            )
+        )
+
+
+def euclidean_distance_field_to_gif_frame(image: np.ndarray) -> np.ndarray:
+    assert image.dtype == np.float64, f"Wrong dtype for frame conversion: {image.dtype}"
+
+    # greatest distance is diagonal across frame, which is `sqrt(2)`, which we map to `255`
+    factor = 255 / np.sqrt(2)
+
+    # actually contrast is a bit low, increase a bit
+    return np.array(np.clip(image * factor * DISTANCE_FIELD_CONTRAST_FACTOR, a_min=0, a_max=255), dtype=np.int8)
+
+
+def euclidean_squared_distance_field_to_gif_frame(image: np.ndarray) -> np.ndarray:
+    assert image.dtype == np.float64, f"Wrong dtype for frame conversion: {image.dtype}"
+
+    # greatest distance is diagonal across frame, which is `2`, which we map to `255`
+    factor = 255 / 2
+
+    # actually contrast is a bit low, increase a bit
+    return np.array(np.clip(image * factor * DISTANCE_FIELD_CONTRAST_FACTOR, a_min=0, a_max=255), dtype=np.int8)
+
+
+def manhattan_distance_field_to_gif_frame(image: np.ndarray) -> np.ndarray:
+    assert image.dtype == np.float64, f"Wrong dtype for frame conversion: {image.dtype}"
+
+    # greatest distance is diagonal across frame, which is `2`, which we map to `255`
+    factor = 255 / 2
+
+    # actually contrast is a bit low, increase a bit
+    return np.array(np.clip(image * factor * DISTANCE_FIELD_CONTRAST_FACTOR, a_min=0, a_max=255), dtype=np.int8)
 
 
 def make_grid_configuration(resolution: int, threads_per_dimension: int = 16) -> tuple[tuple[int, int], tuple[int, int]]:

@@ -43,9 +43,14 @@ Beim iterieren wird die Distanz zu jedem Punkt berechnet und der Index des am n�
 
 Folgende Animation gibt an, wie das Ergebnis nach jeder Iteration, also Hinzunahme eines weiteren Punkt, aussieht.
 
-![](../data/task3_euclidean_visualization.gif)
+| Voronoi                                        | Distanzen                                            |
+| ---------------------------------------------- | ---------------------------------------------------- |
+| ![](../data/task3_euclidean_visualization.gif) | ![](../data/task3_euclidean_field_visualization.gif) |
 
-Aus dieser Animation ist ersichtlich, dass jeder Pixel immer den bisherigen nächsten Nachbar verwaltet und inkrementell weitere Punkte hinzunimmt.
+Aus dieser Animation ist ersichtlich, dass jeder Pixel immer den bisherigen nächsten Nachbar verwaltet und inkrementell weitere Punkte hinzunimmt. In der beistehenden Animation sind die Distanzen zu sehen. Hierbei ist zu erkennen, dass die Distanzen sich mit jeder Iterationen verringern (oder gleich bleiben).
+
+> [!note]
+> Das berechneten Distanzen wurden aus dem Wertebereich $0$ bis $\sqrt{2}$ in den Wertebereich $0$ bis $255$ abgebildet. Zur besseren Visualisierung wurden die Distanzen mit dem Faktor $4$ hoch-skaliert und an der Oberen-Grenze abgeschnitten. Die Begründung hierfür ist, dass auch bei den letzten Iterationen der Animation noch Änderungen mit bloßem Auge zu erkennen sind. Für andere Animationen der Distanzen wird ebenfalls mit dem gleichen Faktor hoch-skaliert um Vergleiche zu ermöglichen.
 
 _Wieso arbeitet der Algorithmus korrekt?_
 
@@ -77,7 +82,9 @@ Der zuvor beschriebene Algorithmus ist Distanz-Funktion agnostisch, weswegen nur
 
 Folgende Animation wurde für die Manhattan-Distanz erstellt.
 
-![](../data/task3_manhattan_visualization.gif)
+| Voronoi                                        | Distanzen                                            |
+| ---------------------------------------------- | ---------------------------------------------------- |
+| ![](../data/task3_manhattan_visualization.gif) | ![](../data/task3_manhattan_field_visualization.gif) |
 
 `TODO: erwähnen, dass Manhattan schneller ist -> Motivation für Aufgabe 4`
 
