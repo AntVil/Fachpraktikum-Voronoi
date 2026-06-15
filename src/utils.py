@@ -200,7 +200,7 @@ def is_outside_image(x_index: int, y_index: int, image: cuda.devicearray.DeviceN
     Check wether the pixel is outside the image or not
     """
 
-    return x_index >= image.shape[0] and y_index >= image.shape[1]
+    return x_index >= image.shape[0] or y_index >= image.shape[1]
 
 
 @cuda.jit(device=True, inline=True)
