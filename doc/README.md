@@ -25,6 +25,15 @@ _Welche Parameter sind entscheidend für das Problem und welchen Einfluss haben 
 
 # Aufgabe 2 - Performance Analyse Konzept
 
+```
+TODO
+
+- 512, 1024, ... 2^16
+- log scale (x & y)
+- single or multiple lines
+- kernel only (no transfer or context switching)
+```
+
 _Wie werden im folgenden Performance Analysen durchgeführt?_
 
 _Wie wird die Zeit für das kompilieren und den Daten-Transfer in der Analyse berücksichtigt?_
