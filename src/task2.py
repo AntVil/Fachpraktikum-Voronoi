@@ -3,6 +3,7 @@ import numpy as np
 from numba import cuda
 import imageio.v3 as imageio
 from typing import Any, Literal
+import matplotlib.colors as mcolors
 from matplotlib import pyplot as plt
 
 
@@ -234,21 +235,54 @@ def voronoi_compare():
     seed_spatial_uids = seeds_jfa[:, 0] + seeds_jfa[:, 1] * res
     voronoi_pixel_algo = seed_spatial_uids[voronoi_pixel_algo_aligned]
 
-    # Compare the different output grids containing the seed IDs
-    print(
-        f"Correlation between Pixel-Algo and JFA: {np.mean(voronoi_pixel_algo == voronoi_jfa) * 100:.4f}%"
-    )
-    print(
-        f"Correlation between Pixel-Algo and JFA+1: {np.mean(voronoi_pixel_algo == voronoi_jfa_plus1) * 100:.4f}%"
-    )
-    print(
-        f"Correlation between Pixel-Algo and JFA+2: {np.mean(voronoi_pixel_algo == voronoi_jfa_plus2) * 100:.4f}%"
-    )
+    variants = [
+        ("Standard JFA", voronoi_jfa),
+        ("JFA + 1", voronoi_jfa_plus1),
+        ("JFA + 2", voronoi_jfa_plus2),
+    ]
+    
+    # Terminal print
+    for name, jfa_grid in variants:
+        accuracy = np.mean(voronoi_pixel_algo == jfa_grid) * 100
+        print(f"{name}: {accuracy:.4f}%")
 
-    # Display error map
-    error_map = (voronoi_pixel_algo != voronoi_jfa).astype(np.uint8)
-    plt.imshow(error_map, cmap="gray")
-    plt.show()
+    # Custom colour palette: 0 (correct) = black, 1 (error) = red
+    cmap_errors = mcolors.ListedColormap(["#000000", "#ff0000"])
+
+    # Save error map
+    for name, jfa_grid in variants:
+        fig, ax = plt.subplots(figsize=(8, 8))
+        fig.suptitle(
+            f"Error Map: '{name}' compared to Pixel-Algorithm",
+            fontsize=12,
+            fontweight="bold",
+        )
+
+        # Create mask: True (1) where different, False (0) where the same
+        error_map = (voronoi_pixel_algo != jfa_grid).astype(np.uint8)
+
+        # Calculate total number of errors
+        total_errors = np.sum(error_map)
+
+        # Plot
+        ax.imshow(error_map, cmap=cmap_errors, vmin=0, vmax=1)
+        ax.set_title(f"({total_errors:,} wrong pixels)", fontsize=11)
+        ax.axis("off")
+        plt.tight_layout()
+
+        # Save image
+        plt.savefig(
+            os.path.join(
+                DATA_FOLDER,
+                f"task6_error_map_{name.lower().replace(" ", "_").replace("+", "plus")}.jpg",
+            ),
+            dpi=300,
+        )
+
+    # plt.show()
+    plt.cla()
+    plt.clf()
+    plt.close()
 
 
 if __name__ == "__main__":

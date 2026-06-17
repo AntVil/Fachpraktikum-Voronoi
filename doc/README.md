@@ -165,6 +165,18 @@ _Können Optimierungen durchgeführt werden? wieso Ja/ Nein?_
 
 _Gibt es Qualitätsunterschiede (Pixelfehler) im Diagramm?_
 
+Die folgenden _Error Maps_ zeigen die Abweichungen der verschiedenen JFA-Varianten im Vergleich zum Pixel-Algorithmus, welcher hier als exakte `100%`-Referenz dient (schwarz = identisch, rot = Abweichung).
+
+| `Standard JFA`                                | `JFA+1`                                     | `JFA+2`                                     |
+| --------------------------------------------- | ------------------------------------------- | ------------------------------------------- |
+| ![](../data/task6_error_map_standard_jfa.jpg) | ![](../data/task6_error_map_jfa_plus_1.jpg) | ![](../data/task6_error_map_jfa_plus_2.jpg) |
+
+```bash
+Standard JFA: 99.5950%
+JFA + 1: 99.5990%
+JFA + 2: 99.5993%
+```
+
 # Aufgabe 7 - Ergebnisse
 
 _Welche der Optimierungen hat den größten Laufzeit-gewinn erbracht?_
