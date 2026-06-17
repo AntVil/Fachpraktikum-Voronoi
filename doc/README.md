@@ -23,6 +23,16 @@ _Was ist die Eingabe und Ausgabe und welcher Daten-Typ wird genutzt?_
 
 _Welche Parameter sind entscheidend für das Problem und welchen Einfluss haben diese?_
 
+> [!NOTE]
+> **Einschränkung bei Keyword (Named)-Arguments in CUDA-Kernels**
+>
+> Je nach installierter **Numba**-Version kann es zu Problemen kommen, wenn innerhalb eines CUDA-Kernels Keyword-Arguments (benannte Argumente) für Device-Funktionen verwendet werden.
+>
+> - **Problem:** Die Kompilierung schlägt fehl und scheint direkt bei der Kernel-Signatur "stehenzubleiben". Der Traceback zeigt jedoch, dass die Ursache weiter unten im Kernel liegt. Ein Aufruf der Art `get_thread_position(image=out_image)` kann nicht verarbeitet werden
+> - **Lösung:** Den Aufruf auf positionale Argumente umstellen: `get_thread_position(out_image)`
+>
+> Verwendete Versionen anzeigen: `pip freeze`
+
 # Aufgabe 2 - Performance Analyse Konzept
 
 ```
