@@ -1,4 +1,4 @@
-# Fachpraktikum Bild-Filter
+# Fachpraktikum Voronoi Projekt
 
 ## Program Ausführen
 
