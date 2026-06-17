@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 from constants import DATA_FOLDER, RUNS
 
 from task3 import (
-    # voroni_manhattan,
+    voroni_manhattan,
     # voroni_euclidean_hypot,
     _voroni_euclidean_hypot_kernel,
     _voroni_manhattan_kernel,
@@ -21,7 +21,7 @@ from task4 import (
     # voroni_euclidean_hypot_fast,
     # voroni_euclidean_sqrt,
     # voroni_euclidean_sqrt_fast,
-    # voroni_square_euclidean,
+    voroni_square_euclidean,
     # voroni_square_euclidean_fast,
     _voroni_euclidean_hypot_fast_kernel,
     _voroni_euclidean_sqrt_kernel,
@@ -32,7 +32,7 @@ from task4 import (
 from task5 import _voroni_euclidean_grid_stride_kernel
 from task6 import (
     jfa_voronoi_host,
-    _jfa_pass_naive_euclidean_kernel,
+    _jfa_pass_naive_square_euclidean_kernel,
     _jfa_pass_naive_manhattan_kernel,
 )
 from utils import (
@@ -64,7 +64,9 @@ SEED_COUNT: int = 100
 
 
 def main() -> None:
-    distance_calculations_performance_analysis()
+    # distance_calculations_performance_analysis()
+
+    voronoi_compare()
 
 
 def distance_calculations_performance_analysis() -> None:
@@ -162,6 +164,91 @@ def distance_calculations_test(
     print("")
 
     return results
+
+
+def voronoi_compare():
+    """
+    NOTE:
+    The goal is to check how precise the JFA+1 and JFA+2 are compared to the standard JFA.
+    We use the pixel algorithm (brute force) as a reference.
+    Combining both worlds presents an issue: we need to adjust the seed- and UID-indexing for the final result grid.
+    Ultimately, we want to see how many pixels differ from the pixel algorithm and create an error map.
+    """
+
+    res: int = 1024
+    seeds: int = 2000
+
+    ###
+    # JFA
+    ###
+    seeds_jfa = generate_random_seeds_jfa(seeds, res)
+    voronoi_jfa = jfa_voronoi_host(
+        kernel=_jfa_pass_naive_square_euclidean_kernel,
+        # kernel=_jfa_pass_naive_manhattan_kernel,
+        seeds=seeds_jfa,
+        resolution=res,
+        mode="standard",
+    )
+    voronoi_jfa_plus1 = jfa_voronoi_host(
+        kernel=_jfa_pass_naive_square_euclidean_kernel,
+        # kernel=_jfa_pass_naive_manhattan_kernel,
+        seeds=seeds_jfa,
+        resolution=res,
+        mode="jfa+1",
+    )
+    voronoi_jfa_plus2 = jfa_voronoi_host(
+        kernel=_jfa_pass_naive_square_euclidean_kernel,
+        # kernel=_jfa_pass_naive_manhattan_kernel,
+        seeds=seeds_jfa,
+        resolution=res,
+        mode="jfa+2",
+    )
+
+    ###
+    # Pixel-Algorithm
+    ###
+    # Create an array of seeds in the same shape as the JFA
+    seeds_pixel_algo = np.zeros_like(seeds_jfa, dtype=np.float64)
+
+    # Scale integer values to a float by dividing each value by the resolution, giving a value between 0 and 1
+    seeds_pixel_algo[:, 0] = (seeds_jfa[:, 0]).astype(np.float64) / res
+    seeds_pixel_algo[:, 1] = (seeds_jfa[:, 1]).astype(np.float64) / res
+    voronoi_pixel_algo_raw = voroni_square_euclidean(
+        points=cuda.to_device(seeds_pixel_algo),
+        resolution=res,
+    )
+
+    # NOTE: Coordinate Alignment
+    # - Seeds are natively stored as (x, y) coordinates.
+    # - The pixel algorithm stores output data as out_image[x, y], which maps to a [column, row] layout.
+    # - The JFA kernel stores output data as grid_out[y, x], which maps to a [row, column] layout.
+    # To directly compare them, we must transpose (.T) the pixel algorithm's output.
+    voronoi_pixel_algo_aligned = voronoi_pixel_algo_raw.T
+
+    # NOTE: UID Mapping
+    # The pixel algorithm returns random array indices (0...N-1) representing the seed UID.
+    # JFA returns spatial UIDs based on pixel coordinates. We convert the pixel algorithm's
+    # indices into identical JFA spatial UIDs (ID = X + Y * RESOLUTION) for a 1:1 comparison.
+    # `seed_spatial_uids`: 1D array containing the UIDs of the seeds.
+    # `voronoi_pixel_algo`: Image in which each pixel contains only the seed UID (0...N-1).
+    seed_spatial_uids = seeds_jfa[:, 0] + seeds_jfa[:, 1] * res
+    voronoi_pixel_algo = seed_spatial_uids[voronoi_pixel_algo_aligned]
+
+    # Compare the different output grids containing the seed IDs
+    print(
+        f"Correlation between Pixel-Algo and JFA: {np.mean(voronoi_pixel_algo == voronoi_jfa) * 100:.4f}%"
+    )
+    print(
+        f"Correlation between Pixel-Algo and JFA+1: {np.mean(voronoi_pixel_algo == voronoi_jfa_plus1) * 100:.4f}%"
+    )
+    print(
+        f"Correlation between Pixel-Algo and JFA+2: {np.mean(voronoi_pixel_algo == voronoi_jfa_plus2) * 100:.4f}%"
+    )
+
+    # Display error map
+    error_map = (voronoi_pixel_algo != voronoi_jfa).astype(np.uint8)
+    plt.imshow(error_map, cmap="gray")
+    plt.show()
 
 
 if __name__ == "__main__":

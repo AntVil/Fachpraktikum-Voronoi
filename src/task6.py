@@ -33,7 +33,7 @@ def main() -> None:
     # Naive Euclidean and Manhattan JFA
     seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
     image_euclidean = jfa_voronoi_host(
-        kernel=_jfa_pass_naive_euclidean_kernel,
+        kernel=_jfa_pass_naive_square_euclidean_kernel,
         seeds=seeds,
         resolution=RESOLUTION,
     )
@@ -50,7 +50,7 @@ def main() -> None:
     # JFA+1 and JFA+2
     plt.imshow(
         jfa_voronoi_host(
-            kernel=_jfa_pass_naive_euclidean_kernel,
+            kernel=_jfa_pass_naive_square_euclidean_kernel,
             seeds=seeds,
             resolution=RESOLUTION,
             mode="jfa+1",
@@ -61,7 +61,7 @@ def main() -> None:
     # Generate GIFs for visualisation
     seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT_VISU, resolution=RESOLUTION)
     jfa_voronoi_host(
-        kernel=_jfa_pass_naive_euclidean_kernel,
+        kernel=_jfa_pass_naive_square_euclidean_kernel,
         seeds=seeds,
         resolution=RESOLUTION,
         gif_path=os.path.join(DATA_FOLDER, "task6_euclidean_jfa_visualization.gif"),
@@ -168,7 +168,7 @@ def jfa_voronoi_host(
 
 
 @cuda.jit("void(int32[:,:,:], int32[:,:,:], int32, int32)")
-def _jfa_pass_naive_euclidean_kernel(grid_in, grid_out, step_size, size) -> None:
+def _jfa_pass_naive_square_euclidean_kernel(grid_in, grid_out, step_size, size) -> None:
     """
     Executes a single pass of the Jump Flooding Algorithm (JFA) on the GPU.
 
@@ -179,7 +179,7 @@ def _jfa_pass_naive_euclidean_kernel(grid_in, grid_out, step_size, size) -> None
     """
 
     # Determine the thread's position within the 2D grid
-    pixel_x, pixel_y = cuda.grid(2)
+    pixel_x, pixel_y = cuda.grid(2)  # (column, row)
 
     # Out of bounds check: Terminate threads outside the valid image boundaries
     if is_outside_image(pixel_x, pixel_y, grid_in):
