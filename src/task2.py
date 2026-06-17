@@ -29,6 +29,7 @@ from task4 import (
     _voroni_square_euclidean_kernel,
     _voroni_square_euclidean_fast_kernel,
 )
+from task5 import _voroni_euclidean_grid_stride_kernel
 from task6 import (
     jfa_voronoi_host,
     _jfa_pass_naive_euclidean_kernel,
@@ -38,17 +39,16 @@ from utils import (
     generate_grid_jfa,
     generate_random_seeds_jfa,
     make_grid_configuration,
-    calculate_square_euclidean_distance,
-    calculate_manhattan_distance,
     generate_uniform_points,
     make_empty_voronoi_output,
+    make_empty_distance_field_output,
 )
 
 # Different sizes for the resolution
 SIZES: list[int] = [
     2**9,  # 512
     2**10,  # 1024
-    # 2**11,  # 2048
+    2**11,  # 2048
     # 2**12,  # 4096
     # 2**13,  # 8192
     # 2**14,  # 16384
@@ -59,7 +59,7 @@ SIZES: list[int] = [
 
 
 # The number of seeds (points) in the diagram
-SEED_COUNT: int = 2000
+SEED_COUNT: int = 100
 # TODO: Also vary the seed count and observe the effect on kernel runtime?!
 
 
@@ -68,29 +68,54 @@ def main() -> None:
 
 
 def distance_calculations_performance_analysis() -> None:
-    distance_calculations_test(_voroni_euclidean_hypot_kernel)
-    distance_calculations_test(_voroni_manhattan_kernel)
-    distance_calculations_test(_voroni_euclidean_hypot_fast_kernel)
-    distance_calculations_test(_voroni_euclidean_sqrt_kernel)
-    distance_calculations_test(_voroni_euclidean_sqrt_fast_kernel)
-    distance_calculations_test(_voroni_square_euclidean_kernel)
-    distance_calculations_test(_voroni_square_euclidean_fast_kernel)
+    # Naive kernels with different approaches to calculating the seed distance
+    distance_calculations_test(
+        _voroni_euclidean_hypot_kernel, make_empty_voronoi_output
+    )
+    distance_calculations_test(
+        _voroni_manhattan_kernel, make_empty_voronoi_output
+        )
+    distance_calculations_test(
+        _voroni_euclidean_hypot_fast_kernel, make_empty_voronoi_output
+    )
+    distance_calculations_test(
+        _voroni_euclidean_sqrt_kernel, make_empty_voronoi_output
+        )
+    distance_calculations_test(
+        _voroni_euclidean_sqrt_fast_kernel, make_empty_voronoi_output
+    )
+    distance_calculations_test(
+        _voroni_square_euclidean_kernel, make_empty_voronoi_output
+    )
+    distance_calculations_test(
+        _voroni_square_euclidean_fast_kernel, make_empty_voronoi_output
+    )
 
-    # NOTE: They have other kernel signatures
-    # distance_calculations_test(_distance_field_euclidean_hypot_kernel)
-    # distance_calculations_test(_distance_field_manhattan_kernel)
+    # NOTE: They have other kernel signatures (int32 vs Float64)
+    distance_calculations_test(
+        _distance_field_euclidean_hypot_kernel, make_empty_distance_field_output
+    )
+    distance_calculations_test(
+        _distance_field_manhattan_kernel, make_empty_distance_field_output
+    )
+
+    # Optimised kernel using shared memory
+    distance_calculations_test(
+        _voroni_euclidean_grid_stride_kernel, make_empty_voronoi_output
+    )
 
 
 def distance_calculations_test(
     kernel: Any,  # TODO: Specify typiing
+    make_output_grid: Any,
 ) -> dict[int, float]:
 
-    # Dry definitions
+    # Dry run definitions
     _blocks, _threads = make_grid_configuration(resolution=SIZES[0])
 
     # NOTE: Utilities also call cuda.to_device() and cuda.device_array() directly
     _in: Any = generate_uniform_points(point_count=100)
-    _out: Any = make_empty_voronoi_output(resolution=SIZES[0])
+    _out: Any = make_output_grid(SIZES[0])
 
     # Dry run over multiple runs
     for _ in range(5):
@@ -116,7 +141,7 @@ def distance_calculations_test(
         kernel_times: list[float] = []
         for _ in range(RUNS):
             # Reset out_data
-            out_image = make_empty_voronoi_output(resolution=N)
+            out_image = make_output_grid(N)
             # NOTE: Consider moving this outside the 'RUNS'-loop, and either ignore resetting
             # or use something like 'out_image_gpu.copy_to_device(blank_host_array)'
 
