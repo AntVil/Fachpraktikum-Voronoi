@@ -240,7 +240,7 @@ def voronoi_compare():
         ("JFA + 1", voronoi_jfa_plus1),
         ("JFA + 2", voronoi_jfa_plus2),
     ]
-    
+
     # Terminal print
     for name, jfa_grid in variants:
         accuracy = np.mean(voronoi_pixel_algo == jfa_grid) * 100
@@ -280,6 +280,66 @@ def voronoi_compare():
         )
 
     # plt.show()
+    plt.cla()
+    plt.clf()
+    plt.close()
+
+
+def create_kernel_performance_plot(resolution: int, input_sizes: np.ndarray | list[int], performances: list[tuple[str, np.ndarray | list[float]]]):
+    # NOTE: convert to numpy arrays for plotting and easier validation
+    input_sizes_ = np.array(input_sizes)
+    performances_: list[tuple[str, np.ndarray]] = list(map(lambda p: (p[0], np.array(p[1])), performances))
+
+    # NOTE: catch logic mistakes early and give good error messages
+    assert input_sizes_.dtype in [int, np.int32, np.int64], f"`input_sizes` needs to be an array of integer type, got: {input_sizes_.dtype}"
+    assert len(input_sizes_.shape) == 1, f"`input_sizes` should have a single dimension, got {input_sizes_.shape}"
+    assert input_sizes_.shape[0] > 0, f"`input_sizes` should not be empty"
+    assert len(performances_) > 0, "`performances` should not be empty"
+    assert all(map(lambda p: type(p[0]) == str, performances_)), "`performances` should have a associated name"
+    assert all(map(lambda p: len(p[0]) > 0, performances_)), "`performances` should have names which are not empty"
+    assert len(set(map(lambda p: p[0], performances_))) == len(performances), f"`performances` should have unique names"
+    assert all(map(lambda p: p[1].dtype in [float, np.float32, np.float64], performances_)), f"`performances` should be measured as float type, got {set(map(lambda p: p[1].dtype, performances_))}"
+    assert all(map(lambda p: len(p[1].shape) == 1, performances_)), "`performances` should have a single dimension"
+    assert all(map(lambda p: p[1].shape[0] == input_sizes_.shape[0], performances_)), "`performances` should have the same dimensionality as `input_sizes`"
+
+    # NOTE: On our machines these differed
+    device = cuda.get_current_device()
+    if isinstance(device.name, str):
+        device_name: str = device.name
+    elif isinstance(device.name, bytes):
+        device_name: str = device.name.decode("utf-8")
+    else:
+        device_name = "unknown"
+
+    (fig, ax) = plt.subplots(nrows=1, ncols=1)
+
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+
+    ax.grid(True, alpha=0.3, linestyle="--")
+    ax.set_xlabel("Input-Size N", fontsize=10)
+    ax.set_ylabel("Runtime [s]", fontsize=10)
+
+    for method_name, performance in performances_:
+        ax.plot(input_sizes_, performance, marker="o", linewidth=2, label=method_name)
+
+    ax.legend()
+
+    ax.set_title(
+        f"Device: {device_name}",
+        fontsize=12,
+        color="gray",
+        fontweight="semibold",
+        pad=10
+    )
+
+    fig.suptitle(
+        f"Performance-Plot with Image-Resolution {resolution}",
+        fontsize=16,
+        fontweight="bold",
+    )
+
+    plt.show()
     plt.cla()
     plt.clf()
     plt.close()
