@@ -8,6 +8,7 @@ from matplotlib import pyplot as plt
 
 from constants import DATA_FOLDER
 from utils import (
+    is_outside_image,
     generate_grid_jfa,
     generate_random_seeds_jfa,
     make_grid_configuration,
@@ -73,7 +74,6 @@ def main() -> None:
     )
 
 
-
 def jfa_voronoi_host(
     kernel: Any,  # TODO: Specify typiing
     seeds: np.ndarray,
@@ -129,7 +129,9 @@ def jfa_voronoi_host(
     step_frames: list[np.ndarray] = []
     for step_size in steps:
         # Kernel launch
-        kernel[blocks_per_grid, threads_per_block](grid_in, grid_out, step_size, resolution)
+        kernel[blocks_per_grid, threads_per_block](
+            grid_in, grid_out, step_size, resolution
+        )
 
         # Ping Pong: Swap the grids so that the previous result becomes the new input
         grid_in, grid_out = grid_out, grid_in
@@ -180,8 +182,7 @@ def _jfa_pass_naive_euclidean_kernel(grid_in, grid_out, step_size, size) -> None
     pixel_x, pixel_y = cuda.grid(2)
 
     # Out of bounds check: Terminate threads outside the valid image boundaries
-    # if is_outside_image(pixel_x, pixel_y, grid_in):
-    if pixel_x >= size or pixel_y >= size:
+    if is_outside_image(pixel_x, pixel_y, grid_in):
         return
 
     # Get current seed information for this specific pixel/thread
@@ -193,7 +194,6 @@ def _jfa_pass_naive_euclidean_kernel(grid_in, grid_out, step_size, size) -> None
 
     # Only update distance if the current pixel already knows a valid seed
     if best_seed_x != -1 and best_seed_y != -1:
-        # best_dist = (pixel_x - best_seed_x) ** 2 + (pixel_y - best_seed_y) ** 2
         best_dist = calculate_square_euclidean_distance(
             pixel_x, pixel_y, best_seed_x, best_seed_y
         )
@@ -214,7 +214,6 @@ def _jfa_pass_naive_euclidean_kernel(grid_in, grid_out, step_size, size) -> None
                 # Check if the neighbour already knows a seed (= does not have the initial default value of -1)
                 if seed_x != -1 and seed_y != -1:
                     # Calculate the distance from the current pixel to the seed that the neighbour knows
-                    # dist = (pixel_x - seed_x) ** 2 + (pixel_y - seed_y) ** 2
                     dist = calculate_square_euclidean_distance(
                         pixel_x, pixel_y, seed_x, seed_y
                     )
@@ -238,7 +237,7 @@ def _jfa_pass_naive_manhattan_kernel(grid_in, grid_out, step_size, size) -> None
     """
 
     pixel_x, pixel_y = cuda.grid(2)
-    if pixel_x >= size or pixel_y >= size:
+    if is_outside_image(pixel_x, pixel_y, grid_in):
         return
 
     best_seed_x = grid_in[pixel_y, pixel_x, 0]
