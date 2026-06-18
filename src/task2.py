@@ -2,8 +2,7 @@ import os
 import numpy as np
 from numba import cuda
 import imageio.v3 as imageio
-from typing import Any, Literal
-import matplotlib.colors as mcolors
+from typing import Any
 from matplotlib import pyplot as plt
 
 
@@ -65,9 +64,7 @@ SEED_COUNT: int = 100
 
 
 def main() -> None:
-    # distance_calculations_performance_analysis()
-
-    voronoi_compare()
+    distance_calculations_performance_analysis()
 
 
 def distance_calculations_performance_analysis() -> None:
@@ -165,124 +162,6 @@ def distance_calculations_test(
     print("")
 
     return results
-
-
-def voronoi_compare():
-    """
-    NOTE:
-    The goal is to check how precise the JFA+1 and JFA+2 are compared to the standard JFA.
-    We use the pixel algorithm (brute force) as a reference.
-    Combining both worlds presents an issue: we need to adjust the seed- and UID-indexing for the final result grid.
-    Ultimately, we want to see how many pixels differ from the pixel algorithm and create an error map.
-    """
-
-    res: int = 1024
-    seeds: int = 2000
-
-    ###
-    # JFA
-    ###
-    seeds_jfa = generate_random_seeds_jfa(seeds, res)
-    voronoi_jfa = jfa_voronoi_host(
-        kernel=_jfa_pass_naive_square_euclidean_kernel,
-        # kernel=_jfa_pass_naive_manhattan_kernel,
-        seeds=seeds_jfa,
-        resolution=res,
-        mode="standard",
-    )
-    voronoi_jfa_plus1 = jfa_voronoi_host(
-        kernel=_jfa_pass_naive_square_euclidean_kernel,
-        # kernel=_jfa_pass_naive_manhattan_kernel,
-        seeds=seeds_jfa,
-        resolution=res,
-        mode="jfa+1",
-    )
-    voronoi_jfa_plus2 = jfa_voronoi_host(
-        kernel=_jfa_pass_naive_square_euclidean_kernel,
-        # kernel=_jfa_pass_naive_manhattan_kernel,
-        seeds=seeds_jfa,
-        resolution=res,
-        mode="jfa+2",
-    )
-
-    ###
-    # Pixel-Algorithm
-    ###
-    # Create an array of seeds in the same shape as the JFA
-    seeds_pixel_algo = np.zeros_like(seeds_jfa, dtype=np.float64)
-
-    # Scale integer values to a float by dividing each value by the resolution, giving a value between 0 and 1
-    seeds_pixel_algo[:, 0] = (seeds_jfa[:, 0]).astype(np.float64) / res
-    seeds_pixel_algo[:, 1] = (seeds_jfa[:, 1]).astype(np.float64) / res
-    voronoi_pixel_algo_raw = voroni_square_euclidean(
-        points=cuda.to_device(seeds_pixel_algo),
-        resolution=res,
-    )
-
-    # NOTE: Coordinate Alignment
-    # - Seeds are natively stored as (x, y) coordinates.
-    # - The pixel algorithm stores output data as out_image[x, y], which maps to a [column, row] layout.
-    # - The JFA kernel stores output data as grid_out[y, x], which maps to a [row, column] layout.
-    # To directly compare them, we must transpose (.T) the pixel algorithm's output.
-    voronoi_pixel_algo_aligned = voronoi_pixel_algo_raw.T
-
-    # NOTE: UID Mapping
-    # The pixel algorithm returns random array indices (0...N-1) representing the seed UID.
-    # JFA returns spatial UIDs based on pixel coordinates. We convert the pixel algorithm's
-    # indices into identical JFA spatial UIDs (ID = X + Y * RESOLUTION) for a 1:1 comparison.
-    # `seed_spatial_uids`: 1D array containing the UIDs of the seeds.
-    # `voronoi_pixel_algo`: Image in which each pixel contains only the seed UID (0...N-1).
-    seed_spatial_uids = seeds_jfa[:, 0] + seeds_jfa[:, 1] * res
-    voronoi_pixel_algo = seed_spatial_uids[voronoi_pixel_algo_aligned]
-
-    variants = [
-        ("Standard JFA", voronoi_jfa),
-        ("JFA + 1", voronoi_jfa_plus1),
-        ("JFA + 2", voronoi_jfa_plus2),
-    ]
-
-    # Terminal print
-    for name, jfa_grid in variants:
-        accuracy = np.mean(voronoi_pixel_algo == jfa_grid) * 100
-        print(f"{name}: {accuracy:.4f}%")
-
-    # Custom colour palette: 0 (correct) = black, 1 (error) = red
-    cmap_errors = mcolors.ListedColormap(["#000000", "#ff0000"])
-
-    # Save error map
-    for name, jfa_grid in variants:
-        fig, ax = plt.subplots(figsize=(8, 8))
-        fig.suptitle(
-            f"Error Map: '{name}' compared to Pixel-Algorithm",
-            fontsize=12,
-            fontweight="bold",
-        )
-
-        # Create mask: True (1) where different, False (0) where the same
-        error_map = (voronoi_pixel_algo != jfa_grid).astype(np.uint8)
-
-        # Calculate total number of errors
-        total_errors = np.sum(error_map)
-
-        # Plot
-        ax.imshow(error_map, cmap=cmap_errors, vmin=0, vmax=1)
-        ax.set_title(f"({total_errors:,} wrong pixels)", fontsize=11)
-        ax.axis("off")
-        plt.tight_layout()
-
-        # Save image
-        plt.savefig(
-            os.path.join(
-                DATA_FOLDER,
-                f"task6_error_map_{name.lower().replace(" ", "_").replace("+", "plus")}.jpg",
-            ),
-            dpi=300,
-        )
-
-    # plt.show()
-    plt.cla()
-    plt.clf()
-    plt.close()
 
 
 def create_kernel_performance_plot(resolution: int, input_sizes: np.ndarray | list[int], performances: list[tuple[str, np.ndarray | list[float]]]):
