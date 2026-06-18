@@ -59,8 +59,22 @@ SIZES: list[int] = [
 
 
 # The number of seeds (points) in the diagram
-SEED_COUNT: int = 100
+# SEED_COUNT: int = 100
+
+
 # TODO: Also vary the seed count and observe the effect on kernel runtime?!
+# Different values for the seeds (points) in the diagram
+SEED_COUNTS: list[int] = [
+    100,
+    500,
+    1000,
+    # 2000,
+    # 5000,
+    # 10000,
+    # 15000,
+    # 20000,
+    # TODO: Define values
+]
 
 
 def main() -> None:
@@ -108,7 +122,7 @@ def distance_calculations_performance_analysis() -> None:
 def distance_calculations_test(
     kernel: Any,  # TODO: Specify typiing
     make_output_grid: Any,
-) -> dict[int, float]:
+) -> dict[int, dict[int, float]]:
 
     # Dry run definitions
     _blocks, _threads = make_grid_configuration(resolution=SIZES[0])
@@ -122,8 +136,8 @@ def distance_calculations_test(
         kernel[_blocks, _threads](_in, _out)
         cuda.synchronize()
 
-    # Store the median kernel time (value) for each size (key)
-    results: dict[int, float] = {}
+    # Store the median kernel time (value) for each sizeXseedCount combination (key)
+    results: dict[int, dict[int, float]] = {}
 
     # CUDA Events
     kernel_start = cuda.event(timing=True)
@@ -135,30 +149,35 @@ def distance_calculations_test(
             resolution=N, threads_per_dimension=16
         )
 
-        # Send data to GPU
-        seeds = generate_uniform_points(point_count=SEED_COUNT)
+        # Define a nested dictionary for the seed counts
+        results[N] = {}
 
-        kernel_times: list[float] = []
-        for _ in range(RUNS):
-            # Reset out_data
-            out_image = make_output_grid(N)
-            # NOTE: Consider moving this outside the 'RUNS'-loop, and either ignore resetting
-            # or use something like 'out_image_gpu.copy_to_device(blank_host_array)'
+        for S in SEED_COUNTS:
+            # Send data to GPU
+            seeds = generate_uniform_points(point_count=S)
 
-            # Measure kernel
-            kernel_start.record()
-            kernel[blocks_per_grid, threads_per_block](seeds, out_image)
-            kernel_end.record()
+            kernel_times: list[float] = []
+            for _ in range(RUNS):
+                # Reset out_data
+                out_image = make_output_grid(N)
+                # NOTE: Consider moving this outside the 'RUNS'-loop, and either ignore resetting
+                # or use something like 'out_image_gpu.copy_to_device(blank_host_array)'
 
-            # Synchronize and add the measured time to the list
-            cuda.synchronize()
-            kernel_times.append(kernel_start.elapsed_time(kernel_end))
+                # Measure kernel
+                kernel_start.record()
+                kernel[blocks_per_grid, threads_per_block](seeds, out_image)
+                kernel_end.record()
 
-        results[N] = np.median(kernel_times)
+                # Synchronize and add the measured time to the list
+                cuda.synchronize()
+                kernel_times.append(kernel_start.elapsed_time(kernel_end))
+
+            results[N][S] = np.median(kernel_times)
 
     # MARK: DEBUG only (remove later)
-    for k, v in results.items():
-        print(f"{k}: {v}ms")
+    for size, sub_dict in results.items():
+        for seed, time_ms in sub_dict.items():
+            print(f"{size}x{seed}: {time_ms}ms")
     print("")
 
     return results
