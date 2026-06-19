@@ -55,46 +55,76 @@ def main() -> None:
     Test the implementations and generate example diagrams for the Jump Flooding Algorithm (JFA).
     """
 
-    # Optimized kernel
-    seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
-    image_euclidean = jfa_voronoi_host(
-        kernel=_jfa_pass_ultimate_square_euclidean_kernel,
-        seeds=seeds,
-        resolution=RESOLUTION,
-    )
-    plt.imshow(image_euclidean)
-    plt.show()
-    return
-
+    ###
     # Naive Euclidean and Manhattan JFA
+    ###
     seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
-    image_euclidean = jfa_voronoi_host(
+    naive_euclidean = jfa_voronoi_host(
         kernel=_jfa_pass_naive_square_euclidean_kernel,
         seeds=seeds,
         resolution=RESOLUTION,
+        mode="standard",
     )
-    image_manhattan = jfa_voronoi_host(
+    naive_manhattan = jfa_voronoi_host(
         kernel=_jfa_pass_naive_manhattan_kernel,
         seeds=seeds,
         resolution=RESOLUTION,
+        mode="standard",
     )
-    plt.imshow(image_euclidean)
+    plt.imshow(naive_euclidean)
     plt.show()
-    plt.imshow(image_manhattan)
+    plt.imshow(naive_manhattan)
     plt.show()
 
+    ###
     # JFA+1 and JFA+2
-    plt.imshow(
-        jfa_voronoi_host(
-            kernel=_jfa_pass_naive_square_euclidean_kernel,
-            seeds=seeds,
-            resolution=RESOLUTION,
-            mode="jfa+1",
-        )
+    ###
+    voronoi_jfa_plus1 = jfa_voronoi_host(
+        kernel=_jfa_pass_naive_square_euclidean_kernel,  # kernel=_jfa_pass_naive_manhattan_kernel,
+        seeds=seeds,
+        resolution=RESOLUTION,
+        mode="jfa+1",
     )
+    voronoi_jfa_plus2 = jfa_voronoi_host(
+        kernel=_jfa_pass_naive_square_euclidean_kernel,  # kernel=_jfa_pass_naive_manhattan_kernel,
+        seeds=seeds,
+        resolution=RESOLUTION,
+        mode="jfa+2",
+    )
+    plt.imshow(voronoi_jfa_plus1)
+    plt.show()
+    plt.imshow(voronoi_jfa_plus2)
     plt.show()
 
+    ###
+    # Compare JFA variants
+    ###
+    evaluate_jfa_accuracy(
+        seeds_jfa=seeds,
+        voronoi_jfa=naive_euclidean,
+        voronoi_jfa_plus1=voronoi_jfa_plus1,
+        voronoi_jfa_plus2=voronoi_jfa_plus2,
+    )
+
+    ###
+    # Optimized Euclidean JFA
+    ###
+    optimized_euclidean = jfa_voronoi_host(
+        kernel=_jfa_pass_ultimate_square_euclidean_kernel,
+        seeds=seeds,
+        resolution=RESOLUTION,
+        mode="standard",
+    )
+    # Validate
+    generate_error_map(
+        actual_grid=optimized_euclidean,
+        reference_grid=naive_euclidean,
+        title="NAIVE vs. OPTIMIZED JFA",
+    )
+
+    ###
     # Generate GIFs for visualisation
+    ###
     seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT_VISU, resolution=RESOLUTION)
     jfa_voronoi_host(
         kernel=_jfa_pass_naive_square_euclidean_kernel,
@@ -108,9 +138,6 @@ def main() -> None:
         resolution=RESOLUTION,
         gif_path=os.path.join(DATA_FOLDER, "task6_manhattan_jfa_visualization.gif"),
     )
-
-    # Compare JFA variants
-    evaluate_jfa_accuracy()
 
 
 def jfa_voronoi_host(
@@ -206,7 +233,7 @@ def jfa_voronoi_host(
     return out_image[:, :, 0] + out_image[:, :, 1] * resolution
 
 
-def evaluate_jfa_accuracy():
+def evaluate_jfa_accuracy(seeds_jfa, voronoi_jfa, voronoi_jfa_plus1, voronoi_jfa_plus2):
     """
     Compares the precision of JFA variants against the pixel algorithm.
 
@@ -215,32 +242,6 @@ def evaluate_jfa_accuracy():
     accuracy (match percentages) and generates error maps that highlight
     structural JFA discrepancies.
     """
-
-    ###
-    # JFA
-    ###
-    seeds_jfa = generate_random_seeds_jfa(SEED_COUNT, RESOLUTION)
-    voronoi_jfa = jfa_voronoi_host(
-        kernel=_jfa_pass_naive_square_euclidean_kernel,
-        # kernel=_jfa_pass_naive_manhattan_kernel,
-        seeds=seeds_jfa,
-        resolution=RESOLUTION,
-        mode="standard",
-    )
-    voronoi_jfa_plus1 = jfa_voronoi_host(
-        kernel=_jfa_pass_naive_square_euclidean_kernel,
-        # kernel=_jfa_pass_naive_manhattan_kernel,
-        seeds=seeds_jfa,
-        resolution=RESOLUTION,
-        mode="jfa+1",
-    )
-    voronoi_jfa_plus2 = jfa_voronoi_host(
-        kernel=_jfa_pass_naive_square_euclidean_kernel,
-        # kernel=_jfa_pass_naive_manhattan_kernel,
-        seeds=seeds_jfa,
-        resolution=RESOLUTION,
-        mode="jfa+2",
-    )
 
     ###
     # Pixel-Algorithm
@@ -283,40 +284,57 @@ def evaluate_jfa_accuracy():
         accuracy = np.mean(voronoi_pixel_algo == jfa_grid) * 100
         print(f"{name}: {accuracy:.4f}%")
 
+    # Save error map
+    for name, jfa_grid in variants:
+        generate_error_map(
+            actual_grid=jfa_grid,
+            reference_grid=voronoi_pixel_algo,
+            title=f"Error Map: '{name}' compared to Pixel-Algorithm",
+            filename=f"task6_error_map_{name.lower().replace(" ", "_").replace("+", "plus")}.jpg",
+        )
+
+
+def generate_error_map(
+    actual_grid: np.ndarray,
+    reference_grid: np.ndarray,
+    title: str,
+    filename: str | None = None,
+) -> None:
+    """
+    Compares the generated grid against a reference grid and saves a visual
+    error map highlighting mismatched pixels.
+    """
+
+    fig, ax = plt.subplots(figsize=(8, 8))
+    fig.suptitle(title, fontsize=12, fontweight="bold")
+
+    # Create mask: True (1) where different, False (0) where the same
+    error_map = (reference_grid != actual_grid).astype(np.uint8)
+
+    # Calculate total number of errors
+    total_errors = np.sum(error_map)
+
     # Custom colour palette: 0 (correct) = black, 1 (error) = red
     cmap_errors = mcolors.ListedColormap(["#000000", "#ff0000"])
 
-    # Save error map
-    for name, jfa_grid in variants:
-        fig, ax = plt.subplots(figsize=(8, 8))
-        fig.suptitle(
-            f"Error Map: '{name}' compared to Pixel-Algorithm",
-            fontsize=12,
-            fontweight="bold",
-        )
+    # Plot
+    ax.imshow(error_map, cmap=cmap_errors, vmin=0, vmax=1)
+    ax.set_title(f"({total_errors:,} wrong pixels)", fontsize=11)
+    ax.axis("off")
+    plt.tight_layout()
 
-        # Create mask: True (1) where different, False (0) where the same
-        error_map = (voronoi_pixel_algo != jfa_grid).astype(np.uint8)
-
-        # Calculate total number of errors
-        total_errors = np.sum(error_map)
-
-        # Plot
-        ax.imshow(error_map, cmap=cmap_errors, vmin=0, vmax=1)
-        ax.set_title(f"({total_errors:,} wrong pixels)", fontsize=11)
-        ax.axis("off")
-        plt.tight_layout()
-
+    if filename:
         # Save image
         plt.savefig(
             os.path.join(
                 DATA_FOLDER,
-                f"task6_error_map_{name.lower().replace(" ", "_").replace("+", "plus")}.jpg",
+                filename,
             ),
             dpi=300,
         )
+    else:
+        plt.show()
 
-    # plt.show()
     plt.cla()
     plt.clf()
     plt.close()
