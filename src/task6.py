@@ -630,5 +630,71 @@ def _jfa_pass_ultimate_square_euclidean_kernel(
     grid_out[pixel_y, pixel_x, 1] = best_seed_y
 
 
+@cuda.jit("void(int32[:,:], int32[:,:], int32, int32)")
+def _jfa_pass_planar_square_euclidean_kernel(
+    grid_in, grid_out, step_size, size
+) -> None:
+    """
+    Executes a single pass of the Jump Flooding Algorithm (JFA) using a planar 2D layout.
+
+    Memory Layout (Top2Bottom Planar):
+    To achieve optimal coalesced memory access for the warps, the 3D grid structure (Height, Width, 2)
+    is flattened into a 2D array with double the logical height (2 * size, size).
+
+    - Upper Half (Rows 0 to size - 1): Holds the X-coordinates of the seeds.
+    - Lower Half (Rows size to 2 * size - 1): Holds the Y-coordinates of the seeds.
+    """
+
+    # 1 Thread = 1 Pixel
+    pixel_x, pixel_y = cuda.grid(2)  # (column, row)
+
+    # Out of bounds check based on the actual resolution (size)
+    if pixel_x >= size or pixel_y >= size:
+        return
+
+    # Load the current seed information for this specific pixel/thread
+    best_seed_x = grid_in[pixel_y, pixel_x]
+    best_seed_y = grid_in[pixel_y + size, pixel_x]
+
+    # Calculate initial distance
+    best_dist = np.float32(np.inf)
+    if best_seed_x != -1 and best_seed_y != -1:
+        best_dist = calculate_square_euclidean_distance(
+            pixel_x, pixel_y, best_seed_x, best_seed_y
+        )
+
+    # Look for all eight neighbours
+    for dy in (-1, 0, 1):
+        for dx in (-1, 0, 1):
+            # NOTE: We can skip the pixel that this thread computes
+            if dx == 0 and dy == 0:
+                continue
+
+            # Calculate the x and y position of the neighbour within the actual image
+            neighbour_x = pixel_x + dx * step_size
+            neighbour_y = pixel_y + dy * step_size
+
+            # Check if the current neighbour (x, y) is within the actual logical image size range
+            if (0 <= neighbour_x < size) and (0 <= neighbour_y < size):
+                # Read the seed data of the neighbour
+                seed_x = grid_in[neighbour_y, neighbour_x]
+                seed_y = grid_in[neighbour_y + size, neighbour_x]
+
+                # Check if the neighbour already knows a seed
+                if seed_x != -1 and seed_y != -1:
+                    dist = calculate_square_euclidean_distance(
+                        pixel_x, pixel_y, seed_x, seed_y
+                    )
+                    if dist < best_dist:
+                        best_dist = dist
+                        best_seed_x = seed_x
+                        best_seed_y = seed_y
+
+    # Write the closest seed coordinates to the output grid
+    # (separated again into top and bottom)
+    grid_out[pixel_y, pixel_x] = best_seed_x
+    grid_out[pixel_y + size, pixel_x] = best_seed_y
+
+
 if __name__ == "__main__":
     main()
