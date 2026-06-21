@@ -7,6 +7,13 @@
 
 ---
 
+# Vorgehen und Aufbau
+
+Um ein strukturiertes Vorgehen zu gewährleisten wurde vorab ein Konzept entwickelt. Es beginnt mit dem ersten Abschnitt bei dem das Thema dieses Projekts klar beschrieben und abgesteckt wird.
+Im darauf folgendem Abschnitt wird ein Performance Analyse Konzept entwickelt und implementiert und in allen anderen Abschnitten einheitliche Zeitmessungen und Analysen durchzuführen.
+Der dritte Abschnitt befasst sich einer Naiven Implementation, wobei geklärt wird wie und warum diese funktioniert. Danach werden in Abschnitt vier und fünf die aus dem Kurs-Text erlernten Optimierungs-Verfahren angewandt. In Abschnitt sechs wird ein Algorithmus aus der Literatur erklärt, implementiert und mit dem bisherigem Algorithmus verglichen.
+Zuletzt wird in Abschnitt sieben eine finale Analyse und Zusammenfassung der Ergebnisse dargelegt.
+
 # Aufgabe 1 - Beschreibung des Problems
 
 _Was ist das Problem?_
@@ -22,16 +29,6 @@ _Welche Einschränkungen beziehungsweise Annahmen werden gemacht?_
 _Was ist die Eingabe und Ausgabe und welcher Daten-Typ wird genutzt?_
 
 _Welche Parameter sind entscheidend für das Problem und welchen Einfluss haben diese?_
-
-> [!NOTE]
-> **Einschränkung bei Keyword (Named)-Arguments in CUDA-Kernels**
->
-> Je nach installierter **Numba**-Version kann es zu Problemen kommen, wenn innerhalb eines CUDA-Kernels Keyword-Arguments (benannte Argumente) für Device-Funktionen verwendet werden.
->
-> - **Problem:** Die Kompilierung schlägt fehl und scheint direkt bei der Kernel-Signatur "stehenzubleiben". Der Traceback zeigt jedoch, dass die Ursache weiter unten im Kernel liegt. Ein Aufruf der Art `get_thread_position(image=out_image)` kann nicht verarbeitet werden
-> - **Lösung:** Den Aufruf auf positionale Argumente umstellen: `get_thread_position(out_image)`
->
-> Verwendete Versionen anzeigen: `pip freeze`
 
 # Aufgabe 2 - Performance Analyse Konzept
 
@@ -188,3 +185,15 @@ _Welchen Durchsatz haben die verschiedenen Implementationen?_
 _Ab welcher Eingabe-Größe erreicht die GPU ihre Sättigung?_
 
 _Was liefern die Profiling-Tools?_
+
+# Anhang
+
+> [!NOTE]
+> **Einschränkung bei Keyword (Named)-Arguments in CUDA-Kernels**
+>
+> Je nach installierter **Numba**-Version kann es zu Problemen kommen, wenn innerhalb eines CUDA-Kernels Keyword-Arguments (benannte Argumente) für Device-Funktionen verwendet werden.
+>
+> - **Problem:** Die Kompilierung schlägt fehl und scheint direkt bei der Kernel-Signatur "stehenzubleiben". Der Traceback zeigt jedoch, dass die Ursache weiter unten im Kernel liegt. Ein Aufruf der Art `get_thread_position(image=out_image)` kann nicht verarbeitet werden
+> - **Lösung:** Den Aufruf auf positionale Argumente umstellen: `get_thread_position(out_image)`
+>
+> Verwendete Versionen anzeigen: `pip freeze`
