@@ -9,20 +9,11 @@ from matplotlib import pyplot as plt
 from constants import DATA_FOLDER, RUNS
 
 from task3 import (
-    voroni_manhattan,
-    # voroni_euclidean_hypot,
     _voroni_euclidean_hypot_kernel,
     _voroni_manhattan_kernel,
-    _distance_field_euclidean_hypot_kernel,
-    _distance_field_manhattan_kernel,
 )
 
 from task4 import (
-    # voroni_euclidean_hypot_fast,
-    # voroni_euclidean_sqrt,
-    # voroni_euclidean_sqrt_fast,
-    voroni_square_euclidean,
-    # voroni_square_euclidean_fast,
     _voroni_euclidean_hypot_fast_kernel,
     _voroni_euclidean_sqrt_kernel,
     _voroni_euclidean_sqrt_fast_kernel,
@@ -41,11 +32,12 @@ from utils import (
     make_grid_configuration,
     generate_uniform_points,
     make_empty_voronoi_output,
-    make_empty_distance_field_output,
 )
 
 # Different sizes for the resolution
-RESOLUTION_SIZES: list[int] = [
+RESOLUTION_SIZES = np.array([
+    2**7,
+    2**8,
     2**9,  # 512
     2**10,  # 1024
     2**11,  # 2048
@@ -54,98 +46,139 @@ RESOLUTION_SIZES: list[int] = [
     # 2**14,  # 16384
     # 2**15,  # 32768
     # 2**16,  # 65536
-]
+], dtype=np.int64)
 # TODO: 2^16 might be a bit big; We will see ...
 
-
-# The number of seeds (points) in the diagram
-# SEED_COUNT: int = 100
-
-
-# TODO: Also vary the seed count and observe the effect on kernel runtime?!
 # Different values for the seeds (points) in the diagram
-POINT_COUNTS: list[int] = [
+POINT_COUNTS = np.array([
+    2**6,
+    2**7,
     2**8,
     2**9,
     # 2**10,
+    # 2**10,
     # 2**11,
     # TODO: Define values
-]
+], dtype=np.int64)
 
 
 def main() -> None:
-    distance_calculations_performance_analysis()
-
-
-def distance_calculations_performance_analysis() -> None:
     # Naive kernels with different approaches to calculating the seed distance
-    distance_calculations_test(
-        _voroni_euclidean_hypot_kernel, make_empty_voronoi_output
+    kernel_performance_analysis(
+        kernel_name="euclidean_hypot",
+        kernel=_voroni_euclidean_hypot_kernel,
+        make_output_grid=make_empty_voronoi_output,
     )
-    distance_calculations_test(
-        _voroni_manhattan_kernel, make_empty_voronoi_output
-        )
-    distance_calculations_test(
-        _voroni_euclidean_hypot_fast_kernel, make_empty_voronoi_output
+    kernel_performance_analysis(
+        kernel_name="manhattan",
+        kernel=_voroni_manhattan_kernel,
+        make_output_grid=make_empty_voronoi_output,
     )
-    distance_calculations_test(
-        _voroni_euclidean_sqrt_kernel, make_empty_voronoi_output
-        )
-    distance_calculations_test(
-        _voroni_euclidean_sqrt_fast_kernel, make_empty_voronoi_output
+    kernel_performance_analysis(
+        kernel_name="euclidean_hypot_fast",
+        kernel=_voroni_euclidean_hypot_fast_kernel,
+        make_output_grid=make_empty_voronoi_output,
     )
-    distance_calculations_test(
-        _voroni_square_euclidean_kernel, make_empty_voronoi_output
+    kernel_performance_analysis(
+        kernel_name="euclidean_sqrt",
+        kernel=_voroni_euclidean_sqrt_kernel,
+        make_output_grid=make_empty_voronoi_output,
     )
-    distance_calculations_test(
-        _voroni_square_euclidean_fast_kernel, make_empty_voronoi_output
+    kernel_performance_analysis(
+        kernel_name="euclidean_sqrt_fast",
+        kernel=_voroni_euclidean_sqrt_fast_kernel,
+        make_output_grid=make_empty_voronoi_output,
+    )
+    kernel_performance_analysis(
+        kernel_name="square_euclidean",
+        kernel=_voroni_square_euclidean_kernel,
+        make_output_grid=make_empty_voronoi_output,
+    )
+    kernel_performance_analysis(
+        kernel_name="square_euclidean_fast",
+        kernel=_voroni_square_euclidean_fast_kernel,
+        make_output_grid=make_empty_voronoi_output,
     )
 
     # Optimised kernel using shared memory
-    distance_calculations_test(
-        _voroni_euclidean_grid_stride_kernel, make_empty_voronoi_output
+    kernel_performance_analysis(
+        kernel_name="euclidean_grid_stride",
+        kernel=_voroni_euclidean_grid_stride_kernel,
+        make_output_grid=make_empty_voronoi_output,
     )
 
 
-def distance_calculations_test(
-    kernel: Callable[[cuda.devicearray.DeviceNDArray, cuda.devicearray.DeviceNDArray]],
-    make_output_grid: Callable[[int], cuda.devicearray.DeviceNDArray],
-) -> dict[int, dict[int, float]]:
+def kernel_performance_analysis(
+    kernel_name: str,
+    kernel: Callable[[cuda.devicearray.DeviceNDArray, cuda.devicearray.DeviceNDArray], None],
+    make_output_grid: Callable[[int | np.int64], cuda.devicearray.DeviceNDArray],
+) -> None:
+    """
+    Do a performance analysis on a single Kernel and generate a number of plots
+    """
+
+    metrics = compute_performance_metrics(
+        kernel=kernel,
+        make_output_grid=make_output_grid,
+        resolution_sizes=RESOLUTION_SIZES,
+        point_counts=POINT_COUNTS,
+        run_count=RUNS
+    )
+
+    create_kernel_performance_plot(
+        resolution=RESOLUTION_SIZES[0],
+        input_sizes=POINT_COUNTS,
+        performances=[
+            (kernel_name, np.median(metrics[0], axis=1))
+        ]
+    )
+    # create_kernel_performance_matrix()
+
+
+def compute_performance_metrics(
+    kernel: Callable[[cuda.devicearray.DeviceNDArray, cuda.devicearray.DeviceNDArray], None],
+    make_output_grid: Callable[[int | np.int64], cuda.devicearray.DeviceNDArray],
+    resolution_sizes: np.ndarray[tuple[int], np.dtype[np.int64]],
+    point_counts: np.ndarray[tuple[int], np.dtype[np.int64]],
+    run_count: int
+) -> np.ndarray[tuple[int, int, int], np.dtype[np.float64]]:
+    """
+    Compute execution time of kernel (without any data transfer) as a multi-dimensional array with dimensions (resolution, point_count, executions).
+    Each entry is measured in milliseconds.
+    """
 
     # MARK: Dry run definitions
-    _blocks, _threads = make_grid_configuration(resolution=RESOLUTION_SIZES[0])
+    _blocks, _threads = make_grid_configuration(resolution=resolution_sizes[0])
 
     # NOTE: Utilities also call cuda.to_device() and cuda.device_array() directly
     _in = generate_uniform_points(point_count=100)
-    _out = make_output_grid(RESOLUTION_SIZES[0])
+    _out = make_output_grid(resolution_sizes[0])
 
     # MARK: Dry run over multiple runs
     for _ in range(5):
         kernel[_blocks, _threads](_in, _out)
         cuda.synchronize()
 
-    # Store the median kernel time (value) for each sizeXseedCount combination (key)
-    results: dict[int, dict[int, float]] = {}
+    result: list[list[list[float]]] = []
 
     # CUDA Events
     kernel_start = cuda.event(timing=True)
     kernel_end = cuda.event(timing=True)
 
-    for resolution in RESOLUTION_SIZES:
+    for resolution in resolution_sizes:
         # Grid configuration
         blocks_per_grid, threads_per_block = make_grid_configuration(
             resolution=resolution, threads_per_dimension=16
         )
 
-        # Define a nested dictionary for the seed counts
-        results[resolution] = {}
+        result_entry: list[list[float]] = []
 
-        for point_count in POINT_COUNTS:
+        for point_count in point_counts:
             # Send data to GPU
             points = generate_uniform_points(point_count=point_count)
 
             kernel_times: list[float] = []
-            for _ in range(RUNS):
+            for _ in range(run_count):
                 # Reset out_data
                 out_image = make_output_grid(resolution)
                 # NOTE: Consider moving this outside the 'RUNS'-loop, and either ignore resetting
@@ -160,18 +193,28 @@ def distance_calculations_test(
                 cuda.synchronize()
                 kernel_times.append(kernel_start.elapsed_time(kernel_end))
 
-            results[resolution][point_count] = np.median(kernel_times)
+            result_entry.append(kernel_times)
 
-    # TODO: DEBUG only (remove later)
-    for size, sub_dict in results.items():
-        for seed, time_ms in sub_dict.items():
-            print(f"resolution={size}^2 points={seed}: {time_ms}ms")
-    print("")
+        result.append(result_entry)
 
-    return results
+    # # TODO: DEBUG only (remove later)
+    # for size, sub_dict in results.items():
+    #     for seed, time_ms in sub_dict.items():
+    #         print(f"resolution={size}^2 points={seed}: {time_ms}ms")
+    # print("")
+
+    return np.array(result)
 
 
-def create_kernel_performance_plot(resolution: int, input_sizes: np.ndarray | list[int], performances: list[tuple[str, np.ndarray | list[float]]]):
+def create_kernel_performance_plot(
+    resolution: int,
+    input_sizes: np.ndarray[tuple[int], np.dtype[np.int32] | np.dtype[np.int64]],
+    performances: list[tuple[str, np.ndarray[tuple[int], np.dtype[np.float32] | np.dtype[np.float64]]]]
+):
+    """
+    Create a performance plot of one or multiple kernels.
+    Performances are expected to be in milliseconds.
+    """
     # NOTE: convert to numpy arrays for plotting and easier validation
     input_sizes_ = np.array(input_sizes)
     performances_: list[tuple[str, np.ndarray]] = list(map(lambda p: (p[0], np.array(p[1])), performances))
@@ -204,7 +247,7 @@ def create_kernel_performance_plot(resolution: int, input_sizes: np.ndarray | li
 
     ax.grid(True, alpha=0.3, linestyle="--")
     ax.set_xlabel("Input-Size N", fontsize=10)
-    ax.set_ylabel("Runtime [s]", fontsize=10)
+    ax.set_ylabel("Runtime [ms]", fontsize=10)
 
     for method_name, performance in performances_:
         ax.plot(input_sizes_, performance, marker="o", linewidth=2, label=method_name)
@@ -229,6 +272,11 @@ def create_kernel_performance_plot(resolution: int, input_sizes: np.ndarray | li
     plt.cla()
     plt.clf()
     plt.close()
+
+
+def create_kernel_performance_matrix(resolution: int, input_sizes: np.ndarray | list[int], performances: list[tuple[str, np.ndarray | list[float]]]):
+    print("TODO")
+    pass
 
 
 if __name__ == "__main__":

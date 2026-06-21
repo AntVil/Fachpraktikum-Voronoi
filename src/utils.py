@@ -27,31 +27,33 @@ def get_argument() -> str | None:
         return sys.argv[1]
 
 
-def generate_uniform_points(point_count: int) -> cuda.devicearray.DeviceNDArray:
+def generate_uniform_points(point_count: int | np.int64) -> cuda.devicearray.DeviceNDArray:
     """
     Create array of uniformly distributed points on device within [0, 1) as doubles
     """
 
-    points = np.random.rand(point_count, 2)
+    points = np.random.rand(int(point_count), 2)
     return cuda.to_device(points)
 
 
-def generate_random_seeds_jfa(seed_count: int, resolution: int) -> np.ndarray:
+def generate_random_seeds_jfa(seed_count: int | np.int64, resolution: int | np.int64) -> np.ndarray:
     """
     Generate a random array of seed positions within the resolution range.
     The array contains seed_count entries, with each entry representing the x and y position of a seed within the grid (integer).
     """
 
-    return np.random.randint(low=0, high=resolution, size=(seed_count, 2))
+    return np.random.randint(low=0, high=int(resolution), size=(int(seed_count), 2))
 
 
-def generate_grid_jfa(seeds: np.ndarray, resolution: int) -> np.ndarray:
+def generate_grid_jfa(seeds: np.ndarray, resolution: int | np.int64) -> np.ndarray:
     """
     Generate a grid data structure for the JFA.
     Each pixel in the grid represents the x and y position of the nearest seed. During initialisation,
     each pixel is given a default value of '-1', indicating that no seed position has been set.
     At the start, each seed knows its position and is therefore set directly in the grid configuration.
     """
+
+    resolution = int(resolution)
 
     # Construct and initialize a grid: Each pixel stores the position of the closest seed (seed_x, seed_y)
     # Initialization of '-1' means: "No seed known yet"
@@ -68,17 +70,20 @@ def generate_grid_jfa(seeds: np.ndarray, resolution: int) -> np.ndarray:
     return grid
 
 
-def make_empty_voronoi_output(resolution: int, fill_value: int | None = None) -> cuda.devicearray.DeviceNDArray:
+def make_empty_voronoi_output(resolution: int | np.int64, fill_value: int  | np.int64 | None = None) -> cuda.devicearray.DeviceNDArray:
     """
     An empty voronoi diagram on the device
     """
 
-    if fill_value == None:
+    resolution = int(resolution)
+
+    if fill_value is None:
         return cuda.device_array(
             shape=(resolution, resolution),
             dtype=np.int32
         )
     else:
+        fill_value = int(fill_value)
         return cuda.to_device(
             np.full(
                 shape=(resolution, resolution),
@@ -88,10 +93,12 @@ def make_empty_voronoi_output(resolution: int, fill_value: int | None = None) ->
         )
 
 
-def make_empty_distance_field_output(resolution: int, fill_value: float | None = None) -> cuda.devicearray.DeviceNDArray:
+def make_empty_distance_field_output(resolution: int | np.int64, fill_value: float | np.float64 | None = None) -> cuda.devicearray.DeviceNDArray:
     """
     An empty distance field diagram on the device
     """
+
+    resolution = int(resolution)
 
     if fill_value == None:
         return cuda.device_array(
@@ -99,6 +106,7 @@ def make_empty_distance_field_output(resolution: int, fill_value: float | None =
             dtype=np.float64
         )
     else:
+        fill_value = float(fill_value)
         return cuda.to_device(
             np.full(
                 shape=(resolution, resolution),
@@ -108,7 +116,9 @@ def make_empty_distance_field_output(resolution: int, fill_value: float | None =
         )
 
 
-def euclidean_distance_field_to_gif_frame(image: np.ndarray) -> np.ndarray:
+def euclidean_distance_field_to_gif_frame(
+    image: np.ndarray[tuple[int, int], np.dtype[np.float64]]
+) -> np.ndarray[tuple[int, int], np.dtype[np.int8]]:
     assert image.dtype == np.float64, f"Wrong dtype for frame conversion: {image.dtype}"
 
     # greatest distance is diagonal across frame, which is `sqrt(2)`, which we map to `255`
@@ -118,7 +128,9 @@ def euclidean_distance_field_to_gif_frame(image: np.ndarray) -> np.ndarray:
     return np.array(np.clip(image * factor * DISTANCE_FIELD_CONTRAST_FACTOR, a_min=0, a_max=255), dtype=np.int8)
 
 
-def euclidean_squared_distance_field_to_gif_frame(image: np.ndarray) -> np.ndarray:
+def euclidean_squared_distance_field_to_gif_frame(
+    image: np.ndarray[tuple[int, int], np.dtype[np.float64]]
+) -> np.ndarray[tuple[int, int], np.dtype[np.int8]]:
     assert image.dtype == np.float64, f"Wrong dtype for frame conversion: {image.dtype}"
 
     # greatest distance is diagonal across frame, which is `2`, which we map to `255`
@@ -128,7 +140,9 @@ def euclidean_squared_distance_field_to_gif_frame(image: np.ndarray) -> np.ndarr
     return np.array(np.clip(image * factor * DISTANCE_FIELD_CONTRAST_FACTOR, a_min=0, a_max=255), dtype=np.int8)
 
 
-def manhattan_distance_field_to_gif_frame(image: np.ndarray) -> np.ndarray:
+def manhattan_distance_field_to_gif_frame(
+    image: np.ndarray[tuple[int, int], np.dtype[np.float64]]
+) -> np.ndarray[tuple[int, int], np.dtype[np.int8]]:
     assert image.dtype == np.float64, f"Wrong dtype for frame conversion: {image.dtype}"
 
     # greatest distance is diagonal across frame, which is `2`, which we map to `255`
@@ -138,13 +152,16 @@ def manhattan_distance_field_to_gif_frame(image: np.ndarray) -> np.ndarray:
     return np.array(np.clip(image * factor * DISTANCE_FIELD_CONTRAST_FACTOR, a_min=0, a_max=255), dtype=np.int8)
 
 
-def make_grid_configuration(resolution: int, threads_per_dimension: int = 16) -> tuple[tuple[int, int], tuple[int, int]]:
+def make_grid_configuration(resolution: int | np.int64, threads_per_dimension: int | np.int64 = 16) -> tuple[tuple[int, int], tuple[int, int]]:
     """
     Get the block and thread configuration for calling the kernel.
     For every pixel of the square image there will be one thread.
 
     NOTE: There can be more threads than pixels.
     """
+
+    resolution = int(resolution)
+    threads_per_dimension = int(threads_per_dimension)
 
     blocks_per_dimension = ((resolution + threads_per_dimension - 1) // threads_per_dimension)
 
