@@ -1,7 +1,7 @@
 import numpy as np
 from numba import cuda
 from typing import Callable
-from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt, colors
 
 
 from constants import DATA_FOLDER, RUNS
@@ -65,7 +65,12 @@ def kernel_performance_analysis(
             (kernel_name, np.median(metrics[0], axis=1))
         ]
     )
-    # create_kernel_performance_matrix()
+    create_kernel_performance_matrix(
+        kernel_name=kernel_name,
+        resolution_sizes=RESOLUTION_SIZES,
+        point_counts=POINT_COUNTS,
+        performances=np.median(metrics, axis=2)
+    )
 
 
 def compute_performance_metrics(
@@ -207,9 +212,43 @@ def create_kernel_performance_plot(
     plt.close()
 
 
-def create_kernel_performance_matrix(resolution: int, input_sizes: np.ndarray | list[int], performances: list[tuple[str, np.ndarray | list[float]]]):
-    print("TODO")
-    pass
+def create_kernel_performance_matrix(
+    kernel_name: str,
+    resolution_sizes: np.ndarray[tuple[int], np.dtype[np.int64]],
+    point_counts: np.ndarray[tuple[int], np.dtype[np.int64]],
+    performances: np.ndarray[tuple[int, int], np.dtype[np.float64]]
+):
+    fig, ax = plt.subplots()
+
+    plot = ax.imshow(performances, cmap="viridis_r", norm=colors.LogNorm())
+
+    threshold = np.mean(performances)
+
+    for y, row in enumerate(performances):
+        for x, item in enumerate(row):
+            ax.text(x, y, f"{item:.3f}", ha="center", va="center", color="#222222" if item < threshold else "#FFFFFF")
+
+    device = cuda.get_current_device()
+    if isinstance(device.name, str):
+        device_name: str = device.name
+    elif isinstance(device.name, bytes):
+        device_name: str = device.name.decode("utf-8")
+    else:
+        device_name = "unknown"
+
+    fig.suptitle(f"Points/Resolution kernel-ms comparison {kernel_name}")
+    ax.set_title(f"Device: {device_name}", fontsize=10, color="gray")
+    ax.set_xlabel("Point-counts")
+    ax.set_ylabel("Resolution")
+    ax.set_xticks(range(len(point_counts)))
+    ax.set_yticks(range(len(resolution_sizes)))
+    ax.set_xticklabels(list(map(lambda x: str(x), point_counts)))
+    ax.set_yticklabels(list(map(lambda x: str(x), resolution_sizes)))
+
+    fig.colorbar(plot, ax=ax)
+
+    plt.show()
+    # plt.savefig(os.path.join(DATA_FOLDER, f"task3_block_thread_comparison_{device_name.replace(" ", "_")}_27_bin.jpg"), dpi=300)
 
 
 if __name__ == "__main__":
