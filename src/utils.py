@@ -80,7 +80,7 @@ def make_empty_voronoi_output(resolution: int | np.int64, fill_value: int  | np.
     if fill_value is None:
         return cuda.device_array(
             shape=(resolution, resolution),
-            dtype=np.int32
+            dtype=np.int32 # type: ignore
         )
     else:
         fill_value = int(fill_value)
@@ -183,7 +183,7 @@ def get_thread_position(image: cuda.devicearray.DeviceNDArray) -> tuple[int, int
     x_index: int
     y_index: int
 
-    x_index, y_index = cuda.grid(2)
+    x_index, y_index = cuda.grid(2) # type: ignore
 
     x_coordinate = float(x_index) / float(image.shape[0])
     y_coordinate = float(y_index) / float(image.shape[1])
@@ -203,7 +203,7 @@ def get_thread_grid_stride_start() -> tuple[int, int]:
     """
 
     # Unique index inside a block
-    thread_index: int = cuda.threadIdx.y * cuda.blockDim.x + cuda.threadIdx.x
+    thread_index: int = cuda.threadIdx.y * cuda.blockDim.x + cuda.threadIdx.x # type: ignore
 
     stride_offset_point = thread_index // 2
     stride_offset_dimension = thread_index % 2
@@ -240,7 +240,7 @@ def calculate_euclidean_distance_with_sqrt(
     point_x_coordinate: float,
     point_y_coordinate: float
 ) -> float:
-    return cuda.libdevice.sqrt(
+    return cuda.libdevice.sqrt( # pyright: ignore[reportAttributeAccessIssue]
         calculate_square_euclidean_distance(
             x_coordinate=x_coordinate,
             y_coordinate=y_coordinate,
@@ -257,7 +257,7 @@ def calculate_euclidean_distance_with_hypot(
     point_x_coordinate: float,
     point_y_coordinate: float
 ) -> float:
-    return cuda.libdevice.hypot(
+    return cuda.libdevice.hypot( # pyright: ignore[reportAttributeAccessIssue]
         x_coordinate - point_x_coordinate,
         y_coordinate - point_y_coordinate
     )
@@ -283,7 +283,7 @@ def calculate_euclidean_distance_with_sqrt_fast(
     point_x_coordinate: float,
     point_y_coordinate: float
 ) -> float:
-    return cuda.libdevice.sqrt(
+    return cuda.libdevice.sqrt( # pyright: ignore[reportAttributeAccessIssue]
         calculate_square_euclidean_distance_fast(
             x_coordinate=x_coordinate,
             y_coordinate=y_coordinate,
@@ -300,7 +300,7 @@ def calculate_euclidean_distance_with_hypot_fast(
     point_x_coordinate: float,
     point_y_coordinate: float
 ) -> float:
-    return cuda.libdevice.hypot(
+    return cuda.libdevice.hypot( # pyright: ignore[reportAttributeAccessIssue]
         x_coordinate - point_x_coordinate,
         y_coordinate - point_y_coordinate
     )

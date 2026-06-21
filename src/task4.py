@@ -82,7 +82,7 @@ def voroni_euclidean_sqrt(
         threads_per_dimension=16
     )
 
-    _voroni_euclidean_sqrt_kernel[blocks_per_grid, threads_per_block](
+    _voroni_euclidean_sqrt_kernel[blocks_per_grid, threads_per_block]( # type: ignore
         points,
         out_image
     )
@@ -131,7 +131,7 @@ def voroni_square_euclidean(
         threads_per_dimension=16
     )
 
-    _voroni_square_euclidean_kernel[blocks_per_grid, threads_per_block](
+    _voroni_square_euclidean_kernel[blocks_per_grid, threads_per_block]( # type: ignore
         points,
         out_image
     )
@@ -180,7 +180,7 @@ def voroni_euclidean_sqrt_fast(
         threads_per_dimension=16
     )
 
-    _voroni_euclidean_sqrt_fast_kernel[blocks_per_grid, threads_per_block](
+    _voroni_euclidean_sqrt_fast_kernel[blocks_per_grid, threads_per_block]( # type: ignore
         points,
         out_image
     )
@@ -229,7 +229,7 @@ def voroni_euclidean_hypot_fast(
         threads_per_dimension=16
     )
 
-    _voroni_euclidean_hypot_fast_kernel[blocks_per_grid, threads_per_block](
+    _voroni_euclidean_hypot_fast_kernel[blocks_per_grid, threads_per_block]( # type: ignore
         points,
         out_image
     )
@@ -278,7 +278,7 @@ def voroni_square_euclidean_fast(
         threads_per_dimension=16
     )
 
-    _voroni_square_euclidean_fast_kernel[blocks_per_grid, threads_per_block](
+    _voroni_square_euclidean_fast_kernel[blocks_per_grid, threads_per_block]( # type: ignore
         points,
         out_image
     )

@@ -89,7 +89,7 @@ def compute_performance_metrics(
 
     # MARK: Dry run over multiple runs
     for _ in range(5):
-        kernel[_blocks, _threads](_in, _out)
+        kernel[_blocks, _threads](_in, _out) # type: ignore
         cuda.synchronize()
 
     result: list[list[list[float]]] = []
@@ -119,7 +119,7 @@ def compute_performance_metrics(
 
                 # Measure kernel
                 kernel_start.record()
-                kernel[blocks_per_grid, threads_per_block](points, out_image)
+                kernel[blocks_per_grid, threads_per_block](points, out_image) # type: ignore
                 kernel_end.record()
 
                 # Synchronize and add the measured time to the list

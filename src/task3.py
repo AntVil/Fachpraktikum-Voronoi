@@ -185,7 +185,7 @@ def voroni_euclidean_hypot(
         threads_per_dimension=16
     )
 
-    _voroni_euclidean_hypot_kernel[blocks_per_grid, threads_per_block](
+    _voroni_euclidean_hypot_kernel[blocks_per_grid, threads_per_block]( # type: ignore
         points,
         out_image
     )
@@ -234,7 +234,7 @@ def voroni_manhattan(
         threads_per_dimension=16
     )
 
-    _voroni_manhattan_kernel[blocks_per_grid, threads_per_block](
+    _voroni_manhattan_kernel[blocks_per_grid, threads_per_block]( # type: ignore
         points,
         out_image
     )
@@ -283,7 +283,7 @@ def distance_field_euclidean_hypot(
         threads_per_dimension=16
     )
 
-    _distance_field_euclidean_hypot_kernel[blocks_per_grid, threads_per_block](
+    _distance_field_euclidean_hypot_kernel[blocks_per_grid, threads_per_block]( # type: ignore
         points,
         out_image
     )
@@ -330,7 +330,7 @@ def distance_field_manhattan(
         threads_per_dimension=16
     )
 
-    _distance_field_manhattan_kernel[blocks_per_grid, threads_per_block](
+    _distance_field_manhattan_kernel[blocks_per_grid, threads_per_block]( # type: ignore
         points,
         out_image
     )
