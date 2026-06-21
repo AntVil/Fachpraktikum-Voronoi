@@ -1,38 +1,17 @@
-import os
 import numpy as np
 from numba import cuda
-import imageio.v3 as imageio
 from typing import Callable
 from matplotlib import pyplot as plt
 
 
 from constants import DATA_FOLDER, RUNS
 
-from task3 import (
-    _voroni_euclidean_hypot_kernel,
-    _voroni_manhattan_kernel,
-)
 
-from task4 import (
-    _voroni_euclidean_hypot_fast_kernel,
-    _voroni_euclidean_sqrt_kernel,
-    _voroni_euclidean_sqrt_fast_kernel,
-    _voroni_square_euclidean_kernel,
-    _voroni_square_euclidean_fast_kernel,
-)
-from task5 import _voroni_euclidean_grid_stride_kernel
-from task6 import (
-    jfa_voronoi_host,
-    _jfa_pass_naive_square_euclidean_kernel,
-    _jfa_pass_naive_manhattan_kernel,
-)
 from utils import (
-    generate_grid_jfa,
-    generate_random_seeds_jfa,
     make_grid_configuration,
     generate_uniform_points,
-    make_empty_voronoi_output,
 )
+
 
 # Different sizes for the resolution
 RESOLUTION_SIZES = np.array([
@@ -60,52 +39,6 @@ POINT_COUNTS = np.array([
     # 2**11,
     # TODO: Define values
 ], dtype=np.int64)
-
-
-def main() -> None:
-    # Naive kernels with different approaches to calculating the seed distance
-    kernel_performance_analysis(
-        kernel_name="euclidean_hypot",
-        kernel=_voroni_euclidean_hypot_kernel,
-        make_output_grid=make_empty_voronoi_output,
-    )
-    kernel_performance_analysis(
-        kernel_name="manhattan",
-        kernel=_voroni_manhattan_kernel,
-        make_output_grid=make_empty_voronoi_output,
-    )
-    kernel_performance_analysis(
-        kernel_name="euclidean_hypot_fast",
-        kernel=_voroni_euclidean_hypot_fast_kernel,
-        make_output_grid=make_empty_voronoi_output,
-    )
-    kernel_performance_analysis(
-        kernel_name="euclidean_sqrt",
-        kernel=_voroni_euclidean_sqrt_kernel,
-        make_output_grid=make_empty_voronoi_output,
-    )
-    kernel_performance_analysis(
-        kernel_name="euclidean_sqrt_fast",
-        kernel=_voroni_euclidean_sqrt_fast_kernel,
-        make_output_grid=make_empty_voronoi_output,
-    )
-    kernel_performance_analysis(
-        kernel_name="square_euclidean",
-        kernel=_voroni_square_euclidean_kernel,
-        make_output_grid=make_empty_voronoi_output,
-    )
-    kernel_performance_analysis(
-        kernel_name="square_euclidean_fast",
-        kernel=_voroni_square_euclidean_fast_kernel,
-        make_output_grid=make_empty_voronoi_output,
-    )
-
-    # Optimised kernel using shared memory
-    kernel_performance_analysis(
-        kernel_name="euclidean_grid_stride",
-        kernel=_voroni_euclidean_grid_stride_kernel,
-        make_output_grid=make_empty_voronoi_output,
-    )
 
 
 def kernel_performance_analysis(
@@ -280,4 +213,4 @@ def create_kernel_performance_matrix(resolution: int, input_sizes: np.ndarray | 
 
 
 if __name__ == "__main__":
-    main()
+    print("This task only concerns helper functions, which are used throughout, execute `task7.py` for the actual performance analyses")
