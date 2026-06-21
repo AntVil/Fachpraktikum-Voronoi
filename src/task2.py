@@ -2,7 +2,7 @@ import os
 import numpy as np
 from numba import cuda
 import imageio.v3 as imageio
-from typing import Any
+from typing import Callable
 from matplotlib import pyplot as plt
 
 
@@ -45,7 +45,7 @@ from utils import (
 )
 
 # Different sizes for the resolution
-SIZES: list[int] = [
+RESOLUTION_SIZES: list[int] = [
     2**9,  # 512
     2**10,  # 1024
     2**11,  # 2048
@@ -64,15 +64,11 @@ SIZES: list[int] = [
 
 # TODO: Also vary the seed count and observe the effect on kernel runtime?!
 # Different values for the seeds (points) in the diagram
-SEED_COUNTS: list[int] = [
-    100,
-    500,
-    1000,
-    # 2000,
-    # 5000,
-    # 10000,
-    # 15000,
-    # 20000,
+POINT_COUNTS: list[int] = [
+    2**8,
+    2**9,
+    # 2**10,
+    # 2**11,
     # TODO: Define values
 ]
 
@@ -105,14 +101,6 @@ def distance_calculations_performance_analysis() -> None:
         _voroni_square_euclidean_fast_kernel, make_empty_voronoi_output
     )
 
-    # NOTE: They have other kernel signatures (int32 vs Float64)
-    distance_calculations_test(
-        _distance_field_euclidean_hypot_kernel, make_empty_distance_field_output
-    )
-    distance_calculations_test(
-        _distance_field_manhattan_kernel, make_empty_distance_field_output
-    )
-
     # Optimised kernel using shared memory
     distance_calculations_test(
         _voroni_euclidean_grid_stride_kernel, make_empty_voronoi_output
@@ -120,18 +108,18 @@ def distance_calculations_performance_analysis() -> None:
 
 
 def distance_calculations_test(
-    kernel: Any,  # TODO: Specify typiing
-    make_output_grid: Any,
+    kernel: Callable[[cuda.devicearray.DeviceNDArray, cuda.devicearray.DeviceNDArray]],
+    make_output_grid: Callable[[int], cuda.devicearray.DeviceNDArray],
 ) -> dict[int, dict[int, float]]:
 
-    # Dry run definitions
-    _blocks, _threads = make_grid_configuration(resolution=SIZES[0])
+    # MARK: Dry run definitions
+    _blocks, _threads = make_grid_configuration(resolution=RESOLUTION_SIZES[0])
 
     # NOTE: Utilities also call cuda.to_device() and cuda.device_array() directly
-    _in: Any = generate_uniform_points(point_count=100)
-    _out: Any = make_output_grid(SIZES[0])
+    _in = generate_uniform_points(point_count=100)
+    _out = make_output_grid(RESOLUTION_SIZES[0])
 
-    # Dry run over multiple runs
+    # MARK: Dry run over multiple runs
     for _ in range(5):
         kernel[_blocks, _threads](_in, _out)
         cuda.synchronize()
@@ -143,41 +131,41 @@ def distance_calculations_test(
     kernel_start = cuda.event(timing=True)
     kernel_end = cuda.event(timing=True)
 
-    for N in SIZES:
+    for resolution in RESOLUTION_SIZES:
         # Grid configuration
         blocks_per_grid, threads_per_block = make_grid_configuration(
-            resolution=N, threads_per_dimension=16
+            resolution=resolution, threads_per_dimension=16
         )
 
         # Define a nested dictionary for the seed counts
-        results[N] = {}
+        results[resolution] = {}
 
-        for S in SEED_COUNTS:
+        for point_count in POINT_COUNTS:
             # Send data to GPU
-            seeds = generate_uniform_points(point_count=S)
+            points = generate_uniform_points(point_count=point_count)
 
             kernel_times: list[float] = []
             for _ in range(RUNS):
                 # Reset out_data
-                out_image = make_output_grid(N)
+                out_image = make_output_grid(resolution)
                 # NOTE: Consider moving this outside the 'RUNS'-loop, and either ignore resetting
                 # or use something like 'out_image_gpu.copy_to_device(blank_host_array)'
 
                 # Measure kernel
                 kernel_start.record()
-                kernel[blocks_per_grid, threads_per_block](seeds, out_image)
+                kernel[blocks_per_grid, threads_per_block](points, out_image)
                 kernel_end.record()
 
                 # Synchronize and add the measured time to the list
                 cuda.synchronize()
                 kernel_times.append(kernel_start.elapsed_time(kernel_end))
 
-            results[N][S] = np.median(kernel_times)
+            results[resolution][point_count] = np.median(kernel_times)
 
-    # MARK: DEBUG only (remove later)
+    # TODO: DEBUG only (remove later)
     for size, sub_dict in results.items():
         for seed, time_ms in sub_dict.items():
-            print(f"{size}x{seed}: {time_ms}ms")
+            print(f"resolution={size}^2 points={seed}: {time_ms}ms")
     print("")
 
     return results
