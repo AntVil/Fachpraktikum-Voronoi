@@ -27,6 +27,17 @@ def get_argument() -> str | None:
         return sys.argv[1]
 
 
+def get_device_name() -> str:
+    device = cuda.get_current_device()
+    # NOTE: On our machines these differed
+    if isinstance(device.name, str):
+        return device.name
+    elif isinstance(device.name, bytes):
+        return device.name.decode("utf-8")
+    else:
+        return "unknown"
+
+
 def generate_uniform_points(point_count: int | np.int64) -> cuda.devicearray.DeviceNDArray:
     """
     Create array of uniformly distributed points on device within [0, 1) as doubles

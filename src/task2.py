@@ -10,6 +10,7 @@ from constants import DATA_FOLDER, RUNS
 from utils import (
     make_grid_configuration,
     generate_uniform_points,
+    get_device_name,
 )
 
 
@@ -169,14 +170,7 @@ def create_kernel_performance_plot(
     assert all(map(lambda p: len(p[1].shape) == 1, performances_)), "`performances` should have a single dimension"
     assert all(map(lambda p: p[1].shape[0] == input_sizes_.shape[0], performances_)), "`performances` should have the same dimensionality as `input_sizes`"
 
-    # NOTE: On our machines these differed
-    device = cuda.get_current_device()
-    if isinstance(device.name, str):
-        device_name: str = device.name
-    elif isinstance(device.name, bytes):
-        device_name: str = device.name.decode("utf-8")
-    else:
-        device_name = "unknown"
+    device_name = get_device_name()
 
     (fig, ax) = plt.subplots(nrows=1, ncols=1)
 
@@ -210,6 +204,7 @@ def create_kernel_performance_plot(
     plt.cla()
     plt.clf()
     plt.close()
+    # TODO: save to some path
 
 
 def create_kernel_performance_matrix(
@@ -228,13 +223,7 @@ def create_kernel_performance_matrix(
         for x, item in enumerate(row):
             ax.text(x, y, f"{item:.3f}", ha="center", va="center", color="#222222" if item < threshold else "#FFFFFF")
 
-    device = cuda.get_current_device()
-    if isinstance(device.name, str):
-        device_name: str = device.name
-    elif isinstance(device.name, bytes):
-        device_name: str = device.name.decode("utf-8")
-    else:
-        device_name = "unknown"
+    device_name = get_device_name()
 
     fig.suptitle(f"Points/Resolution kernel-ms comparison {kernel_name}")
     ax.set_title(f"Device: {device_name}", fontsize=10, color="gray")
@@ -248,7 +237,10 @@ def create_kernel_performance_matrix(
     fig.colorbar(plot, ax=ax)
 
     plt.show()
-    # plt.savefig(os.path.join(DATA_FOLDER, f"task3_block_thread_comparison_{device_name.replace(" ", "_")}_27_bin.jpg"), dpi=300)
+    plt.cla()
+    plt.clf()
+    plt.close()
+    # TODO: save to some path
 
 
 if __name__ == "__main__":

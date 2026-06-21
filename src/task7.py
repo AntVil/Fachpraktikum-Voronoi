@@ -11,7 +11,6 @@ from task3 import (
     _voroni_euclidean_hypot_kernel,
     _voroni_manhattan_kernel,
 )
-
 from task4 import (
     _voroni_euclidean_hypot_fast_kernel,
     _voroni_euclidean_sqrt_kernel,
