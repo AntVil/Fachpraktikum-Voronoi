@@ -1,3 +1,4 @@
+import re
 from constants import DATA_FOLDER
 from utils import (
     get_argument,
@@ -5,7 +6,8 @@ from utils import (
 )
 
 from task2 import (
-    kernel_performance_analysis
+    kernel_performance_analysis,
+    kernel_performance_analysis_compare
 )
 from task3 import (
     _voroni_euclidean_hypot_kernel,
@@ -50,6 +52,27 @@ def main() -> None:
         kernel_performance_analysis(
             kernel_name=command,
             kernel=pixel_based[command],
+            make_output_grid=make_empty_voronoi_output
+        )
+    elif command == "all":
+        for kernel_name, kernel in pixel_based.items():
+            kernel_performance_analysis(
+                kernel_name=kernel_name,
+                kernel=kernel,
+                make_output_grid=make_empty_voronoi_output
+            )
+    elif command is not None and "compare" in command:
+        match = re.match(pattern="^compare-([^-]+)-([^-]+)$", string=command)
+        if match is None:
+            print(f"Error: unknown command '{command}'")
+            exit(1)
+        kernel1 = match[1]
+        kernel2 = match[2]
+        kernel_performance_analysis_compare(
+            kernels=[
+                (kernel1, pixel_based[kernel1]),
+                (kernel2, pixel_based[kernel2])
+            ],
             make_output_grid=make_empty_voronoi_output
         )
     else:

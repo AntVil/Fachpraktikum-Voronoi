@@ -55,7 +55,7 @@ Für jeden Pixel des Ergebnis wird ein Thread initialisiert. Jeder Thread iterie
 
 _Wie wird entschieden ob ein Punkt nächster Nachbar ist?_
 
-Beim iterieren wird die Distanz zu jedem Punkt berechnet und der Index des am nächsten liegenden Punkt gespeichert. Wenn nun ein Punkt mit geringerer Distanz gefunden wird, wird der Index überschrieben.
+Beim iterieren wird die Distanz zu jedem Punkt mit Hilfe von `cuda.libdevice.hypot` berechnet und der Index des am nächsten liegenden Punkt gespeichert. Wenn nun ein Punkt mit geringerer Distanz gefunden wird, wird der Index überschrieben.
 
 Folgende Animation gibt an, wie das Ergebnis nach jeder Iteration, also Hinzunahme eines weiteren Punkt, aussieht.
 
@@ -88,6 +88,17 @@ _Welche Parameter haben den größten Einfluss auf die Performance und wieso?_
 
 Die Anzahl an Punkten und die Ausgabe-Größe haben den größten Einfluss auf die Performance, da weitere Schleifen-Iterationen durchgeführt beziehungsweise weitere Threads gestartet werden müssen.
 
+Folgendes Diagramm gibt die Laufzeit für eine feste Ausgabe-Größe von `128x128`.
+
+| RTX-5070                                                                                                                           |     |
+| ---------------------------------------------------------------------------------------------------------------------------------- | --- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |     |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_resolution=128_points=64,128,256,512.png)                     |     |
+
+Es ist leicht zu erkennen, dass größenordnungsmäßig ein verdoppeln der Anzahl an Punkten ein verdoppeln der Laufzeit mit sich bringt. Ein verdoppeln der Auflösung führt größenordnungsmäßig zu einem vervierfachen der Laufzeit. Das liegt daran, dass ein verdoppeln der Auflösung dazu führt, dass viermal so viele Pixel berechnet werden müssen.
+
+Um eine nahe-liegende Optimierung zu motivieren, wird als Exkurs die Manhattan-Distanz betrachtet.
+
 _Exkurs Manhattan-Distanz: Welchen Einfluss hat die Manhattan-Distanz als alternative Metrik, und wie verändert sich das visuelle Ergebnis?_
 
 Die Manhattan-Distanz ist eine alternative Distanz-Funktion zur Euklidischen Distanz-Funktion. Sie ist definiert als die Summe der absoluten Abstände für jede Dimension.
@@ -102,7 +113,16 @@ Folgende Animation wurde für die Manhattan-Distanz erstellt.
 | ---------------------------------------------- | ---------------------------------------------------- |
 | ![](../data/task3_manhattan_visualization.gif) | ![](../data/task3_manhattan_field_visualization.gif) |
 
-`TODO: erwähnen, dass Manhattan schneller ist -> Motivation für Aufgabe 4`
+Der Algorithmus funktioniert auf die gleiche Weise, es gibt jedoch abgesehen von der Ausgabe einen deutlichen Unterschied in der Laufzeit.
+Der gleiche Algorithmus mit Manhattan-Distanz ist deutlich schneller als mit Euklidischer-Distanz, wie folgendes Diagramm zeigt.
+
+| RTX-5070                                                                                                                 |     |
+| ------------------------------------------------------------------------------------------------------------------------ | --- |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_manhattan_resolution=128_points=64,128,256,512.png) |     |
+
+Dies ist natürlich nicht verwunderlich, da für die Berechnung der Manhattan-Distanz nur Addition und die Absolut-Funktion nötig sind, welche sehr leicht zu berechnen sind.
+Hingegen für die Euklidische-Distanz wird die `cuda.libdevice.hypot` Funktion aufgerufen, welche schwerer beziehungsweise langsamer zu berechnen ist.
+Es ist also ersichtlich, dass durch eine effizientere Distanz-Prüfung eine schnellere Laufzeit möglich ist.
 
 # Aufgabe 4 - Optimierung durch billigere Distanz-Prüfung
 
@@ -116,7 +136,7 @@ Es kann versucht werden das berechnen von Distanz-Funktionen zu verbessern. Hier
 
 Ansonsten können schnellere Mathe-Operationen ermöglicht werden mit der `fastmath=True` annotation. Laut dem [nvidia-numba-cuda-user-guide](https://nvidia.github.io/numba-cuda/user/fastmath.html) werden einige Operationen wie `sqrt` durch schnellere Approximationen ersetzt und Multiplikations- und Additions-Operationen verschmolzen. Da unser Algorithmus nicht die exakten Distanzen benötigt sondern nur Distanzen vergleichen muss ist dies ein klarer Anwendungsfall.
 
-Zuletzt kann darauf verzichtet werden die tatsächliche Euklidische Distanz zu berechnen. Da nur Distanzen verglichen werden können wir auch die quadratische euklidische Distanz vergleichen. Auf den ersten Blick erscheint dies aufwendiger, jedoch kann auf diese Weise auf alle kompliziertere Mathe-Operationen verzichtet werden.
+Zuletzt kann darauf verzichtet werden die tatsächliche Euklidische Distanz zu berechnen. Da nur Distanzen verglichen werden, können wir auch die quadratische euklidische Distanz vergleichen. Auf den ersten Blick erscheint dies aufwendiger, jedoch kann auf diese Weise auf alle kompliziertere Mathe-Operationen verzichtet werden.
 
 2. Distanz Berechnung überspringen
 

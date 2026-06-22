@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from numba import cuda
 from typing import Callable
@@ -71,6 +72,34 @@ def kernel_performance_analysis(
         resolution_sizes=RESOLUTION_SIZES,
         point_counts=POINT_COUNTS,
         performances=np.median(metrics, axis=2)
+    )
+
+
+def kernel_performance_analysis_compare(
+    kernels: list[tuple[str, Callable[[cuda.devicearray.DeviceNDArray, cuda.devicearray.DeviceNDArray], None]]],
+    make_output_grid: Callable[[int | np.int64], cuda.devicearray.DeviceNDArray],
+) -> None:
+    performances: list[tuple[str, np.ndarray[tuple[int], np.dtype[np.float32] | np.dtype[np.float64]]]] = []
+    for kernel_name, kernel in kernels:
+        metrics = compute_performance_metrics(
+            kernel=kernel,
+            make_output_grid=make_output_grid,
+            resolution_sizes=RESOLUTION_SIZES,
+            point_counts=POINT_COUNTS,
+            run_count=RUNS
+        )
+
+        performances.append(
+            (
+                kernel_name,
+                np.median(metrics[0], axis=1)
+            )
+        )
+
+    create_kernel_performance_plot(
+        resolution=RESOLUTION_SIZES[0],
+        input_sizes=POINT_COUNTS,
+        performances=performances
     )
 
 
@@ -200,11 +229,17 @@ def create_kernel_performance_plot(
         fontweight="bold",
     )
 
-    plt.show()
+    # plt.show()
+    plt.savefig(
+        os.path.join(
+            DATA_FOLDER,
+            f"performance_plot_{device_name.replace(" ", "-")}_{"_".join(map(lambda x: x[0].replace(" ", "-"), performances))}_resolution={resolution}_points={",".join(map(str, input_sizes))}.png"
+        ),
+        dpi=300
+    )
     plt.cla()
     plt.clf()
     plt.close()
-    # TODO: save to some path
 
 
 def create_kernel_performance_matrix(
@@ -236,11 +271,17 @@ def create_kernel_performance_matrix(
 
     fig.colorbar(plot, ax=ax)
 
-    plt.show()
+    # plt.show()
+    plt.savefig(
+        os.path.join(
+            DATA_FOLDER,
+            f"performance_matrix_{device_name.replace(" ", "-")}_{kernel_name.replace(" ", "-")}_resolution={",".join(map(str, resolution_sizes))}_points={",".join(map(str, point_counts))}.png"
+        ),
+        dpi=300
+    )
     plt.cla()
     plt.clf()
     plt.close()
-    # TODO: save to some path
 
 
 if __name__ == "__main__":
