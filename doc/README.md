@@ -202,10 +202,10 @@ Für den Algorithmus sind die meisten dieser Bedingungen tatsächlich irrelevant
 
 Durch die verringerte Anzahl an Anweisungen ist eine klare Verbesserung in der Laufzeit zu erkennen.
 
-| RTX-5070 |     |
-| -------- | --- |
-|  ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |     |
-|   ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_euclidean_sqrt_resolution=128_points=64,128,256,512.png)       |     |
+| RTX-5070                                                                                                                          |     |
+| --------------------------------------------------------------------------------------------------------------------------------- | --- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |     |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_euclidean_sqrt_resolution=128_points=64,128,256,512.png)     |     |
 
 Es ist hierbei zu beachten, dass effektiv keine günstigere Distanz-Rechnung durchgeführt wurde, sondern es wurde auf gewisse Garantien bei der bisherigen Distanz-Berechnung verzichtet, da diese für den Algorithmus keinen Unterschied machen. Im folgenden wird auf exakte Ergebnisse verzichtet um den Algorithmus noch schneller zu machen.
 
@@ -235,14 +235,56 @@ In diesem Fall hat der Compiler wegen `fastmath=True` die intrinsic Funktion `sq
 
 Für die Laufzeit ergeben sich folgende Unterschiede.
 
-| RTX-5070 |     |
-| -------- | --- |
-|  ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |     |
-|   ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_euclidean_sqrt_fast_resolution=128_points=64,128,256,512.png)       |     |
+| RTX-5070                                                                                                                               |     |
+| -------------------------------------------------------------------------------------------------------------------------------------- | --- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |     |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_euclidean_sqrt_fast_resolution=128_points=64,128,256,512.png)      |     |
 
-
+Die Laufzeit hat sich deutlich verbessert durch den Einsatz von der `fastmath=True` Annotation. Für den Fall `Resolution=2048` und `Point-count=512` hat sich die Laufzeit ungefähr halbiert im Vergleich zur initialen Implementation aus _Aufgabe 3_.
 
 _Welchen Einfluss hat schlicht $a^2 + b^2$ und wieso?_
+
+Es gibt nun noch eine weitere wichtige Optimierung bei der Berechnung der Distanz-Funktion, nämlich das Verzichten auf die `sqrt` Operation. Im Algorithmus werden Distanzen nur verglichen und nicht anderweitig verwendet. Aus diesem Grund können wir folgende Folgerung ausnutzen: $\sqrt{a} \leq \sqrt{b} \implies a \leq b$, wenn $a \geq 0$ und $b \geq 0$. Da im Algorithmus die Eingaben für `sqrt` immer Quadrate (`^2`) sind, sind die Eingaben immer $0$ oder positiv.
+
+Im Assembly ist die Änderung wie zu erwarten (An dieser Stelle wurden Register-Namen geändert, um die Übersichtlichkeit zu verbessern):
+
+```diff
+$L__BB0_6:
+	mul.lo.s64 	%rd66, %rd76, %rd8;
+	add.s64 	%rd67, %rd1, %rd66;
+	add.s64 	%rd68, %rd5, %rd66;
+	ld.global.b32 	%r60, [%rd67];
+	add.s64 	%rd69, %rd9, %rd68;
+	ld.b32 	%r61, [%rd69];
+	sub.f32 	%r62, %r1, %r60;
+	sub.f32 	%r63, %r2, %r61;
+	mul.f32 	%r64, %r63, %r63;
+	fma.rn.f32 	%r65, %r62, %r62, %r64;
+-	sqrt.rn.f32 	%r66, %r65;
+-	setp.lt.f32 	%p24, %r66, %r67;
++	setp.lt.f32 	%p24, %r65, %r67;
+	selp.b64 	%rd75, %rd76, %rd75, %p24;
+```
+
+Diese Änderung erscheint auf den ersten Blick ernüchternd, jedoch ist die `sqrt.rn.f32` eine Aufwendige Operation, diese Operation einzusparen macht einen großen Unterschied.
+
+In dem bisherigen Assembly hat der Compiler Loop-Unrolling durchgeführt mit bis zu vier Iterationen der Schleife. Durch das verzichten auf `sqrt.rn.f32` scheint der Compiler bis zu acht Iterationen der Schleife aufzurollen.
+
+Folgende Diagramme zeigen die Laufzeit des Algorithmus mit der neuen Distanz-Funktion.
+
+| RTX-5070                                                                                                                            |     |
+| ----------------------------------------------------------------------------------------------------------------------------------- | --- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |     |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_fast_square_euclidean_resolution=128_points=64,128,256,512.png) |     |
+
+Es ist zu sehen, dass ein verzichten auf die `sqrt` Funktion die Performance steigert, jedoch ist auch zu erkennen, dass die Laufzeit zwischen der `sqrt` Funktion mit `fastmath=True` und keiner `sqrt` Funktion relativ nahe beieinander liegen.
+
+Das Verwenden von `fastmath=True` für die neue Distanz-Funktion hat nur minimale Auswirkungen, da im Algorithmus nur noch Divisionen, die nur selten durchgeführt werden beschleunigt werden, wie folgende Diagramme zeigen.
+
+| RTX-5070                                                                                                                                 |     |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | --- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |     |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_fast_square_euclidean_fast_resolution=128_points=64,128,256,512.png) |     |
 
 # Aufgabe 5 - Effizienteres Laden von Daten
 
