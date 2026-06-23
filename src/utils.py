@@ -40,10 +40,10 @@ def get_device_name() -> str:
 
 def generate_uniform_points(point_count: int | np.int64) -> cuda.devicearray.DeviceNDArray:
     """
-    Create array of uniformly distributed points on device within [0, 1) as doubles
+    Create array of uniformly distributed points on device within [0, 1) as single precision floats
     """
 
-    points = np.random.rand(int(point_count), 2)
+    points = np.random.rand(int(point_count), 2).astype(np.float32)
     return cuda.to_device(points)
 
 
@@ -185,24 +185,24 @@ def make_grid_configuration(resolution: int | np.int64, threads_per_dimension: i
 # MARK: Device-Functions
 
 
-@cuda.jit(device=True, inline=True)
-def get_thread_position(image: cuda.devicearray.DeviceNDArray) -> tuple[int, int, float, float]:
+@cuda.jit("Tuple((int32, int32, float32, float32))(int32[:, :])", device=True, inline=True)
+def get_thread_position(image: cuda.devicearray.DeviceNDArray) -> tuple[np.int32, np.int32, np.float32, np.float32]:
     """
     Get the position of the pixel inside the image and the coordinate position in the diagram based on the thread
     """
 
-    x_index: int
-    y_index: int
+    x_index: np.int32
+    y_index: np.int32
 
     x_index, y_index = cuda.grid(2) # type: ignore
 
-    x_coordinate = float(x_index) / float(image.shape[0])
-    y_coordinate = float(y_index) / float(image.shape[1])
+    x_coordinate = np.float32(x_index) / np.float32(image.shape[0])
+    y_coordinate = np.float32(y_index) / np.float32(image.shape[1])
 
     return (x_index, y_index, x_coordinate, y_coordinate)
 
 
-@cuda.jit(device=True, inline=True)
+@cuda.jit("Tuple((int32, int32))()", device=True, inline=True)
 def get_thread_grid_stride_start() -> tuple[int, int]:
     """
     Get the indices for indexing into the points array for each block in a grid-stride-loop.
@@ -222,8 +222,8 @@ def get_thread_grid_stride_start() -> tuple[int, int]:
     return (stride_offset_point, stride_offset_dimension)
 
 
-@cuda.jit(device=True, inline=True)
-def is_outside_image(x_index: int, y_index: int, image: cuda.devicearray.DeviceNDArray) -> bool:
+@cuda.jit("boolean(int32, int32, int32[:, :])", device=True, inline=True, fastmath=False)
+def is_outside_image(x_index: np.int32, y_index: np.int32, image: cuda.devicearray.DeviceNDArray) -> np.bool:
     """
     Check wether the pixel is outside the image or not
     """
@@ -231,27 +231,56 @@ def is_outside_image(x_index: int, y_index: int, image: cuda.devicearray.DeviceN
     return x_index >= image.shape[0] or y_index >= image.shape[1]
 
 
-@cuda.jit(device=True, inline=True)
+# MARK: Distance functions
+
+
+@cuda.jit("float32(float32, float32, float32, float32)", device=True, inline=True, fastmath=False)
 def calculate_manhattan_distance(
-    x_coordinate: float,
-    y_coordinate: float,
-    point_x_coordinate: float,
-    point_y_coordinate: float
-) -> float:
+    x_coordinate: np.float32,
+    y_coordinate: np.float32,
+    point_x_coordinate: np.float32,
+    point_y_coordinate: np.float32
+) -> np.float32:
     return (
         abs(x_coordinate - point_x_coordinate) +
         abs(y_coordinate - point_y_coordinate)
     )
 
 
-@cuda.jit(device=True, inline=True)
+@cuda.jit("float32(float32, float32, float32, float32)", device=True, inline=True, fastmath=True)
+def calculate_manhattan_distance_fast(
+    x_coordinate: np.float32,
+    y_coordinate: np.float32,
+    point_x_coordinate: np.float32,
+    point_y_coordinate: np.float32
+) -> np.float32:
+    return (
+        abs(x_coordinate - point_x_coordinate) +
+        abs(y_coordinate - point_y_coordinate)
+    )
+
+
+@cuda.jit("float32(float32, float32, float32, float32)", device=True, inline=True, fastmath=False)
+def calculate_square_euclidean_distance(
+    x_coordinate: np.float32,
+    y_coordinate: np.float32,
+    point_x_coordinate: np.float32,
+    point_y_coordinate: np.float32
+) -> np.float32:
+    return (
+        (x_coordinate - point_x_coordinate) * (x_coordinate - point_x_coordinate) +
+        (y_coordinate - point_y_coordinate) * (y_coordinate - point_y_coordinate)
+    )
+
+
+@cuda.jit("float32(float32, float32, float32, float32)", device=True, inline=True, fastmath=False)
 def calculate_euclidean_distance_with_sqrt(
-    x_coordinate: float,
-    y_coordinate: float,
-    point_x_coordinate: float,
-    point_y_coordinate: float
-) -> float:
-    return cuda.libdevice.sqrt( # pyright: ignore[reportAttributeAccessIssue]
+    x_coordinate: np.float32,
+    y_coordinate: np.float32,
+    point_x_coordinate: np.float32,
+    point_y_coordinate: np.float32
+) -> np.float32:
+    return cuda.libdevice.sqrtf( # pyright: ignore[reportAttributeAccessIssue]
         calculate_square_euclidean_distance(
             x_coordinate=x_coordinate,
             y_coordinate=y_coordinate,
@@ -261,40 +290,40 @@ def calculate_euclidean_distance_with_sqrt(
     )
 
 
-@cuda.jit(device=True, inline=True)
+@cuda.jit("float32(float32, float32, float32, float32)", device=True, inline=True, fastmath=False)
 def calculate_euclidean_distance_with_hypot(
-    x_coordinate: float,
-    y_coordinate: float,
-    point_x_coordinate: float,
-    point_y_coordinate: float
-) -> float:
-    return cuda.libdevice.hypot( # pyright: ignore[reportAttributeAccessIssue]
+    x_coordinate: np.float32,
+    y_coordinate: np.float32,
+    point_x_coordinate: np.float32,
+    point_y_coordinate: np.float32
+) -> np.float32:
+    return cuda.libdevice.hypotf( # pyright: ignore[reportAttributeAccessIssue]
         x_coordinate - point_x_coordinate,
         y_coordinate - point_y_coordinate
     )
 
 
-@cuda.jit(device=True, inline=True)
-def calculate_square_euclidean_distance(
-    x_coordinate: float,
-    y_coordinate: float,
-    point_x_coordinate: float,
-    point_y_coordinate: float
-) -> float:
+@cuda.jit("float32(float32, float32, float32, float32)", device=True, inline=True, fastmath=True)
+def calculate_square_euclidean_distance_fast(
+    x_coordinate: np.float32,
+    y_coordinate: np.float32,
+    point_x_coordinate: np.float32,
+    point_y_coordinate: np.float32
+) -> np.float32:
     return (
         (x_coordinate - point_x_coordinate) * (x_coordinate - point_x_coordinate) +
         (y_coordinate - point_y_coordinate) * (y_coordinate - point_y_coordinate)
     )
 
 
-@cuda.jit(device=True, inline=True, fastmath=True)
+@cuda.jit("float32(float32, float32, float32, float32)", device=True, inline=True, fastmath=True)
 def calculate_euclidean_distance_with_sqrt_fast(
-    x_coordinate: float,
-    y_coordinate: float,
-    point_x_coordinate: float,
-    point_y_coordinate: float
-) -> float:
-    return cuda.libdevice.sqrt( # pyright: ignore[reportAttributeAccessIssue]
+    x_coordinate: np.float32,
+    y_coordinate: np.float32,
+    point_x_coordinate: np.float32,
+    point_y_coordinate: np.float32
+) -> np.float32:
+    return cuda.libdevice.sqrtf( # pyright: ignore[reportAttributeAccessIssue]
         calculate_square_euclidean_distance_fast(
             x_coordinate=x_coordinate,
             y_coordinate=y_coordinate,
@@ -304,27 +333,14 @@ def calculate_euclidean_distance_with_sqrt_fast(
     )
 
 
-@cuda.jit(device=True, inline=True, fastmath=True)
+@cuda.jit("float32(float32, float32, float32, float32)", device=True, inline=True, fastmath=True)
 def calculate_euclidean_distance_with_hypot_fast(
-    x_coordinate: float,
-    y_coordinate: float,
-    point_x_coordinate: float,
-    point_y_coordinate: float
-) -> float:
-    return cuda.libdevice.hypot( # pyright: ignore[reportAttributeAccessIssue]
+    x_coordinate: np.float32,
+    y_coordinate: np.float32,
+    point_x_coordinate: np.float32,
+    point_y_coordinate: np.float32
+) -> np.float32:
+    return cuda.libdevice.hypotf( # pyright: ignore[reportAttributeAccessIssue]
         x_coordinate - point_x_coordinate,
         y_coordinate - point_y_coordinate
-    )
-
-
-@cuda.jit(device=True, inline=True, fastmath=True)
-def calculate_square_euclidean_distance_fast(
-    x_coordinate: float,
-    y_coordinate: float,
-    point_x_coordinate: float,
-    point_y_coordinate: float
-) -> float:
-    return (
-        (x_coordinate - point_x_coordinate) * (x_coordinate - point_x_coordinate) +
-        (y_coordinate - point_y_coordinate) * (y_coordinate - point_y_coordinate)
     )

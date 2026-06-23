@@ -193,13 +193,13 @@ def voroni_euclidean_hypot(
     return out_image.copy_to_host()
 
 
-@cuda.jit("void(float64[:, :], int32[:, :])")
+@cuda.jit("void(float32[:, :], int32[:, :])")
 def _voroni_euclidean_hypot_kernel(
     in_points: cuda.devicearray.DeviceNDArray,
     out_image: cuda.devicearray.DeviceNDArray
 ) -> None:
-    closest_index = 0
-    closest_distance = np.inf
+    closest_index = np.int32(0)
+    closest_distance = np.float32(np.inf)
 
     (x_index, y_index, x_coordinate, y_coordinate) = get_thread_position(image=out_image)
 
@@ -242,13 +242,13 @@ def voroni_manhattan(
     return out_image.copy_to_host()
 
 
-@cuda.jit("void(float64[:, :], int32[:, :])")
+@cuda.jit("void(float32[:, :], int32[:, :])")
 def _voroni_manhattan_kernel(
     in_points: cuda.devicearray.DeviceNDArray,
     out_image: cuda.devicearray.DeviceNDArray
 ) -> None:
-    closest_index = 0
-    closest_distance = np.inf
+    closest_index = np.int32(0)
+    closest_distance = np.float32(np.inf)
 
     (x_index, y_index, x_coordinate, y_coordinate) = get_thread_position(image=out_image)
 
@@ -291,12 +291,12 @@ def distance_field_euclidean_hypot(
     return out_image.copy_to_host()
 
 
-@cuda.jit("void(float64[:, :], float64[:, :])")
+@cuda.jit("void(float32[:, :], float64[:, :])")
 def _distance_field_euclidean_hypot_kernel(
     in_points: cuda.devicearray.DeviceNDArray,
     out_image: cuda.devicearray.DeviceNDArray
 ) -> None:
-    closest_distance = np.inf
+    closest_distance = np.float32(np.inf)
 
     (x_index, y_index, x_coordinate, y_coordinate) = get_thread_position(image=out_image)
 
@@ -338,12 +338,12 @@ def distance_field_manhattan(
     return out_image.copy_to_host()
 
 
-@cuda.jit("void(float64[:, :], float64[:, :])")
+@cuda.jit("void(float32[:, :], float64[:, :])")
 def _distance_field_manhattan_kernel(
     in_points: cuda.devicearray.DeviceNDArray,
     out_image: cuda.devicearray.DeviceNDArray
 ) -> None:
-    closest_distance = np.inf
+    closest_distance = np.float32(np.inf)
 
     (x_index, y_index, x_coordinate, y_coordinate) = get_thread_position(image=out_image)
 

@@ -68,20 +68,20 @@ def voronoi_euclidean_grid_stride(
     return out_image.copy_to_host()
 
 
-@cuda.jit("void(float64[:, :], int32[:, :])")
+@cuda.jit("void(float32[:, :], int32[:, :])")
 def _voroni_euclidean_grid_stride_kernel(
     in_points: cuda.devicearray.DeviceNDArray,
     out_image: cuda.devicearray.DeviceNDArray
 ) -> None:
-    closest_index = 0
-    closest_distance = np.inf
+    closest_index = np.int32(0)
+    closest_distance = np.float32(np.inf)
 
     (x_index, y_index, x_coordinate, y_coordinate) = get_thread_position(image=out_image)
 
     (stride_offset_point, stride_offset_dimension) = get_thread_grid_stride_start()
 
     # NOTE: local buffer with same characteristics like `in_points`, just smaller
-    shared_buffer: cuda.devicearray.DeviceNDArray = cuda.shared.array(shape=(GRID_STRIDE_SIZE, 2), dtype=np.float64) # type: ignore
+    shared_buffer: cuda.devicearray.DeviceNDArray = cuda.shared.array(shape=(GRID_STRIDE_SIZE, 2), dtype=np.float32) # type: ignore
 
     for stride_index in range(0, in_points.shape[0], GRID_STRIDE_SIZE):
         # NOTE: check if thread is inside `shared_buffer`
@@ -144,13 +144,13 @@ def voronoi_euclidean_warp_shfl(
     return out_image.copy_to_host()
 
 
-@cuda.jit("void(float64[:, :], int32[:, :])")
+@cuda.jit("void(float32[:, :], int32[:, :])")
 def _voroni_euclidean_warp_shfl(
     in_points: cuda.devicearray.DeviceNDArray,
     out_image: cuda.devicearray.DeviceNDArray
 ) -> None:
-    closest_index = 0
-    closest_distance = np.inf
+    closest_index = np.int32(0)
+    closest_distance = np.float32(np.inf)
 
     (x_index, y_index, x_coordinate, y_coordinate) = get_thread_position(image=out_image)
 
@@ -158,7 +158,7 @@ def _voroni_euclidean_warp_shfl(
     stride_offset_point = stride_offset_point % WARP_POINTS
 
     # NOTE: Container of `x` and `y` depending on `stride_offset_dimension`
-    point_component_warp_value = np.inf
+    point_component_warp_value = np.float32(np.inf)
 
     for stride_index in range(0, in_points.shape[0], WARP_POINTS):
         global_point_index = stride_index + stride_offset_point
@@ -168,7 +168,7 @@ def _voroni_euclidean_warp_shfl(
             point_component_warp_value = in_points[global_point_index, stride_offset_dimension]
         else:
             # NOTE: default value for missing points
-            point_component_warp_value = np.inf
+            point_component_warp_value = np.float32(np.inf)
 
         # NOTE: Go through loaded data and do the actual algorithm
         for index in range(0, WARP_SIZE, 2):

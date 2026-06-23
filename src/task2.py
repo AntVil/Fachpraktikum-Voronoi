@@ -52,6 +52,15 @@ def kernel_performance_analysis(
     Do a performance analysis on a single Kernel and generate a number of plots
     """
 
+    device_name = get_device_name().replace(" ", "_")
+
+    # NOTE: reading llvm is quite hard, for our purposes the asm is totally fine
+    # with open(os.path.join(DATA_FOLDER, f"compiled_llvm_{device_name}_{kernel_name.replace(" ", "_")}.ll"), "w") as f:
+    #     f.write(kernel.inspect_llvm(kernel.signatures[0])) # type: ignore
+
+    with open(os.path.join(DATA_FOLDER, f"compiled_asm_{device_name}_{kernel_name.replace(" ", "_")}.asm"), "w") as f:
+        f.write(kernel.inspect_asm(kernel.signatures[0])) # type: ignore
+
     metrics = compute_performance_metrics(
         kernel=kernel,
         make_output_grid=make_output_grid,

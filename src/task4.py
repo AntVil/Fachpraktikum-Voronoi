@@ -90,13 +90,13 @@ def voroni_euclidean_sqrt(
     return out_image.copy_to_host()
 
 
-@cuda.jit("void(float64[:, :], int32[:, :])")
+@cuda.jit("void(float32[:, :], int32[:, :])")
 def _voroni_euclidean_sqrt_kernel(
     in_points: cuda.devicearray.DeviceNDArray,
     out_image: cuda.devicearray.DeviceNDArray
 ) -> None:
-    closest_index = 0
-    closest_distance = np.inf
+    closest_index = np.int32(0)
+    closest_distance = np.float32(np.inf)
 
     (x_index, y_index, x_coordinate, y_coordinate) = get_thread_position(image=out_image)
 
@@ -139,13 +139,13 @@ def voroni_square_euclidean(
     return out_image.copy_to_host()
 
 
-@cuda.jit("void(float64[:, :], int32[:, :])")
+@cuda.jit("void(float32[:, :], int32[:, :])")
 def _voroni_square_euclidean_kernel(
     in_points: cuda.devicearray.DeviceNDArray,
     out_image: cuda.devicearray.DeviceNDArray
 ) -> None:
-    closest_index = 0
-    closest_distance = np.inf
+    closest_index = np.int32(0)
+    closest_distance = np.float32(np.inf)
 
     (x_index, y_index, x_coordinate, y_coordinate) = get_thread_position(image=out_image)
 
@@ -188,13 +188,13 @@ def voroni_euclidean_sqrt_fast(
     return out_image.copy_to_host()
 
 
-@cuda.jit("void(float64[:, :], int32[:, :])")
+@cuda.jit("void(float32[:, :], int32[:, :])", fastmath=True)
 def _voroni_euclidean_sqrt_fast_kernel(
     in_points: cuda.devicearray.DeviceNDArray,
     out_image: cuda.devicearray.DeviceNDArray
 ) -> None:
-    closest_index = 0
-    closest_distance = np.inf
+    closest_index = np.int32(0)
+    closest_distance = np.float32(np.inf)
 
     (x_index, y_index, x_coordinate, y_coordinate) = get_thread_position(image=out_image)
 
@@ -237,13 +237,13 @@ def voroni_euclidean_hypot_fast(
     return out_image.copy_to_host()
 
 
-@cuda.jit("void(float64[:, :], int32[:, :])")
+@cuda.jit("void(float32[:, :], int32[:, :])", fastmath=True)
 def _voroni_euclidean_hypot_fast_kernel(
     in_points: cuda.devicearray.DeviceNDArray,
     out_image: cuda.devicearray.DeviceNDArray
 ) -> None:
-    closest_index = 0
-    closest_distance = np.inf
+    closest_index = np.int32(0)
+    closest_distance = np.float32(np.inf)
 
     (x_index, y_index, x_coordinate, y_coordinate) = get_thread_position(image=out_image)
 
@@ -286,13 +286,13 @@ def voroni_square_euclidean_fast(
     return out_image.copy_to_host()
 
 
-@cuda.jit("void(float64[:, :], int32[:, :])")
+@cuda.jit("void(float32[:, :], int32[:, :])", fastmath=True)
 def _voroni_square_euclidean_fast_kernel(
     in_points: cuda.devicearray.DeviceNDArray,
     out_image: cuda.devicearray.DeviceNDArray
 ) -> None:
-    closest_index = 0
-    closest_distance = np.inf
+    closest_index = np.int32(0)
+    closest_distance = np.float32(np.inf)
 
     (x_index, y_index, x_coordinate, y_coordinate) = get_thread_position(image=out_image)
 
