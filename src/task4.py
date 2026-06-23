@@ -188,6 +188,7 @@ def voroni_euclidean_sqrt_fast(
     return out_image.copy_to_host()
 
 
+# NOTE: it seems it's not enough to just annotate the distance function for whatever reason (check the assembly)
 @cuda.jit("void(float32[:, :], int32[:, :])", fastmath=True)
 def _voroni_euclidean_sqrt_fast_kernel(
     in_points: cuda.devicearray.DeviceNDArray,
@@ -237,6 +238,7 @@ def voroni_euclidean_hypot_fast(
     return out_image.copy_to_host()
 
 
+# NOTE: it seems it's not enough to just annotate the distance function for whatever reason (check the assembly)
 @cuda.jit("void(float32[:, :], int32[:, :])", fastmath=True)
 def _voroni_euclidean_hypot_fast_kernel(
     in_points: cuda.devicearray.DeviceNDArray,
@@ -286,6 +288,7 @@ def voroni_square_euclidean_fast(
     return out_image.copy_to_host()
 
 
+# NOTE: it seems it's not enough to just annotate the distance function for whatever reason (check the assembly)
 @cuda.jit("void(float32[:, :], int32[:, :])", fastmath=True)
 def _voroni_square_euclidean_fast_kernel(
     in_points: cuda.devicearray.DeviceNDArray,

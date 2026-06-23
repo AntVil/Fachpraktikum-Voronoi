@@ -55,7 +55,7 @@ Für jeden Pixel des Ergebnis wird ein Thread initialisiert. Jeder Thread iterie
 
 _Wie wird entschieden ob ein Punkt nächster Nachbar ist?_
 
-Beim iterieren wird die Distanz zu jedem Punkt mit Hilfe von `cuda.libdevice.hypot` berechnet und der Index des am nächsten liegenden Punkt gespeichert. Wenn nun ein Punkt mit geringerer Distanz gefunden wird, wird der Index überschrieben.
+Beim iterieren wird die Distanz zu jedem Punkt mit Hilfe von `cuda.libdevice.hypotf` berechnet und der Index des am nächsten liegenden Punkt gespeichert. Wenn nun ein Punkt mit geringerer Distanz gefunden wird, wird der Index überschrieben.
 
 Folgende Animation gibt an, wie das Ergebnis nach jeder Iteration, also Hinzunahme eines weiteren Punkt, aussieht.
 
@@ -121,7 +121,7 @@ Der gleiche Algorithmus mit Manhattan-Distanz ist deutlich schneller als mit Euk
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_manhattan_resolution=128_points=64,128,256,512.png) |     |
 
 Dies ist natürlich nicht verwunderlich, da für die Berechnung der Manhattan-Distanz nur Addition und die Absolut-Funktion nötig sind, welche sehr leicht zu berechnen sind.
-Hingegen für die Euklidische-Distanz wird die `cuda.libdevice.hypot` Funktion aufgerufen, welche schwerer beziehungsweise langsamer zu berechnen ist.
+Hingegen für die Euklidische-Distanz wird die `cuda.libdevice.hypotf` Funktion aufgerufen, welche schwerer beziehungsweise langsamer zu berechnen ist.
 Es ist also ersichtlich, dass durch eine effizientere Distanz-Prüfung eine schnellere Laufzeit möglich ist.
 
 # Aufgabe 4 - Optimierung durch billigere Distanz-Prüfung
@@ -134,7 +134,7 @@ Der bisherige Algorithmus arbeitet jeden Punkt ab und berechnet den Abstand um e
 
 Es kann versucht werden das berechnen von Distanz-Funktionen zu verbessern. Hierbei gibt es die Möglichkeit die `sqrt` Funktion aufzurufen.
 
-Ansonsten können schnellere Mathe-Operationen ermöglicht werden mit der `fastmath=True` annotation. Laut dem [nvidia-numba-cuda-user-guide](https://nvidia.github.io/numba-cuda/user/fastmath.html) werden einige Operationen wie `sqrt` durch schnellere Approximationen ersetzt und Multiplikations- und Additions-Operationen verschmolzen. Da unser Algorithmus nicht die exakten Distanzen benötigt sondern nur Distanzen vergleichen muss ist dies ein klarer Anwendungsfall.
+Ansonsten können schnellere Mathe-Operationen ermöglicht werden mit der `fastmath=True` Annotation. Laut dem [nvidia-numba-cuda-user-guide](https://nvidia.github.io/numba-cuda/user/fastmath.html) werden einige Operationen wie `sqrt` durch schnellere Approximationen ersetzt und Multiplikations- und Additions-Operationen verschmolzen. Da unser Algorithmus nicht die exakten Distanzen benötigt sondern nur Distanzen vergleichen muss ist dies ein klarer Anwendungsfall.
 
 Zuletzt kann darauf verzichtet werden die tatsächliche Euklidische Distanz zu berechnen. Da nur Distanzen verglichen werden, können wir auch die quadratische euklidische Distanz vergleichen. Auf den ersten Blick erscheint dies aufwendiger, jedoch kann auf diese Weise auf alle kompliziertere Mathe-Operationen verzichtet werden.
 
@@ -142,13 +142,107 @@ Zuletzt kann darauf verzichtet werden die tatsächliche Euklidische Distanz zu b
 
 Es können schnelle Approximationen der Distanz-Funktion verwendet werden um sich die exakte Berechnung einzusparen. Beispielsweise kann der Abstand unter Berücksichtigung nur einer Dimension bestimmt werden. Auf diese Weise können Punkte die definitiv zu Weit entfernt sind übersprungen werden, indem eine Verzweigung eingesetzt wird.
 
+_Welchen Einfluss hat `sqrt` und wieso?_
+
+Für die bisherigen Berechnungen wurde die `cuda.libdevice.hypotf` Funktion verwendet, da diese genau die Euklidische-Distanz berechnet. Es ist auch möglich das equivalent der `cuda.libdevice.hypotf` Funktion zu berechnen, indem der Ausdruck $\sqrt{(a_x - b_x)^2 + (a_y - b_y)^2}$ ausgeschrieben wird mit Hilfe der Funktion `cuda.libdevice.sqrtf`.
+
+Die Annahme vorab ist, dass die beiden Funktionen die gleiche Laufzeit haben. Es wäre auch denkbar, dass die `cuda.libdevice.hypotf` Funktion bestimmte Optimierungen ermöglicht, die bei der generischen Funktion `cuda.libdevice.sqrtf` nicht möglich wären. Tatsächlich hat sich in der Praxis das gegenteil gezeigt, wie folgender Ausschnitt aus dem Assembly zeigt.
+
+```diff
+$L__BB0_6:
+	mul.lo.s64 	%rd66, %rd76, %rd8;
+	add.s64 	%rd67, %rd1, %rd66;
+	add.s64 	%rd68, %rd5, %rd66;
+	ld.global.b32 	%r132, [%rd67];
+	add.s64 	%rd69, %rd9, %rd68;
+-	ld.b32 	%r133, [%rd69];
++   ld.b32 	%r61, [%rd69];
+-	sub.f32 	%r134, %r1, %r132;
+-	sub.f32 	%r135, %r2, %r133;
++	sub.f32 	%r62, %r1, %r60;
++	sub.f32 	%r63, %r2, %r61;
+-	abs.f32 	%r136, %r134;
+-	abs.f32 	%r137, %r135;
+-	min.s32 	%r138, %r137, %r136;
+-	max.s32 	%r139, %r136, %r137;
+-	and.b32 	%r140, %r139, -33554432;
+-	xor.b32 	%r141, %r140, 2122317824;
+-	mul.f32 	%r142, %r138, %r141;
+-	mul.f32 	%r143, %r139, %r141;
+-	mul.f32 	%r144, %r142, %r142;
+-	fma.rn.f32 	%r145, %r143, %r143, %r144;
+-	sqrt.rn.f32 	%r146, %r145;
++	mul.f32 	%r64, %r63, %r63;
++	fma.rn.f32 	%r65, %r62, %r62, %r64;
++	sqrt.rn.f32 	%r66, %r65;
+-	or.b32 	%r147, %r140, 8388608;
+-	mul.f32 	%r148, %r146, %r147;
+-	setp.eq.f32 	%p36, %r138, 0f00000000;
+-	selp.f32 	%r149, %r139, %r148, %p36;
+-	setp.eq.f32 	%p37, %r138, 0f7F800000;
+-	selp.f32 	%r150, 0f7F800000, %r149, %p37;
+-	setp.lt.f32 	%p38, %r150, %r151;
+-	selp.b64 	%rd75, %rd76, %rd75, %p38;
++	setp.lt.f32 	%p24, %r66, %r67;
++	selp.b64 	%rd75, %rd76, %rd75, %p24;
+```
+
+Es ist zu erkennen, dass die `cuda.libdevice.hypotf` zu einem größeren Ausdruck übersetzt wird und innerhalb dieses Ausdruck wird die intrinsic Funktion `sqrt.rn.f32` aufgerufen. Das explizite Ausschreiben des Ausdruck $\sqrt{(a_x - b_x)^2 + (a_y - b_y)^2}$ führt dazu, dass gewisse Anweisungen wegfallen.
+
+Ein Abgleich mit der Dokumentation von CUDA für die [hypotf Funktion](https://docs.nvidia.com/cuda/cuda-math-api/cuda_math_api/group__CUDA__MATH__SINGLE.html#group__cuda__math__single_1ga2880a4ebf5500aeb74fb01340ea91215) gibt einen Einblick weswegen diese Anweisungen existieren.
+Die `cuda.libdevice.hypotf` Funktion muss garantieren, dass:
+- $\mathrm{hypot}(x,y)$, $\mathrm{hypot}(y,x)$ und $\mathrm{hypot}(x,-y)$ äquivalent sind
+- $\mathrm{hypot}(x, \pm 0)$ äquivalent zu $\mathrm{fabsf}(x)$ ist
+- $\mathrm{hypot}(\pm \infty,y)$ immer $+ \infty$ ergibt, selbst wenn $y=\mathrm{NaN}$
+- $\mathrm{hypot}(\mathrm{NaN},y)$ immer $\mathrm{NaN}$ ergibt, selbst wenn $y \neq \pm \infty$
+
+Diese Bedingungen erfordern zusätzliche Anweisungen.
+
+Für den Algorithmus sind die meisten dieser Bedingungen tatsächlich irrelevant. Das Verhalten des Algorithmus ändert sich nicht, wenn die Funktion $\mathrm{NaN}$ statt $\infty$ oder andersherum zurückgibt, da Distanzen nur verglichen werden und der Algorithmus in beiden Fällen die gleiche Verzweigung wählt.
+
+Durch die verringerte Anzahl an Anweisungen ist eine klare Verbesserung in der Laufzeit zu erkennen.
+
+| RTX-5070 |     |
+| -------- | --- |
+|  ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |     |
+|   ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_euclidean_sqrt_resolution=128_points=64,128,256,512.png)       |     |
+
+Es ist hierbei zu beachten, dass effektiv keine günstigere Distanz-Rechnung durchgeführt wurde, sondern es wurde auf gewisse Garantien bei der bisherigen Distanz-Berechnung verzichtet, da diese für den Algorithmus keinen Unterschied machen. Im folgenden wird auf exakte Ergebnisse verzichtet um den Algorithmus noch schneller zu machen.
+
 _Welchen Einfluss hat `fastmath` und wieso?_
 
-_Welchen Einfluss hat `hypot` und wieso?_
+Wie bereits erwähnt ermöglicht die Annotation `fastmath=True`, auf Genauigkeit zu verzichten im Austausch für schnellere Laufzeiten. Als Beispiel ist folgender Ausschnitt aus dem Assembly der regulären `sqrtf`-Variante und der `sqrtf`-Variante mit `fastmath=True` gegeben.
+
+```diff
+$L__BB0_6:
+	mul.lo.s64 	%rd66, %rd76, %rd8;
+	add.s64 	%rd67, %rd1, %rd66;
+	add.s64 	%rd68, %rd5, %rd66;
+	ld.global.b32 	%r60, [%rd67];
+	add.s64 	%rd69, %rd9, %rd68;
+	ld.b32 	%r61, [%rd69];
+	sub.f32 	%r62, %r1, %r60;
+	sub.f32 	%r63, %r2, %r61;
+	mul.f32 	%r64, %r63, %r63;
+	fma.rn.f32 	%r65, %r62, %r62, %r64;
+-	sqrt.rn.f32 	%r66, %r65;
++	sqrt.approx.ftz.f32 	%r66, %r65;
+	setp.lt.f32 	%p24, %r66, %r67;
+	selp.b64 	%rd75, %rd76, %rd75, %p24;
+```
+
+In diesem Fall hat der Compiler wegen `fastmath=True` die intrinsic Funktion `sqrt.approx.ftz.f32` statt `sqrt.rn.f32` ausgewählt. Gleichermaßen wurden Divisionen `div.rn.f32` durch `div.approx.ftz.f32` ersetzt. Abgesehen von diesen beiden Operationen bleibt das Assembly größtenteils gleich.
+
+Für die Laufzeit ergeben sich folgende Unterschiede.
+
+| RTX-5070 |     |
+| -------- | --- |
+|  ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |     |
+|   ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_euclidean_sqrt_fast_resolution=128_points=64,128,256,512.png)       |     |
+
+
 
 _Welchen Einfluss hat schlicht $a^2 + b^2$ und wieso?_
-
-_Welchen Einfluss hat ein approximiertes `if` vor der Distanz-Prüfung und wieso?_
 
 # Aufgabe 5 - Effizienteres Laden von Daten
 
