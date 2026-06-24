@@ -21,8 +21,10 @@ from task4 import (
     _voroni_square_euclidean_fast_kernel,
 )
 from task5 import (
-    _voroni_euclidean_grid_stride_kernel,
-    _voroni_euclidean_warp_shfl,
+    _voroni_euclidean_hypot_grid_stride_kernel,
+    _voroni_euclidean_hypot_warp_shfl_kernel,
+    _voroni_square_euclidean_fast_grid_stride_kernel,
+    _voroni_square_euclidean_fast_warp_shfl_kernel,
 )
 from task6 import (
     jfa_voronoi_host,
@@ -44,8 +46,10 @@ def main() -> None:
         "square_euclidean": _voroni_square_euclidean_kernel,
         "square_euclidean_fast": _voroni_square_euclidean_fast_kernel,
         # Optimised kernel using shared memory
-        "euclidean_grid_stride": _voroni_euclidean_grid_stride_kernel,
-        "euclidean_warp_shfl": _voroni_euclidean_warp_shfl,
+        "euclidean_hypot_grid_stride": _voroni_euclidean_hypot_grid_stride_kernel,
+        "euclidean_hypot_warp_shfl": _voroni_euclidean_hypot_warp_shfl_kernel,
+        "square_euclidean_fast_grid_stride": _voroni_square_euclidean_fast_grid_stride_kernel,
+        "square_euclidean_fast_warp_shfl": _voroni_square_euclidean_fast_warp_shfl_kernel,
     }
 
     if command in pixel_based:
