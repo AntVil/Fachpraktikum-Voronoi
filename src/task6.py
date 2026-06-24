@@ -19,6 +19,7 @@ from utils import (
     make_grid_configuration,
     calculate_square_euclidean_distance,
     calculate_manhattan_distance,
+    get_device_name,
 )
 
 # Resolution of the image containing the voronoi diagram
@@ -236,17 +237,23 @@ def main() -> None:
     elif command is None or command == "jfa-performance":
         # TODO: Refactor
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
-        analyze_runtime_per_step_size(
+        naive_data = analyze_runtime_per_step_size(
             kernel=_jfa_pass_naive_square_euclidean_kernel,
             seeds=seeds,
             resolution=RESOLUTION,
         )
         print()
-        analyze_runtime_per_step_size(
+        shared_data = analyze_runtime_per_step_size(
             kernel=_jfa_pass_shared_memory_square_euclidean_kernel,
             seeds=seeds,
             resolution=RESOLUTION,
         )
+
+        plot_data = [
+            ("Naive square euclidean", naive_data),
+            ("Shared memory euclidean", shared_data),
+        ]
+        create_jfa_performance_plot(RESOLUTION, SEED_COUNT, plot_data)
 
 
 def jfa_voronoi_host(
@@ -460,7 +467,7 @@ def analyze_runtime_per_step_size(
 ) -> list[tuple[int, float]]:
     """
     This function performs the JFA with the given kernel, seed array and resolution, and
-    also measures the kernel runtime. The result is a list of tuples containing the kernel
+    measures the kernel runtime. The result is a list of tuples containing the kernel
     runtime for each step size (pass).
     """
 
@@ -475,8 +482,6 @@ def analyze_runtime_per_step_size(
     )
     for _ in range(5):
         kernel[_blocks, _threads](_in, _out, 512 // 2, 512)
-        # TODO:
-        # kernel.inspect_types()
         cuda.synchronize()
 
     ###
@@ -492,9 +497,11 @@ def analyze_runtime_per_step_size(
     kernel_start = cuda.event(timing=True)
     kernel_end = cuda.event(timing=True)
 
+    # For each iteration, a (step, time_ms) tuple is saved
+    step_x_kernel_times: list[tuple[int, float]] = []
+
     # Jump Flooding Loop (Ping Pong)
     k: int = resolution // 2
-    kernel_times: list[tuple[int, float]] = []
     while k >= 1:
         # Measure kernel
         kernel_start.record()
@@ -503,16 +510,91 @@ def analyze_runtime_per_step_size(
 
         # Synchronize and add the measured time to the list
         cuda.synchronize()
-        kernel_times.append((k, kernel_start.elapsed_time(kernel_end)))
+        step_x_kernel_times.append((k, kernel_start.elapsed_time(kernel_end)))
 
         grid_in, grid_out = grid_out, grid_in
         k //= 2
 
-    print(f"{kernel}")
-    for k_val, t in kernel_times:
+    # Terminal print
+    for k_val, t in step_x_kernel_times:
         print(f"k = {k_val:3d}: {t:.4f} ms")
 
-    return kernel_times
+    return step_x_kernel_times
+
+
+def create_jfa_performance_plot(
+    resolution: int,
+    seed_count: int,
+    performances: list[tuple[str, list[tuple[int, float]]]],
+) -> None:
+    """
+    Create a performance plot for the JFA algorithm.
+
+    Plots the kernel runtime against the step size (k) for one or multiple
+    kernel implementations. The X-axis represents the step size, and the
+    Y-axis represents the iteration runtime in milliseconds.
+
+    Parameters:
+    - resolution (int): The resolution of the JFA grid.
+    - seed_count (int): The total number of seeds processed.
+    - performances (list): A list of tuples, where each tuple contains:
+        - method_name (str): The display name of the kernel.
+        - performances_ (list[tuple[int, float]]): A list of (step, time_ms)
+          tuples representing the runtime for each step size.
+    """
+
+    # Get the device name for the plot title
+    device_name = get_device_name()
+
+    fig, ax = plt.subplots(nrows=1, ncols=1)
+
+    # Axis in log scale
+    ax.set_xscale("log", base=2)
+    ax.set_yscale("log")
+    ax.grid(True, alpha=0.3, linestyle="--")
+    ax.set_xlabel("Step size (k)", fontsize=10)
+    ax.set_ylabel("Iteration runtime [ms]", fontsize=10)
+
+    # Save kernel names for filepath
+    kernel_names: str = ""
+    for method_name, performances_ in performances:
+        kernel_names += f"_{method_name.replace(' ', '-')}"
+        step_sizes = [x[0] for x in performances_]
+        kernel_times = [x[1] for x in performances_]
+        ax.plot(step_sizes, kernel_times, marker="o", linewidth=2, label=method_name)
+
+    # Invert so that the highest step size ist left (e.g. 256 => 1)
+    ax.invert_xaxis()
+
+    ax.legend()
+
+    ax.set_title(
+        f"Device: {device_name}\nResolution: {resolution} | Seeds: {seed_count}",
+        fontsize=12,
+        color="gray",
+        fontweight="semibold",
+        pad=10,
+    )
+
+    fig.suptitle(
+        f"JFA - Kernel iteration runtime over step size",
+        fontsize=16,
+        fontweight="bold",
+    )
+
+    plt.tight_layout()
+
+    # plt.show()
+    plt.savefig(
+        os.path.join(
+            DATA_FOLDER,
+            f"jfa_runtime_x_stepSize_{device_name.replace(" ", "-")}{kernel_names}_resolution={resolution}_points={seed_count}.png",
+        ),
+        dpi=300,
+    )
+    plt.cla()
+    plt.clf()
+    plt.close()
 
 
 @cuda.jit("void(int32[:,:,:], int32[:,:,:], int32, int32)")
