@@ -90,10 +90,10 @@ Die Anzahl an Punkten und die Ausgabe-Größe haben den größten Einfluss auf d
 
 Folgendes Diagramm gibt die Laufzeit für eine feste Ausgabe-Größe von `128x128`.
 
-| RTX-5070                                                                                                                           |     |
-| ---------------------------------------------------------------------------------------------------------------------------------- | --- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |     |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_resolution=128_points=64,128,256,512.png)                     |     |
+| RTX-5070                                                                                                                           | GTX 1660 Ti                                                                                                                           |
+| ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_resolution=128_points=64,128,256,512.png)                     |
 
 Es ist leicht zu erkennen, dass größenordnungsmäßig ein verdoppeln der Anzahl an Punkten ein verdoppeln der Laufzeit mit sich bringt. Ein verdoppeln der Auflösung führt größenordnungsmäßig zu einem vervierfachen der Laufzeit. Das liegt daran, dass ein verdoppeln der Auflösung dazu führt, dass viermal so viele Pixel berechnet werden müssen.
 
@@ -116,9 +116,9 @@ Folgende Animation wurde für die Manhattan-Distanz erstellt.
 Der Algorithmus funktioniert auf die gleiche Weise, es gibt jedoch abgesehen von der Ausgabe einen deutlichen Unterschied in der Laufzeit.
 Der gleiche Algorithmus mit Manhattan-Distanz ist deutlich schneller als mit Euklidischer-Distanz, wie folgendes Diagramm zeigt.
 
-| RTX-5070                                                                                                                 |     |
-| ------------------------------------------------------------------------------------------------------------------------ | --- |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_manhattan_resolution=128_points=64,128,256,512.png) |     |
+| RTX-5070                                                                                                                 | GTX 1660 Ti                                                                                                                 |
+| ------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_manhattan_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_manhattan_resolution=128_points=64,128,256,512.png) |
 
 Dies ist natürlich nicht verwunderlich, da für die Berechnung der Manhattan-Distanz nur Addition und die Absolut-Funktion nötig sind, welche sehr leicht zu berechnen sind.
 Hingegen für die Euklidische-Distanz wird die `cuda.libdevice.hypotf` Funktion aufgerufen, welche schwerer beziehungsweise langsamer zu berechnen ist.
@@ -202,10 +202,10 @@ Für den Algorithmus sind die meisten dieser Bedingungen tatsächlich irrelevant
 
 Durch die verringerte Anzahl an Anweisungen ist eine klare Verbesserung in der Laufzeit zu erkennen.
 
-| RTX-5070                                                                                                                          |     |
-| --------------------------------------------------------------------------------------------------------------------------------- | --- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |     |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_euclidean_sqrt_resolution=128_points=64,128,256,512.png)     |     |
+| RTX-5070                                                                                                                          | GTX 1660 Ti                                                                                                                          |
+| --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_euclidean_sqrt_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_euclidean_sqrt_resolution=128_points=64,128,256,512.png)     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_euclidean_sqrt_resolution=128_points=64,128,256,512.png)     |
 
 Es ist hierbei zu beachten, dass effektiv keine günstigere Distanz-Rechnung durchgeführt wurde, sondern es wurde auf gewisse Garantien bei der bisherigen Distanz-Berechnung verzichtet, da diese für den Algorithmus keinen Unterschied machen. Im folgenden wird auf exakte Ergebnisse verzichtet um den Algorithmus noch schneller zu machen.
 
@@ -235,10 +235,10 @@ In diesem Fall hat der Compiler wegen `fastmath=True` die intrinsic Funktion `sq
 
 Für die Laufzeit ergeben sich folgende Unterschiede.
 
-| RTX-5070                                                                                                                               |     |
-| -------------------------------------------------------------------------------------------------------------------------------------- | --- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |     |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_euclidean_sqrt_fast_resolution=128_points=64,128,256,512.png)      |     |
+| RTX-5070                                                                                                                               | GTX 1660 Ti                                                                                                                               |
+| -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_euclidean_sqrt_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_euclidean_sqrt_fast_resolution=128_points=64,128,256,512.png)      | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_sqrt_euclidean_sqrt_fast_resolution=128_points=64,128,256,512.png)      |
 
 Die Laufzeit hat sich deutlich verbessert durch den Einsatz von der `fastmath=True` Annotation. Für den Fall `Resolution=2048` und `Point-count=512` hat sich die Laufzeit ungefähr halbiert im Vergleich zur initialen Implementation aus _Aufgabe 3_.
 
@@ -272,19 +272,19 @@ In dem bisherigen Assembly hat der Compiler Loop-Unrolling durchgeführt mit bis
 
 Folgende Diagramme zeigen die Laufzeit des Algorithmus mit der neuen Distanz-Funktion.
 
-| RTX-5070                                                                                                                            |     |
-| ----------------------------------------------------------------------------------------------------------------------------------- | --- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |     |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_fast_square_euclidean_resolution=128_points=64,128,256,512.png) |     |
+| RTX-5070                                                                                                                            | GTX 1660 Ti                                                                                                                            |
+| ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_fast_square_euclidean_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_sqrt_fast_square_euclidean_resolution=128_points=64,128,256,512.png) |
 
 Es ist zu sehen, dass ein verzichten auf die `sqrt` Funktion die Performance steigert, jedoch ist auch zu erkennen, dass die Laufzeit zwischen der `sqrt` Funktion mit `fastmath=True` und keiner `sqrt` Funktion relativ nahe beieinander liegen.
 
 Das Verwenden von `fastmath=True` für die neue Distanz-Funktion hat nur minimale Auswirkungen, da im Algorithmus nur noch Divisionen, die nur selten durchgeführt werden beschleunigt werden, wie folgende Diagramme zeigen.
 
-| RTX-5070                                                                                                                                 |     |
-| ---------------------------------------------------------------------------------------------------------------------------------------- | --- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |     |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_fast_square_euclidean_fast_resolution=128_points=64,128,256,512.png) |     |
+| RTX-5070                                                                                                                                 | GTX 1660 Ti                                                                                                                                 |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_fast_square_euclidean_fast_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_sqrt_fast_square_euclidean_fast_resolution=128_points=64,128,256,512.png) |
 
 # Aufgabe 5 - Effizienteres Laden von Daten
 
