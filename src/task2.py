@@ -187,7 +187,7 @@ def create_kernel_performance_plot(
     resolution: int,
     input_sizes: np.ndarray[tuple[int], np.dtype[np.int32] | np.dtype[np.int64]],
     performances: list[tuple[str, np.ndarray[tuple[int], np.dtype[np.float32] | np.dtype[np.float64]]]]
-):
+) -> None:
     """
     Create a performance plot of one or multiple kernels.
     Performances are expected to be in milliseconds.
@@ -256,7 +256,7 @@ def create_kernel_performance_matrix(
     resolution_sizes: np.ndarray[tuple[int], np.dtype[np.int64]],
     point_counts: np.ndarray[tuple[int], np.dtype[np.int64]],
     performances: np.ndarray[tuple[int, int], np.dtype[np.float64]]
-):
+) -> None:
     fig, ax = plt.subplots()
 
     plot = ax.imshow(performances, cmap="viridis_r", norm=colors.LogNorm())
