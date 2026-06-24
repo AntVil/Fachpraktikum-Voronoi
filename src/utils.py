@@ -56,9 +56,10 @@ def generate_random_seeds_jfa(seed_count: int | np.int64, resolution: int | np.i
     return np.random.randint(low=0, high=int(resolution), size=(int(seed_count), 2))
 
 
-def generate_grid_jfa(seeds: np.ndarray, resolution: int | np.int64) -> np.ndarray:
+def generate_AoS_grid_jfa(seeds: np.ndarray, resolution: int | np.int64) -> np.ndarray:
     """
-    Generate a grid data structure for the JFA.
+    Generate an of Array of Structure (AoS) grid for the JFA.
+
     Each pixel in the grid represents the x and y position of the nearest seed. During initialisation,
     each pixel is given a default value of '-1', indicating that no seed position has been set.
     At the start, each seed knows its position and is therefore set directly in the grid configuration.
@@ -77,6 +78,34 @@ def generate_grid_jfa(seeds: np.ndarray, resolution: int | np.int64) -> np.ndarr
     for seed_x, seed_y in seeds:
         grid[seed_y, seed_x, 0] = seed_x
         grid[seed_y, seed_x, 1] = seed_y
+
+    return grid
+
+
+def generate_SoA_grid_jfa(seeds: np.ndarray, resolution: int | np.int64) -> np.ndarray:
+    """
+    Generate an Structure of Arrays (SoA) grid for the JFA.
+
+    Also see `generate_AoS_grid_jfa`
+    """
+
+    resolution = int(resolution)
+
+    # NOTE:
+    # Form: (Height, Width) -> Double the height, but normal width
+    # Initialization of '-1' means: "No seed known yet"
+    grid: np.ndarray = np.full(
+        shape=(resolution * 2, resolution), fill_value=-1, dtype=np.int32
+    )
+
+    # Set the positions of the seeds in the grid
+    # Each seed knows its own position at the start
+    for seed_x, seed_y in seeds:
+        # Top half (0 till resolution-1): hold the x values of the seed ccordinates
+        grid[seed_y, seed_x] = seed_x
+
+        # Bottom half (resolution till 2*resolution-1): holds the y values of the seed ccordinates
+        grid[seed_y + resolution, seed_x] = seed_y
 
     return grid
 
