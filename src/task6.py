@@ -12,6 +12,7 @@ from task4 import (
     voroni_square_euclidean,
 )
 from utils import (
+    get_argument,
     is_outside_image,
     generate_grid_jfa,
     generate_random_seeds_jfa,
@@ -55,89 +56,197 @@ def main() -> None:
     Test the implementations and generate example diagrams for the Jump Flooding Algorithm (JFA).
     """
 
-    ###
-    # Naive Euclidean and Manhattan JFA
-    ###
-    seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
-    naive_euclidean = jfa_voronoi_host(
-        kernel=_jfa_pass_naive_square_euclidean_kernel,
-        seeds=seeds,
-        resolution=RESOLUTION,
-        mode="standard",
-    )
-    naive_manhattan = jfa_voronoi_host(
-        kernel=_jfa_pass_naive_manhattan_kernel,
-        seeds=seeds,
-        resolution=RESOLUTION,
-        mode="standard",
-    )
-    plt.imshow(naive_euclidean)
-    plt.show()
-    plt.imshow(naive_manhattan)
-    plt.show()
+    command: str = get_argument()
 
     ###
-    # JFA+1 and JFA+2
+    # Naive Euclidean JFA
     ###
-    voronoi_jfa_plus1 = jfa_voronoi_host(
-        kernel=_jfa_pass_naive_square_euclidean_kernel,  # kernel=_jfa_pass_naive_manhattan_kernel,
-        seeds=seeds,
-        resolution=RESOLUTION,
-        mode="jfa+1",
-    )
-    voronoi_jfa_plus2 = jfa_voronoi_host(
-        kernel=_jfa_pass_naive_square_euclidean_kernel,  # kernel=_jfa_pass_naive_manhattan_kernel,
-        seeds=seeds,
-        resolution=RESOLUTION,
-        mode="jfa+2",
-    )
-    plt.imshow(voronoi_jfa_plus1)
-    plt.show()
-    plt.imshow(voronoi_jfa_plus2)
-    plt.show()
+    if command is None or command == "jfa-euclidean":
+        seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
+        voronoi_jfa = jfa_voronoi_host(
+            kernel=_jfa_pass_naive_square_euclidean_kernel,
+            seeds=seeds,
+            resolution=RESOLUTION,
+            mode="standard",
+        )
+        plt.imshow(voronoi_jfa)
+        plt.show()
 
     ###
-    # Compare JFA variants
+    # Naive Manhattan JFA
     ###
-    evaluate_jfa_accuracy(
-        seeds_jfa=seeds,
-        voronoi_jfa=naive_euclidean,
-        voronoi_jfa_plus1=voronoi_jfa_plus1,
-        voronoi_jfa_plus2=voronoi_jfa_plus2,
-    )
-
-    ###
-    # Optimized Euclidean JFA
-    ###
-    optimized_euclidean = jfa_voronoi_host(
-        kernel=_jfa_pass_ultimate_square_euclidean_kernel,
-        seeds=seeds,
-        resolution=RESOLUTION,
-        mode="standard",
-    )
-    # Validate
-    generate_error_map(
-        actual_grid=optimized_euclidean,
-        reference_grid=naive_euclidean,
-        title="NAIVE vs. OPTIMIZED JFA",
-    )
+    elif command is None or command == "jfa-manhattan":
+        seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
+        naive_manhattan = jfa_voronoi_host(
+            kernel=_jfa_pass_naive_manhattan_kernel,
+            seeds=seeds,
+            resolution=RESOLUTION,
+            mode="standard",
+        )
+        plt.imshow(naive_manhattan)
+        plt.show()
 
     ###
     # Generate GIFs for visualisation
     ###
-    seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT_VISU, resolution=RESOLUTION)
-    jfa_voronoi_host(
-        kernel=_jfa_pass_naive_square_euclidean_kernel,
-        seeds=seeds,
-        resolution=RESOLUTION,
-        gif_path=os.path.join(DATA_FOLDER, "task6_euclidean_jfa_visualization.gif"),
-    )
-    jfa_voronoi_host(
-        kernel=_jfa_pass_naive_manhattan_kernel,
-        seeds=seeds,
-        resolution=RESOLUTION,
-        gif_path=os.path.join(DATA_FOLDER, "task6_manhattan_jfa_visualization.gif"),
-    )
+    elif command is None or command == "jfa-euclidean-visualization":
+        seeds = generate_random_seeds_jfa(
+            seed_count=SEED_COUNT_VISU, resolution=RESOLUTION
+        )
+        jfa_voronoi_host(
+            kernel=_jfa_pass_naive_square_euclidean_kernel,
+            seeds=seeds,
+            resolution=RESOLUTION,
+            gif_path=os.path.join(DATA_FOLDER, "task6_euclidean_jfa_visualization.gif"),
+        )
+    elif command is None or command == "jfa-manhattan-visualization":
+        seeds = generate_random_seeds_jfa(
+            seed_count=SEED_COUNT_VISU, resolution=RESOLUTION
+        )
+        jfa_voronoi_host(
+            kernel=_jfa_pass_naive_manhattan_kernel,
+            seeds=seeds,
+            resolution=RESOLUTION,
+            gif_path=os.path.join(DATA_FOLDER, "task6_manhattan_jfa_visualization.gif"),
+        )
+
+    ###
+    # Naive Euclidean JFA+1 and JFA+2
+    ###
+    elif command is None or command == "jfa+1-euclidean":
+        seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
+        voronoi_jfa_plus1 = jfa_voronoi_host(
+            kernel=_jfa_pass_naive_square_euclidean_kernel,  # kernel=_jfa_pass_naive_manhattan_kernel,
+            seeds=seeds,
+            resolution=RESOLUTION,
+            mode="jfa+1",
+        )
+        plt.imshow(voronoi_jfa_plus1)
+        plt.show()
+    elif command is None or command == "jfa+2-euclidean":
+        seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
+        voronoi_jfa_plus2 = jfa_voronoi_host(
+            kernel=_jfa_pass_naive_square_euclidean_kernel,  # kernel=_jfa_pass_naive_manhattan_kernel,
+            seeds=seeds,
+            resolution=RESOLUTION,
+            mode="jfa+2",
+        )
+        plt.imshow(voronoi_jfa_plus2)
+        plt.show()
+
+    ###
+    # Compare JFA variants
+    ###
+    elif command is None or command == "jfa-accuracy":
+        seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
+        voronoi_jfa = jfa_voronoi_host(
+            kernel=_jfa_pass_naive_square_euclidean_kernel,
+            seeds=seeds,
+            resolution=RESOLUTION,
+            mode="standard",
+        )
+        voronoi_jfa_plus1 = jfa_voronoi_host(
+            kernel=_jfa_pass_naive_square_euclidean_kernel,
+            seeds=seeds,
+            resolution=RESOLUTION,
+            mode="jfa+1",
+        )
+        voronoi_jfa_plus2 = jfa_voronoi_host(
+            kernel=_jfa_pass_naive_square_euclidean_kernel,
+            seeds=seeds,
+            resolution=RESOLUTION,
+            mode="jfa+2",
+        )
+        evaluate_jfa_accuracy(
+            seeds_jfa=seeds,
+            voronoi_jfa=voronoi_jfa,
+            voronoi_jfa_plus1=voronoi_jfa_plus1,
+            voronoi_jfa_plus2=voronoi_jfa_plus2,
+        )
+
+    ###
+    # Euclidean JFA using shared memory
+    ###
+    elif command is None or command == "jfa-shared":
+        seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
+        voronoi_jfa = jfa_voronoi_host(
+            kernel=_jfa_pass_naive_square_euclidean_kernel,
+            seeds=seeds,
+            resolution=RESOLUTION,
+            mode="standard",
+        )
+        shared_mem_euclidean = jfa_voronoi_host(
+            kernel=_jfa_pass_shared_memory_square_euclidean_kernel,
+            seeds=seeds,
+            resolution=RESOLUTION,
+            mode="standard",
+        )
+        # Validate
+        generate_error_map(
+            actual_grid=shared_mem_euclidean,
+            reference_grid=voronoi_jfa,
+            title="NAIVE vs. OPTIMIZED JFA",
+        )
+
+    ###
+    # Euclidean JFA using 'Structure of Arrays (SoA)'
+    ###
+    elif command is None or command == "jfa-SoA":
+        seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
+        resolution = RESOLUTION
+
+        # NOTE:
+        # Form: (Height, Width) -> Double the height, but normal width
+        grid: np.ndarray = np.full(
+            shape=(resolution * 2, resolution), fill_value=-1, dtype=np.int32
+        )
+
+        for seed_x, seed_y in seeds:
+            # Top half (0 till resolution-1): hold the x values of the seed ccordinates
+            grid[seed_y, seed_x] = seed_x
+            # bottom half (resolution till 2*resolution-1): holds the y values of the seed ccordinates
+            grid[seed_y + resolution, seed_x] = seed_y
+
+        grid_in = cuda.to_device(grid)
+        grid_out = cuda.device_array_like(grid_in)
+
+        # NOTE: We start threads ONLY for the actual image size (resolution x resolution)!
+        # Each thread handles exactly one logical pixel.
+        blocks_per_grid, threads_per_block = make_grid_configuration(
+            resolution=resolution, threads_per_dimension=BLOCK_DIM
+        )
+
+        # Jump Flooding Loop (Ping Pong)
+        k: int = resolution // 2
+        while k >= 1:
+            # Kernel: Here we need to pass the logical resolution of the image
+            _jfa_pass_planar_square_euclidean_kernel[
+                blocks_per_grid, threads_per_block
+            ](grid_in, grid_out, k, resolution)
+            grid_in, grid_out = grid_out, grid_in
+            k //= 2
+
+        out_image = grid_in.copy_to_host()
+        plt.imshow(out_image[:resolution, :] + out_image[resolution:, :] * resolution)
+        plt.show()
+
+    ###
+    # TBD
+    ###
+    elif command is None or command == "jfa-performance":
+        # TODO: Refactor
+        seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
+        analyze_runtime_per_step_size(
+            kernel=_jfa_pass_naive_square_euclidean_kernel,
+            seeds=seeds,
+            resolution=RESOLUTION,
+        )
+        print()
+        analyze_runtime_per_step_size(
+            kernel=_jfa_pass_shared_memory_square_euclidean_kernel,
+            seeds=seeds,
+            resolution=RESOLUTION,
+        )
 
 
 def jfa_voronoi_host(
@@ -243,6 +352,10 @@ def evaluate_jfa_accuracy(seeds_jfa, voronoi_jfa, voronoi_jfa_plus1, voronoi_jfa
     structural JFA discrepancies.
     """
 
+    # TODO:
+    # - Adjust to FP32!
+    # - Add kernel names into diagram and filename
+
     ###
     # Pixel-Algorithm
     ###
@@ -338,6 +451,68 @@ def generate_error_map(
     plt.cla()
     plt.clf()
     plt.close()
+
+
+def analyze_runtime_per_step_size(
+    kernel: Any,  # TODO: Specify typiing
+    seeds: np.ndarray,
+    resolution: int,
+) -> list[tuple[int, float]]:
+    """
+    This function performs the JFA with the given kernel, seed array and resolution, and
+    also measures the kernel runtime. The result is a list of tuples containing the kernel
+    runtime for each step size (pass).
+    """
+
+    ###
+    # Dry run
+    ###
+    _seeds = generate_random_seeds_jfa(seed_count=10, resolution=512)
+    _in = cuda.to_device(generate_grid_jfa(seeds=_seeds, resolution=512))
+    _out = cuda.device_array_like(_in)
+    _blocks, _threads = make_grid_configuration(
+        resolution=512, threads_per_dimension=BLOCK_DIM
+    )
+    for _ in range(5):
+        kernel[_blocks, _threads](_in, _out, 512 // 2, 512)
+        # TODO:
+        # kernel.inspect_types()
+        cuda.synchronize()
+
+    ###
+    # Real JFA
+    ###
+    grid_in = cuda.to_device(generate_grid_jfa(seeds=seeds, resolution=resolution))
+    grid_out = cuda.device_array_like(grid_in)
+    blocks_per_grid, threads_per_block = make_grid_configuration(
+        resolution=resolution, threads_per_dimension=BLOCK_DIM
+    )
+
+    # CUDA Events
+    kernel_start = cuda.event(timing=True)
+    kernel_end = cuda.event(timing=True)
+
+    # Jump Flooding Loop (Ping Pong)
+    k: int = resolution // 2
+    kernel_times: list[tuple[int, float]] = []
+    while k >= 1:
+        # Measure kernel
+        kernel_start.record()
+        kernel[blocks_per_grid, threads_per_block](grid_in, grid_out, k, resolution)
+        kernel_end.record()
+
+        # Synchronize and add the measured time to the list
+        cuda.synchronize()
+        kernel_times.append((k, kernel_start.elapsed_time(kernel_end)))
+
+        grid_in, grid_out = grid_out, grid_in
+        k //= 2
+
+    print(f"{kernel}")
+    for k_val, t in kernel_times:
+        print(f"k = {k_val:3d}: {t:.4f} ms")
+
+    return kernel_times
 
 
 @cuda.jit("void(int32[:,:,:], int32[:,:,:], int32, int32)")
@@ -448,7 +623,7 @@ def _jfa_pass_naive_manhattan_kernel(grid_in, grid_out, step_size, size) -> None
 
 
 @cuda.jit("void(int32[:,:,:], int32[:,:,:], int32, int32)")
-def _jfa_pass_ultimate_square_euclidean_kernel(
+def _jfa_pass_shared_memory_square_euclidean_kernel(
     grid_in, grid_out, step_size, size
 ) -> None:
     """
@@ -505,9 +680,6 @@ def _jfa_pass_ultimate_square_euclidean_kernel(
     # SHARED MEMORY PIPELINE (small step sizes)
     ###
     if step_size < JFA_SHARED_THRESHOLD:
-        if thread_x == 0 and thread_y == 0:
-            print("SHARED MEMORY PIPELINE")
-
         # Shift the block's global origin top-left by 'step_size' to capture the halo
         block_start_x = cuda.blockIdx.x * BLOCK_DIM - step_size
         block_start_y = cuda.blockIdx.y * BLOCK_DIM - step_size
@@ -592,9 +764,6 @@ def _jfa_pass_ultimate_square_euclidean_kernel(
     # NOTE: Corresponds to the naive implementation
     ###
     else:
-        if thread_x == 0 and thread_y == 0:
-            print("GLOBAL VRAM FALLBACK PIPELINE")
-
         # Threads outside the valid image limits can exit immediately here
         if is_outside_image(pixel_x, pixel_y, grid_in):
             return
