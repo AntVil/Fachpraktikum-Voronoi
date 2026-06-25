@@ -3,11 +3,14 @@ from constants import DATA_FOLDER
 from utils import (
     get_argument,
     make_empty_voronoi_output,
+    generate_AoS_grid_jfa,
+    generate_SoA_grid_jfa,
 )
 
 from task2 import (
     kernel_performance_analysis,
-    kernel_performance_analysis_compare
+    kernel_performance_analysis_jfa,
+    kernel_performance_analysis_compare,
 )
 from task3 import (
     _voroni_euclidean_hypot_kernel,
@@ -27,9 +30,10 @@ from task5 import (
     _voroni_square_euclidean_fast_warp_shfl_kernel,
 )
 from task6 import (
-    jfa_voronoi_host,
     _jfa_pass_naive_square_euclidean_kernel,
     _jfa_pass_naive_manhattan_kernel,
+    _jfa_pass_shared_memory_square_euclidean_kernel,
+    _jfa_pass_SoA_square_euclidean_kernel,
 )
 
 
@@ -50,6 +54,25 @@ def main() -> None:
         "euclidean_hypot_warp_shfl": _voroni_euclidean_hypot_warp_shfl_kernel,
         "square_euclidean_fast_grid_stride": _voroni_square_euclidean_fast_grid_stride_kernel,
         "square_euclidean_fast_warp_shfl": _voroni_square_euclidean_fast_warp_shfl_kernel,
+    }
+
+    jfa_based = {
+        "naive_square_euclidean_jfa": (
+            _jfa_pass_naive_square_euclidean_kernel,
+            generate_AoS_grid_jfa,
+        ),
+        "naive_manhattan_jfa": (
+            _jfa_pass_naive_manhattan_kernel,
+            generate_AoS_grid_jfa,
+        ),
+        "shared_memory_square_euclidean_jfa": (
+            _jfa_pass_shared_memory_square_euclidean_kernel,
+            generate_AoS_grid_jfa,
+        ),
+        "_SoA_square_euclidean_jfa": (
+            _jfa_pass_SoA_square_euclidean_kernel,
+            generate_SoA_grid_jfa,
+        ),
     }
 
     if command in pixel_based:
@@ -78,6 +101,12 @@ def main() -> None:
                 (kernel2, pixel_based[kernel2])
             ],
             make_output_grid=make_empty_voronoi_output
+        )
+    if command in jfa_based:
+        kernel_performance_analysis_jfa(
+            kernel_name=command,
+            kernel=jfa_based[command][0],
+            grid_factory=jfa_based[command][1],
         )
     else:
         print(f"Error: unknown command '{command}'")
