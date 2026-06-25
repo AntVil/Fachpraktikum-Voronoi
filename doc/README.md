@@ -349,9 +349,13 @@ Folgende Diagramme geben die Laufzeiten wieder.
 
 Es hat sich ergeben, dass die Warp mit `shfl_sync` Variante für jede Eingabe eine bessere Laufzeit aufweis. Dieser Algorithmus ist nun möglichst effizient implementiert. Im folgenden wollen wir betrachten, ob durch einen alternativen Algorithmus beziehungsweise Ansatz eine weitere Verbesserung der Laufzeit möglich ist.
 
-# Aufgabe 6 - Alternativer Ansatz: Jump Flooding Algorithmus (JFA)
+# Aufgabe 6a - Alternativer Ansatz: Jump Flooding Algorithmus (JFA)
 
 _Wie funktioniert der Algorithmus?_
+
+| `JFA - square euclidean distance`                  | `JFA - manhattan distance`                         |
+| -------------------------------------------------- | -------------------------------------------------- |
+| ![](../data/task6_euclidean_jfa_visualization.gif) | ![](../data/task6_manhattan_jfa_visualization.gif) |
 
 _Wo liegen die Unterschiede zum Ansatz der vorherigen Implementierung? (Komplexität)_
 
@@ -363,13 +367,19 @@ Die folgenden _Error Maps_ zeigen die Abweichungen der verschiedenen JFA-Variant
 
 | `Standard JFA`                                                  | `JFA+1`                                                       | `JFA+2`                                                       |
 | --------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------- |
-| ![](../data/task6_error_map_standard_jfa_res1024_seeds2000.jpg) | ![](../data/task6_error_map_jfa_plus_1_res1024_seeds2000.jpg) | ![](../data/task6_error_map_jfa_plus_2_res1024_seeds2000.jpg) |
+| ![](../data/task6_error_map_standard_jfa_res1024_seeds2000.png) | ![](../data/task6_error_map_jfa_plus_1_res1024_seeds2000.png) | ![](../data/task6_error_map_jfa_plus_2_res1024_seeds2000.png) |
 
 ```bash
 Standard JFA: 99.5950%
 JFA + 1: 99.5990%
 JFA + 2: 99.5993%
 ```
+
+## Aufgabe 6b - Optimierungen
+
+| RTX-5070 | GTX-1660                                                                                                                                                                                 |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|          | ![](../data/task6_jfa_runtime_over_stepSize_NVIDIA-GeForce-GTX-1660-Ti_Naive-square-euclidean_Naive-manhattan_Shared-memory-square-euclidean_SoA-square-euclidean_res1024_seeds2000.png) |
 
 # Aufgabe 7 - Ergebnisse
 
