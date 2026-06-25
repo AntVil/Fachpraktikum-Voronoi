@@ -102,12 +102,19 @@ def main() -> None:
             ],
             make_output_grid=make_empty_voronoi_output
         )
-    if command in jfa_based:
+    elif command in jfa_based:
         kernel_performance_analysis_jfa(
             kernel_name=command,
             kernel=jfa_based[command][0],
-            grid_factory=jfa_based[command][1],
+            make_output_grid=jfa_based[command][1],
         )
+    elif command == "all-jfa":
+        for kernel_name, jfa_data in jfa_based.items():
+            kernel_performance_analysis_jfa(
+                kernel_name=kernel_name,
+                kernel=jfa_data[0],
+                make_output_grid=jfa_data[1]
+            )
     else:
         print(f"Error: unknown command '{command}'")
         exit(1)
