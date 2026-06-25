@@ -21,51 +21,51 @@ from task3 import voroni_euclidean_hypot
 def main() -> None:
     command = get_argument()
 
-    point_count = 2_000
-    resolution = 1024
+    point_count = 512
+    resolution = 2048
 
     if command is None or command == "base" or command == "hypot":
         image = voroni_euclidean_hypot(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
-        plt.imshow(image)
-        plt.show()
+        # plt.imshow(image)
+        # plt.show()
     elif command == "sqrt":
         image = voroni_euclidean_sqrt(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
-        plt.imshow(image)
-        plt.show()
+        # plt.imshow(image)
+        # plt.show()
     elif command == "sqrt-fast":
         image = voroni_euclidean_sqrt_fast(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
-        plt.imshow(image)
-        plt.show()
+        # plt.imshow(image)
+        # plt.show()
     elif command == "hypot-fast":
         image = voroni_euclidean_hypot_fast(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
-        plt.imshow(image)
-        plt.show()
+        # plt.imshow(image)
+        # plt.show()
     elif command == "square":
         image = voroni_square_euclidean(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
-        plt.imshow(image)
-        plt.show()
+        # plt.imshow(image)
+        # plt.show()
     elif command == "square-fast":
         image = voroni_square_euclidean_fast(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
-        plt.imshow(image)
-        plt.show()
+        # plt.imshow(image)
+        # plt.show()
     else:
         print(f"Error: unknown command '{command}'")
         exit(1)

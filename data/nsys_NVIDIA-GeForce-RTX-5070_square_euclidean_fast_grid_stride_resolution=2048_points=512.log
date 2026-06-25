@@ -1,0 +1,136 @@
+Generating SQLite file data/_square_euclidean_fast_grid_stride.sqlite from data/_square_euclidean_fast_grid_stride.nsys-rep
+Processing [data/_square_euclidean_fast_grid_stride.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/nvtx_sum.py]... 
+SKIPPED: data/_square_euclidean_fast_grid_stride.sqlite does not contain NV Tools Extension (NVTX) data.
+
+Processing [data/_square_euclidean_fast_grid_stride.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/osrt_sum.py]... 
+
+ ** OS Runtime Summary (osrt_sum):
+
+ Time (%)  Total Time (ns)  Num Calls     Avg (ns)         Med (ns)        Min (ns)       Max (ns)      StdDev (ns)            Name         
+ --------  ---------------  ---------  ---------------  ---------------  -------------  -------------  -------------  ----------------------
+     54,0    3.507.778.921        154     22.777.785,0     10.087.265,0          1.490    181.247.109   31.520.923,0  poll                  
+     19,0    1.272.831.899          1  1.272.831.899,0  1.272.831.899,0  1.272.831.899  1.272.831.899            0,0  sem_clockwait         
+     18,0    1.161.849.842          5    232.369.968,0    161.636.863,0          1.220    500.089.360  253.143.181,0  pthread_cond_timedwait
+      3,0      242.845.710      8.372         29.006,0          1.240,0            999    102.788.418    1.532.874,0  read                  
+      2,0      179.171.217        777        230.593,0         14.729,0          1.000     24.142.010      979.682,0  ioctl                 
+      0,0       11.088.542      5.430          2.042,0          1.900,0          1.010         15.150          720,0  stat64                
+      0,0        9.643.054        899         10.726,0          1.580,0          1.380      4.398.626      156.916,0  mmap64                
+      0,0        7.010.263      2.244          3.124,0          2.790,0          1.090         50.190        1.704,0  open64                
+      0,0        5.448.786        877          6.213,0          2.159,0          1.970      2.772.383       94.011,0  munmap                
+      0,0        2.310.308         19        121.595,0         63.339,0         14.050        437.645      141.631,0  sem_timedwait         
+      0,0        1.316.715        103         12.783,0          2.630,0          1.810        295.077       46.641,0  mmap                  
+      0,0          905.986        112          8.089,0          7.210,0          1.140         57.439        5.485,0  fgets                 
+      0,0          598.164        409          1.462,0          1.090,0          1.000         10.220        1.174,0  close                 
+      0,0          558.193          3        186.064,0        166.668,0        153.448        238.077       45.526,0  pthread_join          
+      0,0          463.645          1        463.645,0        463.645,0        463.645        463.645            0,0  sem_wait              
+      0,0          338.218         59          5.732,0          5.970,0          1.000         21.990        3.171,0  write                 
+      0,0          334.207        213          1.569,0          1.500,0          1.200          7.960          488,0  lstat64               
+      0,0          289.974        209          1.387,0          1.300,0          1.010          3.430          324,0  stat                  
+      0,0          253.378          5         50.675,0         47.449,0         30.650         68.380       15.169,0  pthread_create        
+      0,0          211.629         46          4.600,0          2.755,0          1.150         23.180        4.489,0  fopen                 
+      0,0          103.238         17          6.072,0          5.510,0          1.090         15.719        3.708,0  pthread_cond_signal   
+      0,0           81.109         41          1.978,0          1.220,0          1.000          9.180        1.860,0  fstat64               
+      0,0           71.079          1         71.079,0         71.079,0         71.079         71.079            0,0  pthread_cond_wait     
+      0,0           69.580         43          1.618,0          1.190,0          1.000          5.350          971,0  fclose                
+      0,0           55.840          3         18.613,0         18.490,0          7.180         30.170       11.495,0  waitpid               
+      0,0           49.399         10          4.939,0          4.799,0          2.150          9.030        2.474,0  pipe2                 
+      0,0           31.350          7          4.478,0          3.760,0          1.600          7.700        2.213,0  open                  
+      0,0           24.389          6          4.064,0          2.735,0          1.640         10.689        3.461,0  fopen64               
+      0,0           22.689          4          5.672,0          6.065,0          2.090          8.469        2.740,0  fread                 
+      0,0           17.789          3          5.929,0          5.430,0          3.749          8.610        2.468,0  socket                
+      0,0           15.450          2          7.725,0          7.725,0          7.040          8.410          968,0  connect               
+      0,0           14.510          1         14.510,0         14.510,0         14.510         14.510            0,0  pthread_mutex_lock    
+      0,0            9.310          6          1.551,0          1.535,0          1.250          1.860          261,0  close_range           
+      0,0            5.790          1          5.790,0          5.790,0          5.790          5.790            0,0  pthread_kill          
+      0,0            4.070          1          4.070,0          4.070,0          4.070          4.070            0,0  mprotect              
+      0,0            3.890          2          1.945,0          1.945,0          1.420          2.470          742,0  fwrite                
+      0,0            2.470          1          2.470,0          2.470,0          2.470          2.470            0,0  pthread_cond_broadcast
+      0,0            2.010          1          2.010,0          2.010,0          2.010          2.010            0,0  bind                  
+      0,0            1.430          1          1.430,0          1.430,0          1.430          1.430            0,0  sigaction             
+      0,0            1.010          1          1.010,0          1.010,0          1.010          1.010            0,0  fcntl                 
+
+Processing [data/_square_euclidean_fast_grid_stride.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/cuda_api_sum.py]... 
+
+ ** CUDA API Summary (cuda_api_sum):
+
+ Time (%)  Total Time (ns)  Num Calls   Avg (ns)     Med (ns)    Min (ns)   Max (ns)   StdDev (ns)          Name        
+ --------  ---------------  ---------  -----------  -----------  ---------  ---------  -----------  --------------------
+     85,0        3.866.541          1  3.866.541,0  3.866.541,0  3.866.541  3.866.541          0,0  cuMemcpyDtoH_v2     
+      6,0          289.237          2    144.618,0    144.618,0     99.759    189.478     63.440,0  cuMemAlloc_v2       
+      4,0          183.726          4     45.931,0     44.439,0     41.799     53.049      5.005,0  cuLibraryLoadData   
+      2,0           94.989          1     94.989,0     94.989,0     94.989     94.989          0,0  cuLaunchKernelEx    
+      0,0           36.679          1     36.679,0     36.679,0     36.679     36.679          0,0  cuMemGetInfo_v2     
+      0,0           33.709          1     33.709,0     33.709,0     33.709     33.709          0,0  cuMemcpyHtoD_v2     
+      0,0           21.979          5      4.395,0      4.880,0      2.300      5.050      1.175,0  cuInit              
+      0,0           14.080         20        704,0        190,0         90      8.120      1.759,0  cuKernelGetAttribute
+      0,0            4.730          1      4.730,0      4.730,0      4.730      4.730          0,0  cuCtxSetCurrent     
+      0,0            2.140          4        535,0        530,0        470        610         59,0  cuLibraryGetKernel  
+
+Processing [data/_square_euclidean_fast_grid_stride.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/cuda_gpu_kern_sum.py]... 
+
+ ** CUDA GPU Kernel Summary (cuda_gpu_kern_sum):
+
+ Time (%)  Total Time (ns)  Instances   Avg (ns)     Med (ns)    Min (ns)   Max (ns)   StdDev (ns)                                                  Name                                                
+ --------  ---------------  ---------  -----------  -----------  ---------  ---------  -----------  ----------------------------------------------------------------------------------------------------
+    100,0        2.075.860          1  2.075.860,0  2.075.860,0  2.075.860  2.075.860          0,0  __main__::_voroni_square_euclidean_fast_grid_stride_kernel[abi:v24,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BI…
+
+Processing [data/_square_euclidean_fast_grid_stride.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/cuda_gpu_mem_time_sum.py]... 
+
+ ** CUDA GPU MemOps Summary (by Time) (cuda_gpu_mem_time_sum):
+
+ Time (%)  Total Time (ns)  Count   Avg (ns)     Med (ns)    Min (ns)   Max (ns)   StdDev (ns)           Operation          
+ --------  ---------------  -----  -----------  -----------  ---------  ---------  -----------  ----------------------------
+    100,0        1.739.825      1  1.739.825,0  1.739.825,0  1.739.825  1.739.825          0,0  [CUDA memcpy Device-to-Host]
+      0,0              640      1        640,0        640,0        640        640          0,0  [CUDA memcpy Host-to-Device]
+
+Processing [data/_square_euclidean_fast_grid_stride.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/cuda_gpu_mem_size_sum.py]... 
+
+ ** CUDA GPU MemOps Summary (by Size) (cuda_gpu_mem_size_sum):
+
+ Total (MB)  Count  Avg (MB)  Med (MB)  Min (MB)  Max (MB)  StdDev (MB)           Operation          
+ ----------  -----  --------  --------  --------  --------  -----------  ----------------------------
+ 16,777          1  16,777    16,777    16,777    16,777    0,000        [CUDA memcpy Device-to-Host]
+ 0,004           1  0,004     0,004     0,004     0,004     0,000        [CUDA memcpy Host-to-Device]
+
+Processing [data/_square_euclidean_fast_grid_stride.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/openmp_sum.py]... 
+SKIPPED: data/_square_euclidean_fast_grid_stride.sqlite does not contain OpenMP event data.
+
+Processing [data/_square_euclidean_fast_grid_stride.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/opengl_khr_range_sum.py]... 
+SKIPPED: data/_square_euclidean_fast_grid_stride.sqlite does not contain KHR Extension (KHR_DEBUG) data.
+
+Processing [data/_square_euclidean_fast_grid_stride.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/opengl_khr_gpu_range_sum.py]... 
+SKIPPED: data/_square_euclidean_fast_grid_stride.sqlite does not contain GPU KHR Extension (KHR_DEBUG) data.
+
+Processing [data/_square_euclidean_fast_grid_stride.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/vulkan_marker_sum.py]... 
+SKIPPED: data/_square_euclidean_fast_grid_stride.sqlite does not contain Vulkan Debug Extension (Vulkan Debug Util) data.
+
+Processing [data/_square_euclidean_fast_grid_stride.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/vulkan_gpu_marker_sum.py]... 
+SKIPPED: data/_square_euclidean_fast_grid_stride.sqlite does not contain GPU Vulkan Debug Extension (GPU Vulkan Debug markers) data.
+
+Processing [data/_square_euclidean_fast_grid_stride.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/dx11_pix_sum.py]... 
+SKIPPED: data/_square_euclidean_fast_grid_stride.sqlite does not contain DX11 CPU debug markers.
+
+Processing [data/_square_euclidean_fast_grid_stride.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/dx12_gpu_marker_sum.py]... 
+SKIPPED: data/_square_euclidean_fast_grid_stride.sqlite does not contain DX12 GPU debug markers.
+
+Processing [data/_square_euclidean_fast_grid_stride.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/dx12_pix_sum.py]... 
+SKIPPED: data/_square_euclidean_fast_grid_stride.sqlite does not contain DX12 CPU debug markers.
+
+Processing [data/_square_euclidean_fast_grid_stride.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/wddm_queue_sum.py]... 
+SKIPPED: data/_square_euclidean_fast_grid_stride.sqlite does not contain WDDM context data.
+
+Processing [data/_square_euclidean_fast_grid_stride.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/um_sum.py]... 
+SKIPPED: data/_square_euclidean_fast_grid_stride.sqlite does not contain CUDA Unified Memory CPU page faults data.
+
+Processing [data/_square_euclidean_fast_grid_stride.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/um_total_sum.py]... 
+SKIPPED: data/_square_euclidean_fast_grid_stride.sqlite does not contain CUDA Unified Memory CPU page faults data.
+
+Processing [data/_square_euclidean_fast_grid_stride.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/um_cpu_page_faults_sum.py]... 
+SKIPPED: data/_square_euclidean_fast_grid_stride.sqlite does not contain CUDA Unified Memory CPU page faults data.
+
+Processing [data/_square_euclidean_fast_grid_stride.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/openacc_sum.py]... 
+SKIPPED: data/_square_euclidean_fast_grid_stride.sqlite does not contain OpenACC event data.
+
+Processing [data/_square_euclidean_fast_grid_stride.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/syscall_sum.py]... 
+SKIPPED: data/_square_euclidean_fast_grid_stride.sqlite does not contain syscall data.
+

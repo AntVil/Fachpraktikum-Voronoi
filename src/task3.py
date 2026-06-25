@@ -24,46 +24,47 @@ def main() -> None:
     command = get_argument()
 
     if command is None or command == "euclidean":
-        point_count = 2_000
-        resolution = 1024
+        point_count = 512
+        resolution = 2048
 
         image = voroni_euclidean_hypot(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
-        plt.imshow(image)
-        plt.show()
-    elif command is None or command == "manhattan":
-        point_count = 2_000
-        resolution = 1024
+
+        # plt.imshow(image)
+        # plt.show()
+    elif command == "manhattan":
+        point_count = 512
+        resolution = 2048
 
         image = voroni_manhattan(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
-        plt.imshow(image)
-        plt.show()
-    elif command is None or command == "euclidean-field":
-        point_count = 2_000
-        resolution = 1024
+        # plt.imshow(image)
+        # plt.show()
+    elif command == "euclidean-field":
+        point_count = 512
+        resolution = 2048
 
         image = distance_field_euclidean_hypot(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
-        plt.imshow(image)
-        plt.show()
-    elif command is None or command == "manhattan-field":
-        point_count = 2_000
-        resolution = 1024
+        # plt.imshow(image)
+        # plt.show()
+    elif command == "manhattan-field":
+        point_count = 512
+        resolution = 2048
 
         image = distance_field_manhattan(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
-        plt.imshow(image)
-        plt.show()
-    elif command is None or command == "compare":
+        # plt.imshow(image)
+        # plt.show()
+    elif command == "compare":
         point_count = 100
         resolution = 1024
 

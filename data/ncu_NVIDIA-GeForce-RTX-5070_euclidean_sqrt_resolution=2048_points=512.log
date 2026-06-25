@@ -1,0 +1,84 @@
+==PROF== Connected to process 42746 (/usr/bin/python3.12)
+==PROF== Profiling "_voroni_euclidean_sqrt_kernel..." - 0: 0%....50%....100% - 9 passes
+==PROF== Disconnected from process 42746
+[42746] python3.12@127.0.0.1
+  _voroni_euclidean_sqrt_kernel[v30,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<float, 2, A, mutable, aligned>, Array<int, 2, A, mutable, aligned>) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
+    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- -------------
+    Metric Name             Metric Unit  Metric Value
+    ----------------------- ----------- -------------
+    DRAM Frequency                  Ghz         13,79
+    SM Frequency                    Ghz          2,54
+    Elapsed Cycles                cycle    13.419.397
+    Memory Throughput                 %         41,82
+    DRAM Throughput                   %          0,12
+    Duration                         ms          5,28
+    L1/TEX Cache Throughput           %         41,90
+    L2 Cache Throughput               %          0,72
+    SM Active Cycles              cycle 13.386.779,33
+    Compute (SM) Throughput           %         83,84
+    ----------------------- ----------- -------------
+
+    INF   This workload is utilizing greater than 80.0% of the available compute or memory performance of this device.  
+          To further improve performance, work will likely need to be shifted from the most utilized to another unit.   
+          Start by analyzing workloads in the Compute Workload Analysis section.                                        
+
+    Section: Launch Statistics
+    -------------------------------- --------------- ---------------
+    Metric Name                          Metric Unit    Metric Value
+    -------------------------------- --------------- ---------------
+    Block Size                                                   256
+    Cluster Scheduling Policy                           PolicySpread
+    Cluster Size                                                   0
+    Function Cache Configuration                     CachePreferNone
+    Grid Size                                                 16.384
+    Preferred Cluster Size                                         0
+    Registers Per Thread             register/thread              28
+    Shared Memory Configuration Size           Kbyte           16,38
+    Driver Shared Memory Per Block       Kbyte/block            1,02
+    Dynamic Shared Memory Per Block       byte/block               0
+    Static Shared Memory Per Block        byte/block               0
+    # SMs                                         SM              48
+    Stack Size                                                 1.024
+    Threads                                   thread       4.194.304
+    # TPCs                                                        24
+    Enabled TPC IDs                                              all
+    Uses Green Context                                             0
+    Waves Per SM                                               56,89
+    -------------------------------- --------------- ---------------
+
+    Section: Occupancy
+    ------------------------------- ----------- ------------
+    Metric Name                     Metric Unit Metric Value
+    ------------------------------- ----------- ------------
+    Max Active Clusters                 cluster            0
+    Max Cluster Size                      block            8
+    Overall GPU Occupancy                     %            0
+    Cluster Occupancy                         %            0
+    Block Limit Barriers                  block           24
+    Block Limit SM                        block           24
+    Block Limit Registers                 block            8
+    Block Limit Shared Mem                block           16
+    Block Limit Warps                     block            6
+    Theoretical Active Warps per SM        warp           48
+    Theoretical Occupancy                     %          100
+    Achieved Occupancy                        %        98,60
+    Achieved Active Warps Per SM           warp        47,33
+    ------------------------------- ----------- ------------
+
+    Section: GPU and Memory Workload Distribution
+    -------------------------- ----------- -------------
+    Metric Name                Metric Unit  Metric Value
+    -------------------------- ----------- -------------
+    Average DRAM Active Cycles       cycle        87.488
+    Total DRAM Elapsed Cycles        cycle   436.877.312
+    Average L1 Active Cycles         cycle 13.386.779,33
+    Total L1 Elapsed Cycles          cycle   643.716.548
+    Average L2 Active Cycles         cycle  1.636.739,62
+    Total L2 Elapsed Cycles          cycle   283.248.360
+    Average SM Active Cycles         cycle 13.386.779,33
+    Total SM Elapsed Cycles          cycle   643.716.548
+    Average SMSP Active Cycles       cycle 13.385.991,18
+    Total SMSP Elapsed Cycles        cycle 2.574.866.192
+    -------------------------- ----------- -------------
+

@@ -27,37 +27,37 @@ WARP_POINTS = WARP_SIZE // 2
 def main() -> None:
     command = get_argument()
 
-    point_count = 2_000
-    resolution = 1024
+    point_count = 512
+    resolution = 2048
 
     if command == "euclidean-hypot-grid-stride":
         image = voronoi_euclidean_hypot_grid_stride(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
-        plt.imshow(image)
-        plt.show()
+        # plt.imshow(image)
+        # plt.show()
     elif command == "euclidean-hypot-warp-shfl":
         image = voronoi_euclidean_hypot_warp_shfl(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
-        plt.imshow(image)
-        plt.show()
+        # plt.imshow(image)
+        # plt.show()
     elif command == "square-euclidean-fast-grid-stride":
-        image = voronoi_square_euclidean_grid_stride(
+        image = voronoi_square_euclidean_fast_grid_stride(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
-        plt.imshow(image)
-        plt.show()
+        # plt.imshow(image)
+        # plt.show()
     elif command == "square-euclidean-fast-warp-shfl":
         image = voronoi_square_euclidean_fast_warp_shfl(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
-        plt.imshow(image)
-        plt.show()
+        # plt.imshow(image)
+        # plt.show()
     else:
         print(f"Error: unknown command '{command}'")
         exit(1)
@@ -212,7 +212,7 @@ def _voroni_euclidean_hypot_warp_shfl_kernel(
     out_image[x_index, y_index] = closest_index
 
 
-def voronoi_square_euclidean_grid_stride(
+def voronoi_square_euclidean_fast_grid_stride(
     points: cuda.devicearray.DeviceNDArray,
     resolution: int
 ) -> np.ndarray:
@@ -225,7 +225,7 @@ def voronoi_square_euclidean_grid_stride(
 
     assert np.prod(threads_per_block) > GRID_STRIDE_SIZE, f"threads_per_block={threads_per_block} and GRID_STRIDE_SIZE={GRID_STRIDE_SIZE} are incompatible, points would be missed, either increase threads_per_block or decrease GRID_STRIDE_SIZE."
 
-    _voroni_square_euclidean_grid_stride_kernel[blocks_per_grid, threads_per_block]( # type: ignore
+    _voroni_square_euclidean_fast_grid_stride_kernel[blocks_per_grid, threads_per_block]( # type: ignore
         points,
         out_image
     )
