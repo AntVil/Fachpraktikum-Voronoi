@@ -361,9 +361,9 @@ _Gibt es Qualitätsunterschiede (Pixelfehler) im Diagramm?_
 
 Die folgenden _Error Maps_ zeigen die Abweichungen der verschiedenen JFA-Varianten im Vergleich zum Pixel-Algorithmus, welcher hier als exakte `100%`-Referenz dient (schwarz = identisch, rot = Abweichung).
 
-| `Standard JFA`                                | `JFA+1`                                     | `JFA+2`                                     |
-| --------------------------------------------- | ------------------------------------------- | ------------------------------------------- |
-| ![](../data/task6_error_map_standard_jfa.jpg) | ![](../data/task6_error_map_jfa_plus_1.jpg) | ![](../data/task6_error_map_jfa_plus_2.jpg) |
+| `Standard JFA`                                                  | `JFA+1`                                                       | `JFA+2`                                                       |
+| --------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------- |
+| ![](../data/task6_error_map_standard_jfa_res1024_seeds2000.jpg) | ![](../data/task6_error_map_jfa_plus_1_res1024_seeds2000.jpg) | ![](../data/task6_error_map_jfa_plus_2_res1024_seeds2000.jpg) |
 
 ```bash
 Standard JFA: 99.5950%

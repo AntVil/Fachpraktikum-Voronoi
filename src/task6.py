@@ -2,7 +2,7 @@ import os
 import numpy as np
 from numba import cuda
 import imageio.v3 as imageio
-from typing import Any, Literal, Callable
+from typing import Literal, Callable
 import matplotlib.colors as mcolors
 from matplotlib import pyplot as plt
 
@@ -122,7 +122,7 @@ def main() -> None:
     elif command is None or command == "jfa+1-euclidean":
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         voronoi_jfa_plus1 = jfa_voronoi_host(
-            kernel=_jfa_pass_naive_square_euclidean_kernel,  # kernel=_jfa_pass_naive_manhattan_kernel,
+            kernel=_jfa_pass_naive_square_euclidean_kernel,
             seeds=seeds,
             resolution=RESOLUTION,
             grid_layout="AoS",
@@ -133,7 +133,7 @@ def main() -> None:
     elif command is None or command == "jfa+2-euclidean":
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         voronoi_jfa_plus2 = jfa_voronoi_host(
-            kernel=_jfa_pass_naive_square_euclidean_kernel,  # kernel=_jfa_pass_naive_manhattan_kernel,
+            kernel=_jfa_pass_naive_square_euclidean_kernel,
             seeds=seeds,
             resolution=RESOLUTION,
             grid_layout="AoS",
@@ -168,12 +168,16 @@ def main() -> None:
             grid_layout="AoS",
             mode="jfa+2",
         )
-        evaluate_jfa_accuracy(
+        evaluation_data = evaluate_jfa_accuracy(
             seeds_jfa=seeds,
-            voronoi_jfa=voronoi_jfa,
-            voronoi_jfa_plus1=voronoi_jfa_plus1,
-            voronoi_jfa_plus2=voronoi_jfa_plus2,
+            jfa_variants=[
+                ("Standard JFA", voronoi_jfa),
+                ("JFA + 1", voronoi_jfa_plus1),
+                ("JFA + 2", voronoi_jfa_plus2),
+            ],
+            resolution=RESOLUTION,
         )
+        create_error_map_plot(evaluation_data=evaluation_data)
 
     ###
     # Euclidean JFA using shared memory
@@ -194,12 +198,12 @@ def main() -> None:
             grid_layout="AoS",
             mode="standard",
         )
-        # Validate
-        create_error_map_plot(
-            actual_grid=shared_mem_euclidean,
-            reference_grid=voronoi_jfa,
-            title="NAIVE vs. SHARED MEMORY JFA",
-        )
+        # # Validate
+        # create_error_map_plot(
+        #     actual_grid=shared_mem_euclidean,
+        #     reference_grid=voronoi_jfa,
+        #     title="NAIVE vs. SHARED MEMORY JFA",
+        # )
 
     ###
     # Euclidean JFA using 'Structure of Arrays (SoA)'
@@ -220,12 +224,12 @@ def main() -> None:
             grid_layout="SoA",
             mode="standard",
         )
-        # Validate
-        create_error_map_plot(
-            actual_grid=soA_euclidean,
-            reference_grid=voronoi_jfa,
-            title="NAIVE vs. SoA JFA",
-        )
+        # # Validate
+        # create_error_map_plot(
+        #     actual_grid=soA_euclidean,
+        #     reference_grid=voronoi_jfa,
+        #     title="NAIVE vs. SoA JFA",
+        # )
 
     ###
     # TBD
@@ -235,28 +239,28 @@ def main() -> None:
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         naive_euclidean_data = analyze_runtime_per_step_size(
             kernel=_jfa_pass_naive_square_euclidean_kernel,
-            grid_factory=generate_AoS_grid_jfa,
+            make_output_grid=generate_AoS_grid_jfa,
             seeds=seeds,
             resolution=RESOLUTION,
         )
         print()
         naive_manhattan_data = analyze_runtime_per_step_size(
             kernel=_jfa_pass_naive_manhattan_kernel,
-            grid_factory=generate_AoS_grid_jfa,
+            make_output_grid=generate_AoS_grid_jfa,
             seeds=seeds,
             resolution=RESOLUTION,
         )
         print()
         shared_euclidean_data = analyze_runtime_per_step_size(
             kernel=_jfa_pass_shared_memory_square_euclidean_kernel,
-            grid_factory=generate_AoS_grid_jfa,
+            make_output_grid=generate_AoS_grid_jfa,
             seeds=seeds,
             resolution=RESOLUTION,
         )
         print()
         soA_euclidean_data = analyze_runtime_per_step_size(
             kernel=_jfa_pass_SoA_square_euclidean_kernel,
-            grid_factory=generate_SoA_grid_jfa,
+            make_output_grid=generate_SoA_grid_jfa,
             seeds=seeds,
             resolution=RESOLUTION,
         )
@@ -270,7 +274,7 @@ def main() -> None:
 
 
 def jfa_voronoi_host(
-    kernel: Any,  # TODO: Specify typiing
+    kernel: Callable[[cuda.devicearray.DeviceNDArray, cuda.devicearray.DeviceNDArray, int, int], None],
     seeds: np.ndarray,
     resolution: int,
     grid_layout: Literal["AoS", "SoA"],
@@ -380,32 +384,33 @@ def jfa_voronoi_host(
     return id_map
 
 
-def evaluate_jfa_accuracy(seeds_jfa, voronoi_jfa, voronoi_jfa_plus1, voronoi_jfa_plus2):
+def evaluate_jfa_accuracy(
+    seeds_jfa: np.ndarray,
+    jfa_variants: list[tuple[str, np.ndarray]],
+    resolution: int,
+) -> list[dict]:
     """
-    Compares the precision of JFA variants against the pixel algorithm.
+    Compares the precision of the given JFA variants against the pixel algorithm.
 
     This function uses the pixel algorithm as the 100% reference to evaluate
     the 'standard JFA', 'JFA+1', and 'JFA+2'. It calculates quantitative
-    accuracy (match percentages) and generates error maps that highlight
-    structural JFA discrepancies.
+    accuracy (match percentages).
     """
 
-    # TODO:
-    # - Adjust to FP32!
-    # - Add kernel names into diagram and filename
+    seed_count: int = len(seeds_jfa)
 
     ###
-    # Pixel-Algorithm
+    # Pixel-Algorithm (Reference)
     ###
     # Create an array of seeds in the same shape as the JFA
-    seeds_pixel_algo = np.zeros_like(seeds_jfa, dtype=np.float64)
+    seeds_pixel_algo = np.zeros_like(seeds_jfa, dtype=np.float32)
 
     # Scale integer values to a float by dividing each value by the resolution, giving a value between 0 and 1
-    seeds_pixel_algo[:, 0] = (seeds_jfa[:, 0]).astype(np.float64) / RESOLUTION
-    seeds_pixel_algo[:, 1] = (seeds_jfa[:, 1]).astype(np.float64) / RESOLUTION
+    seeds_pixel_algo[:, 0] = (seeds_jfa[:, 0]).astype(np.float32) / resolution
+    seeds_pixel_algo[:, 1] = (seeds_jfa[:, 1]).astype(np.float32) / resolution
     voronoi_pixel_algo_raw = voroni_square_euclidean(
         points=cuda.to_device(seeds_pixel_algo),
-        resolution=RESOLUTION,
+        resolution=resolution,
     )
 
     # NOTE: Coordinate Alignment
@@ -418,82 +423,95 @@ def evaluate_jfa_accuracy(seeds_jfa, voronoi_jfa, voronoi_jfa_plus1, voronoi_jfa
     # NOTE: UID Mapping
     # The pixel algorithm returns random array indices (0...N-1) representing the seed UID.
     # JFA returns spatial UIDs based on pixel coordinates. We convert the pixel algorithm's
-    # indices into identical JFA spatial UIDs (ID = X + Y * RESOLUTION) for a 1:1 comparison.
+    # indices into identical JFA spatial UIDs (ID = X + Y * resolution) for a 1:1 comparison.
     # `seed_spatial_uids`: 1D array containing the UIDs of the seeds.
     # `voronoi_pixel_algo`: Image in which each pixel contains only the seed UID (0...N-1).
-    seed_spatial_uids = seeds_jfa[:, 0] + seeds_jfa[:, 1] * RESOLUTION
+    seed_spatial_uids = seeds_jfa[:, 0] + seeds_jfa[:, 1] * resolution
     voronoi_pixel_algo = seed_spatial_uids[voronoi_pixel_algo_aligned]
 
-    variants = [
-        ("Standard JFA", voronoi_jfa),
-        ("JFA + 1", voronoi_jfa_plus1),
-        ("JFA + 2", voronoi_jfa_plus2),
-    ]
+    evaluation_results: list[dict] = []
 
-    # Terminal print
-    for name, jfa_grid in variants:
+    for name, jfa_grid in jfa_variants:
         accuracy = np.mean(voronoi_pixel_algo == jfa_grid) * 100
+
+        # Create mask: True (1) where different, False (0) where the same
+        error_map = (voronoi_pixel_algo != jfa_grid).astype(np.uint8)
+
+        # Calculate total number of errors
+        total_errors = np.sum(error_map)
+
+        evaluation_results.append(
+            {
+                "kernel_name": name,
+                "accuracy": accuracy,
+                "total_errors": total_errors,
+                "error_map": error_map,
+                "resolution": resolution,
+                "seed_count": seed_count,
+            }
+        )
+
+    return evaluation_results
+
+
+def create_error_map_plot(evaluation_data: list[dict]) -> None:
+    """
+    Generate and saves a error map highlighting mismatched pixels against the pixel algorithm.
+    """
+
+    for data_entry in evaluation_data:
+        name = data_entry["kernel_name"]
+        accuracy = data_entry["accuracy"]
+        total_errors = data_entry["total_errors"]
+        error_map = data_entry["error_map"]
+        resolution = data_entry["resolution"]
+        seed_count = data_entry["seed_count"]
         print(f"{name}: {accuracy:.4f}%")
 
-    # Save error map
-    for name, jfa_grid in variants:
-        create_error_map_plot(
-            actual_grid=jfa_grid,
-            reference_grid=voronoi_pixel_algo,
-            title=f"Error Map: '{name}' compared to Pixel-Algorithm",
-            filename=f"task6_error_map_{name.lower().replace(" ", "_").replace("+", "plus")}.jpg",
+        # Custom colour palette: 0 (correct) = black, 1 (error) = red
+        cmap_errors = mcolors.ListedColormap(["#000000", "#ff0000"])
+
+        # Plot
+        fig, ax = plt.subplots(figsize=(8, 8))
+        ax.imshow(error_map, cmap=cmap_errors, vmin=0, vmax=1)
+
+        fig.suptitle(
+            f"Error Map: '{name}' vs. 'Pixel-Algorithm'",
+            fontsize=16,
+            fontweight="bold",
         )
 
+        ax.set_title(
+            f"Wrong pixels: {total_errors:,} | Resolution: {resolution} | Seeds: {seed_count} | Square euclidean",
+            fontsize=12,
+            color="gray",
+            fontweight="semibold",
+            pad=10,
+        )
 
-def create_error_map_plot(
-    actual_grid: np.ndarray,
-    reference_grid: np.ndarray,
-    title: str,
-    filename: str | None = None,
-) -> None:
-    """
-    Compares the generated grid against a reference grid and saves a visual
-    error map highlighting mismatched pixels.
-    """
+        ax.axis("off")
 
-    fig, ax = plt.subplots(figsize=(8, 8))
-    fig.suptitle(title, fontsize=12, fontweight="bold")
+        plt.tight_layout()
 
-    # Create mask: True (1) where different, False (0) where the same
-    error_map = (reference_grid != actual_grid).astype(np.uint8)
-
-    # Calculate total number of errors
-    total_errors = np.sum(error_map)
-
-    # Custom colour palette: 0 (correct) = black, 1 (error) = red
-    cmap_errors = mcolors.ListedColormap(["#000000", "#ff0000"])
-
-    # Plot
-    ax.imshow(error_map, cmap=cmap_errors, vmin=0, vmax=1)
-    ax.set_title(f"({total_errors:,} wrong pixels)", fontsize=11)
-    ax.axis("off")
-    plt.tight_layout()
-
-    if filename:
-        # Save image
+        safe_kernel_name = name.lower().replace(" ", "_").replace("+", "plus")
+        filename = (
+            f"task6_error_map_{safe_kernel_name}_res{resolution}_seeds{seed_count}.jpg"
+        )
+        filepath = os.path.join(DATA_FOLDER, filename)
         plt.savefig(
-            os.path.join(
-                DATA_FOLDER,
-                filename,
-            ),
+            filepath,
             dpi=300,
         )
-    else:
-        plt.show()
 
-    plt.cla()
-    plt.clf()
-    plt.close()
+        # plt.show()
+        plt.cla()
+        plt.clf()
+        plt.close()
 
 
 def analyze_runtime_per_step_size(
-    kernel: Any,  # TODO: Specify typiing
-    grid_factory: Callable[[np.ndarray, int], np.ndarray],
+    kernel: Callable[[cuda.devicearray.DeviceNDArray, cuda.devicearray.DeviceNDArray, int, int], None],
+    make_output_grid: Callable[[np.ndarray, int], np.ndarray],
     seeds: np.ndarray,
     resolution: int,
 ) -> list[tuple[int, float]]:
@@ -507,7 +525,7 @@ def analyze_runtime_per_step_size(
     # Dry run
     ###
     _seeds = generate_random_seeds_jfa(seed_count=10, resolution=512)
-    _in = cuda.to_device(grid_factory(seeds=_seeds, resolution=512))
+    _in = cuda.to_device(make_output_grid(seeds=_seeds, resolution=512))
     _out = cuda.device_array_like(_in)
     _blocks, _threads = make_grid_configuration(
         resolution=512, threads_per_dimension=BLOCK_DIM
@@ -519,7 +537,7 @@ def analyze_runtime_per_step_size(
     ###
     # Real JFA
     ###
-    grid_in = cuda.to_device(grid_factory(seeds=seeds, resolution=resolution))
+    grid_in = cuda.to_device(make_output_grid(seeds=seeds, resolution=resolution))
     grid_out = cuda.device_array_like(grid_in)
     blocks_per_grid, threads_per_block = make_grid_configuration(
         resolution=resolution, threads_per_dimension=BLOCK_DIM
