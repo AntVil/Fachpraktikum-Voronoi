@@ -7,7 +7,7 @@ import matplotlib.colors as mcolors
 from matplotlib import pyplot as plt
 
 
-from constants import DATA_FOLDER
+from constants import DATA_FOLDER, INT64_MAX
 from task4 import (
     voroni_square_euclidean,
 )
@@ -18,8 +18,6 @@ from utils import (
     generate_SoA_grid_jfa,
     generate_random_seeds_jfa,
     make_grid_configuration,
-    calculate_square_euclidean_distance,
-    calculate_manhattan_distance,
 )
 
 # Resolution of the image containing the voronoi diagram
@@ -399,7 +397,12 @@ def create_error_map_plot(evaluation_data: list[dict]) -> None:
 
 
 @cuda.jit("void(int32[:,:,:], int32[:,:,:], int32, int32)")
-def _jfa_pass_naive_square_euclidean_kernel(grid_in, grid_out, step_size, size) -> None:
+def _jfa_pass_naive_square_euclidean_kernel(
+    grid_in: cuda.devicearray.DeviceNDArray,
+    grid_out: cuda.devicearray.DeviceNDArray,
+    step_size: int,
+    size: int,
+) -> None:
     """
     Executes a single pass of the Jump Flooding Algorithm (JFA) on the GPU.
 
@@ -421,17 +424,21 @@ def _jfa_pass_naive_square_euclidean_kernel(grid_in, grid_out, step_size, size) 
     best_seed_y = grid_in[pixel_y, pixel_x, 1]
 
     # Calculate initial distance
-    best_dist = np.inf
+    best_dist = INT64_MAX
 
     # Only update distance if the current pixel already knows a valid seed
     if best_seed_x != -1 and best_seed_y != -1:
-        best_dist = calculate_square_euclidean_distance(
-            pixel_x, pixel_y, best_seed_x, best_seed_y
-        )
+        delta_x = pixel_x - best_seed_x
+        delta_y = pixel_y - best_seed_y
+        best_dist = delta_x * delta_x + delta_y * delta_y
 
     # Look for all eight neighbours with the current step size k (north, west, east, south, and the four diagonals)
     for dy in (-1, 0, 1):
         for dx in (-1, 0, 1):
+            # NOTE: We can skip the pixel that this thread computes
+            if dx == 0 and dy == 0:
+                continue
+
             # Calculate the x and y position of the neighbour
             neighbour_x = pixel_x + dx * step_size
             neighbour_y = pixel_y + dy * step_size
@@ -444,10 +451,9 @@ def _jfa_pass_naive_square_euclidean_kernel(grid_in, grid_out, step_size, size) 
 
                 # Check if the neighbour already knows a seed (= does not have the initial default value of -1)
                 if seed_x != -1 and seed_y != -1:
-                    # Calculate the distance from the current pixel to the seed that the neighbour knows
-                    dist = calculate_square_euclidean_distance(
-                        pixel_x, pixel_y, seed_x, seed_y
-                    )
+                    delta_x = pixel_x - seed_x
+                    delta_y = pixel_y - seed_y
+                    dist = delta_x * delta_x + delta_y * delta_y
 
                     # Check whether the newly found seed is closer than the last one saved
                     if dist < best_dist:
@@ -462,9 +468,16 @@ def _jfa_pass_naive_square_euclidean_kernel(grid_in, grid_out, step_size, size) 
 
 
 @cuda.jit("void(int32[:,:,:], int32[:,:,:], int32, int32)")
-def _jfa_pass_naive_manhattan_kernel(grid_in, grid_out, step_size, size) -> None:
+def _jfa_pass_naive_manhattan_kernel(
+    grid_in: cuda.devicearray.DeviceNDArray,
+    grid_out: cuda.devicearray.DeviceNDArray,
+    step_size: int,
+    size: int,
+) -> None:
     """
-    Executes a single pass of the Jump Flooding Algorithm (JFA) on the GPU (using Manhattan distance).
+    Executes a single pass of the Jump Flooding Algorithm (JFA) on the GPU.
+
+    Identical to the squared Euclidean variant but uses Manhattan distance instead.
     """
 
     pixel_x, pixel_y = cuda.grid(2)
@@ -473,15 +486,18 @@ def _jfa_pass_naive_manhattan_kernel(grid_in, grid_out, step_size, size) -> None
 
     best_seed_x = grid_in[pixel_y, pixel_x, 0]
     best_seed_y = grid_in[pixel_y, pixel_x, 1]
-    best_dist = np.inf
+    best_dist = INT64_MAX
     if best_seed_x != -1 and best_seed_y != -1:
-        best_dist = calculate_manhattan_distance(
-            pixel_x, pixel_y, best_seed_x, best_seed_y
-        )
+        delta_x = pixel_x - best_seed_x
+        delta_y = pixel_y - best_seed_y
+        best_dist = abs(delta_x) + abs(delta_y)
 
     # Look for all eight neighbours with the current step size k
     for dy in (-1, 0, 1):
         for dx in (-1, 0, 1):
+            if dx == 0 and dy == 0:
+                continue
+
             neighbour_x = pixel_x + dx * step_size
             neighbour_y = pixel_y + dy * step_size
 
@@ -491,9 +507,9 @@ def _jfa_pass_naive_manhattan_kernel(grid_in, grid_out, step_size, size) -> None
 
                 # Check if the neighbour already knows a seed
                 if seed_x != -1 and seed_y != -1:
-                    dist = calculate_manhattan_distance(
-                        pixel_x, pixel_y, seed_x, seed_y
-                    )
+                    delta_x = pixel_x - seed_x
+                    delta_y = pixel_y - seed_y
+                    dist = abs(delta_x) + abs(delta_y)
 
                     # Check whether the newly found seed is closer than the last one saved
                     if dist < best_dist:
