@@ -18,6 +18,7 @@ from utils import (
     generate_SoA_grid_jfa,
     generate_random_seeds_jfa,
     make_grid_configuration,
+    calculate_square_euclidean_distance_int64,
 )
 
 # Resolution of the image containing the voronoi diagram
@@ -428,9 +429,9 @@ def _jfa_pass_naive_square_euclidean_kernel(
 
     # Only update distance if the current pixel already knows a valid seed
     if best_seed_x != -1 and best_seed_y != -1:
-        delta_x = pixel_x - best_seed_x
-        delta_y = pixel_y - best_seed_y
-        best_dist = delta_x * delta_x + delta_y * delta_y
+        best_dist = calculate_square_euclidean_distance_int64(
+            pixel_x, pixel_y, best_seed_x, best_seed_y
+        )
 
     # Look for all eight neighbours with the current step size k (north, west, east, south, and the four diagonals)
     for dy in (-1, 0, 1):
@@ -451,9 +452,10 @@ def _jfa_pass_naive_square_euclidean_kernel(
 
                 # Check if the neighbour already knows a seed (= does not have the initial default value of -1)
                 if seed_x != -1 and seed_y != -1:
-                    delta_x = pixel_x - seed_x
-                    delta_y = pixel_y - seed_y
-                    dist = delta_x * delta_x + delta_y * delta_y
+                    # Calculate the distance from the current pixel to the seed that the neighbour knows
+                    dist = calculate_square_euclidean_distance_int64(
+                        pixel_x, pixel_y, seed_x, seed_y
+                    )
 
                     # Check whether the newly found seed is closer than the last one saved
                     if dist < best_dist:

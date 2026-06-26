@@ -373,3 +373,17 @@ def calculate_euclidean_distance_with_hypot_fast(
         x_coordinate - point_x_coordinate,
         y_coordinate - point_y_coordinate
     )
+
+
+# NOTE: For the JFA Kernels
+@cuda.jit("int64(int32, int32, int32, int32)", device=True, inline=True, fastmath=False)
+def calculate_square_euclidean_distance_int64(
+    x_coordinate: np.int32,
+    y_coordinate: np.int32,
+    point_x_coordinate: np.int32,
+    point_y_coordinate: np.int32
+) -> np.int64:
+    delta_x = x_coordinate - point_x_coordinate
+    delta_y = y_coordinate - point_y_coordinate
+    return delta_x * delta_x + delta_y * delta_y
+
