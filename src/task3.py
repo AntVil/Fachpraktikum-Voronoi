@@ -23,7 +23,7 @@ from utils import (
 def main() -> None:
     command = get_argument()
 
-    if command is None or command == "euclidean":
+    if command is None or command == "euclidean_hypot":
         point_count = 512
         resolution = 2048
 
@@ -44,7 +44,7 @@ def main() -> None:
         )
         # plt.imshow(image)
         # plt.show()
-    elif command == "euclidean-field":
+    elif command == "euclidean_field":
         point_count = 512
         resolution = 2048
 
@@ -54,7 +54,7 @@ def main() -> None:
         )
         # plt.imshow(image)
         # plt.show()
-    elif command == "manhattan-field":
+    elif command == "manhattan_field":
         point_count = 512
         resolution = 2048
 
@@ -64,7 +64,7 @@ def main() -> None:
         )
         # plt.imshow(image)
         # plt.show()
-    elif command == "compare":
+    elif command == "compare-euclidean-manhattan":
         point_count = 100
         resolution = 1024
 
@@ -80,7 +80,7 @@ def main() -> None:
         )
         plt.imshow(np.hstack((image1, image2)))
         plt.show()
-    elif command == "visualization-euclidean":
+    elif command == "visualization_euclidean":
         # NOTE: gif only supports up to 256 colors
         point_count = 256
         resolution = 1024
@@ -103,7 +103,7 @@ def main() -> None:
 
         print("Generating Gif")
         imageio.imwrite(os.path.join(DATA_FOLDER, "task3_euclidean_visualization.gif"), frames)
-    elif command == "visualization-manhattan":
+    elif command == "visualization_manhattan":
         # NOTE: gif only supports up to 256 colors
         point_count = 256
         resolution = 1024
@@ -126,7 +126,7 @@ def main() -> None:
 
         print("Generating Gif")
         imageio.imwrite(os.path.join(DATA_FOLDER, "task3_manhattan_visualization.gif"), frames)
-    elif command == "visualization-euclidean-field":
+    elif command == "visualization_euclidean_field":
         point_count = 256
         resolution = 1024
 
@@ -148,7 +148,7 @@ def main() -> None:
 
         print("Generating Gif")
         imageio.imwrite(os.path.join(DATA_FOLDER, "task3_euclidean_field_visualization.gif"), frames)
-    elif command == "visualization-manhattan-field":
+    elif command == "visualization_manhattan_field":
         point_count = 256
         resolution = 1024
 

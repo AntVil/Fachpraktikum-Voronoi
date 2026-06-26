@@ -30,28 +30,28 @@ def main() -> None:
     point_count = 512
     resolution = 2048
 
-    if command == "euclidean-hypot-grid-stride":
+    if command == "euclidean_hypot_grid_stride":
         image = voronoi_euclidean_hypot_grid_stride(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
         # plt.imshow(image)
         # plt.show()
-    elif command == "euclidean-hypot-warp-shfl":
+    elif command == "euclidean_hypot_warp_shfl":
         image = voronoi_euclidean_hypot_warp_shfl(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
         # plt.imshow(image)
         # plt.show()
-    elif command == "square-euclidean-fast-grid-stride":
+    elif command == "square_euclidean_fast_grid_stride":
         image = voronoi_square_euclidean_fast_grid_stride(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
         # plt.imshow(image)
         # plt.show()
-    elif command == "square-euclidean-fast-warp-shfl":
+    elif command == "square_euclidean_fast_warp_shfl":
         image = voronoi_square_euclidean_fast_warp_shfl(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution

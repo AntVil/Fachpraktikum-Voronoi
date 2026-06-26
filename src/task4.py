@@ -24,42 +24,42 @@ def main() -> None:
     point_count = 512
     resolution = 2048
 
-    if command is None or command == "base" or command == "hypot":
+    if command is None or command == "euclidean_hypot":
         image = voroni_euclidean_hypot(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
         # plt.imshow(image)
         # plt.show()
-    elif command == "sqrt":
+    elif command == "euclidean_sqrt":
         image = voroni_euclidean_sqrt(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
         # plt.imshow(image)
         # plt.show()
-    elif command == "sqrt-fast":
+    elif command == "euclidean_sqrt_fast":
         image = voroni_euclidean_sqrt_fast(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
         # plt.imshow(image)
         # plt.show()
-    elif command == "hypot-fast":
+    elif command == "euclidean_hypot_fast":
         image = voroni_euclidean_hypot_fast(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
         # plt.imshow(image)
         # plt.show()
-    elif command == "square":
+    elif command == "square_euclidean":
         image = voroni_square_euclidean(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
         )
         # plt.imshow(image)
         # plt.show()
-    elif command == "square-fast":
+    elif command == "square_euclidean_fast":
         image = voroni_square_euclidean_fast(
             points=generate_uniform_points(point_count=point_count),
             resolution=resolution
