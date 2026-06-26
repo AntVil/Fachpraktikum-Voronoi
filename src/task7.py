@@ -32,6 +32,8 @@ from task5 import (
 from task6 import (
     _jfa_pass_naive_square_euclidean_kernel,
     _jfa_pass_naive_manhattan_kernel,
+)
+from task6b import (
     _jfa_pass_shared_memory_square_euclidean_kernel,
     _jfa_pass_SoA_square_euclidean_kernel,
 )
