@@ -88,16 +88,16 @@ _Welche Parameter haben den größten Einfluss auf die Performance und wieso?_
 
 Die Anzahl an Punkten und die Ausgabe-Größe haben den größten Einfluss auf die Performance, da weitere Schleifen-Iterationen durchgeführt beziehungsweise weitere Threads gestartet werden müssen.
 
-Folgendes Diagramm gibt die Laufzeit für eine feste Ausgabe-Größe von `128x128`.
+Folgendes Diagramm gibt die Laufzeit für verschiedene eine feste Ausgabe-Größe als Matrix. Das Diagram darunter ist für die feste Ausgabe-Größe von `128x128`.
 
-| RTX-5070                                                                                                                           | GTX 1660 Ti                                                                                                                           |
+| RTX 5070                                                                                                                           | GTX 1660 Ti                                                                                                                           |
 | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_resolution=128_points=64,128,256,512.png)                     |
 
 Es ist leicht zu erkennen, dass größenordnungsmäßig ein verdoppeln der Anzahl an Punkten ein verdoppeln der Laufzeit mit sich bringt. Ein verdoppeln der Auflösung führt größenordnungsmäßig zu einem vervierfachen der Laufzeit. Das liegt daran, dass ein verdoppeln der Auflösung dazu führt, dass viermal so viele Pixel berechnet werden müssen.
 
-Für den Fall `resolution=2048` und `points=512` wurde `ncu` ([Nsight Compute](https://developer.nvidia.com/nsight-compute)) für die RTX-5070 ausgeführt. Folgendes Ausschnitt der Ausgabe ist hierbei wichtig:
+Für den Fall `resolution=2048` und `points=512` wurde `ncu` ([Nsight Compute](https://developer.nvidia.com/nsight-compute)) für die `RTX 5070` ausgeführt. Folgender Ausschnitt der Ausgabe ist hierbei wichtig:
 
 ```
     Section: GPU Speed Of Light Throughput
@@ -140,7 +140,7 @@ Folgende Animation wurde für die Manhattan-Distanz erstellt.
 Der Algorithmus funktioniert auf die gleiche Weise, es gibt jedoch abgesehen von der Ausgabe einen deutlichen Unterschied in der Laufzeit.
 Der gleiche Algorithmus mit Manhattan-Distanz ist deutlich schneller als mit Euklidischer-Distanz, wie folgendes Diagramm zeigt.
 
-| RTX-5070                                                                                                                 | GTX 1660 Ti                                                                                                                 |
+| RTX 5070                                                                                                                 | GTX 1660 Ti                                                                                                                 |
 | ------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_manhattan_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_manhattan_resolution=128_points=64,128,256,512.png) |
 
@@ -253,7 +253,7 @@ Für den Algorithmus sind die meisten dieser Bedingungen tatsächlich irrelevant
 
 Durch die verringerte Anzahl an Anweisungen ist eine klare Verbesserung in der Laufzeit zu erkennen.
 
-| RTX-5070                                                                                                                          | GTX 1660 Ti                                                                                                                          |
+| RTX 5070                                                                                                                          | GTX 1660 Ti                                                                                                                          |
 | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_euclidean_sqrt_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_euclidean_sqrt_resolution=128_points=64,128,256,512.png)     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_euclidean_sqrt_resolution=128_points=64,128,256,512.png)     |
@@ -311,7 +311,7 @@ In diesem Fall hat der Compiler wegen `fastmath=True` die intrinsic Funktion `sq
 
 Für die Laufzeit ergeben sich folgende Unterschiede.
 
-| RTX-5070                                                                                                                               | GTX 1660 Ti                                                                                                                               |
+| RTX 5070                                                                                                                               | GTX 1660 Ti                                                                                                                               |
 | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_euclidean_sqrt_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_euclidean_sqrt_fast_resolution=128_points=64,128,256,512.png)      | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_sqrt_euclidean_sqrt_fast_resolution=128_points=64,128,256,512.png)      |
@@ -348,7 +348,7 @@ In dem bisherigen Assembly hat der Compiler Loop-Unrolling durchgeführt mit bis
 
 Folgende Diagramme zeigen die Laufzeit des Algorithmus mit der neuen Distanz-Funktion.
 
-| RTX-5070                                                                                                                            | GTX 1660 Ti                                                                                                                            |
+| RTX 5070                                                                                                                            | GTX 1660 Ti                                                                                                                            |
 | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_fast_square_euclidean_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_sqrt_fast_square_euclidean_resolution=128_points=64,128,256,512.png) |
@@ -383,7 +383,7 @@ Hierbei weist `ncu` darauf hin, dass der Algorithmus viele Berechnungen durchfü
 
 Das Verwenden von `fastmath=True` für die neue Distanz-Funktion hat nur minimale Auswirkungen, da im Algorithmus nur noch Divisionen, die nur selten durchgeführt werden beschleunigt werden, wie folgende Diagramme zeigen.
 
-| RTX-5070                                                                                                                                 | GTX 1660 Ti                                                                                                                                 |
+| RTX 5070                                                                                                                                 | GTX 1660 Ti                                                                                                                                 |
 | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_fast_square_euclidean_fast_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_sqrt_fast_square_euclidean_fast_resolution=128_points=64,128,256,512.png) |
@@ -412,10 +412,10 @@ Die Größe `GRID_STRIDE_SIZE` ist natürlich maßgeblich für die Laufzeit, bei
 
 Ein Blick auf das Assembly zeigt, dass der Compiler wegen der Konstante `GRID_STRIDE_SIZE=8` ein Loop-Unrolling der inneren Schleife, welche Distanz-Berechnungen übernimmt, durchgeführt hat. Im Vergleich zur Naiven Variante konnte der Compiler darauf verzichten mehrere Loop-Unrolling Schritte für verschiedene Längen durchzuführen, da bereits beim Kompilieren des Programm die Anzahl an Iterationen feststeht.
 
-| RTX-5070                                                                                                                                       | GTX 1660 |
-| ---------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_hypot_grid_stride_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |          |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_euclidean_hypot_grid_stride_resolution=128_points=64,128,256,512.png)     |          |
+| RTX 5070                                                                                                                                       | GTX 1660 Ti                                                                                                                                       |
+| ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_hypot_grid_stride_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660_Ti_euclidean_hypot_grid_stride_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_euclidean_hypot_grid_stride_resolution=128_points=64,128,256,512.png)     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660_Ti_euclidean_hypot_euclidean_hypot_grid_stride_resolution=128_points=64,128,256,512.png)     |
 
 Es ist zusehen, dass im Vergleich zur Naiven Variante bei höherer Auflösung und Punkt-Anzahl deutlich Laufzeit eingespart wurde. Interessanterweise ist zu sehen, dass der Algorithmus für kleine Eingaben langsamer geworden ist. Der Grund hierfür ist vermutlich darauf zurückzuführen, dass mehr Overhead durch das Shared-Memory beziehungsweise das Loop-Unrolling entstanden ist. Erst bei größeren Eingaben fällt dieser Overhead weg.
 
@@ -457,10 +457,10 @@ Diese Variante benötigt kein Ausprobieren von verschiedenen `GRID_STRIDE_SIZE`,
 
 Wie zu erwarten ist im Assembly die intrisic Operation `shfl.sync.idx` zu sehen. Der Compiler hat in diesem Fall wegen der Konstante `WARP_SIZE=32` erneut ein Loop-Unrolling durchgefürt. Erneut konnte der Compiler darauf verzichten mehrere Loop-Unrolling für verschiedenen Längen zu erzeugen, da die Anzahl an Iterationen der inneren Schleife eindeutig ist. Der Compiler hat jedoch nicht 16 sondern nur vier Iterationen aufgerollt.
 
-| RTX-5070                                                                                                                                     | GTX-1660 |
-| -------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_hypot_warp_shfl_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |          |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_euclidean_hypot_warp_shfl_resolution=128_points=64,128,256,512.png)     |          |
+| RTX 5070                                                                                                                                     | GTX 1660 Ti                                                                                                                                     |
+| -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_hypot_warp_shfl_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660_Ti_euclidean_hypot_warp_shfl_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_euclidean_hypot_warp_shfl_resolution=128_points=64,128,256,512.png)     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660_Ti_euclidean_hypot_euclidean_hypot_warp_shfl_resolution=128_points=64,128,256,512.png)     |
 
 Es ist zu sehen, dass diese Variante ebenfalls schneller arbeitet, als die initiale Variante. Interessanterweise ist nun kein Unterschied bei kleinen Eingaben zu sehen, der Grund ist an dieser Stelle leider nicht ganz eindeutig, aber es könnte daran liegen, dass kein `cuda.syncthreads` nötig ist. Für größere Eingaben erscheint der Grid-Stride-Loop mit Shared-Memory effektiver.
 
@@ -470,10 +470,10 @@ Wir haben nun die Berechnungen (Compute) und die Speicherzugriffe (Memory) separ
 
 Folgende Diagramme geben die Laufzeiten wieder.
 
-| RTX-5070                                                                                                                                             | GTX-1660 |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_square_euclidean_fast_grid_stride_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |          |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_square_euclidean_fast_warp_shfl_resolution=128,256,512,1024,2048_points=64,128,256,512.png)   |          |
+| RTX 5070                                                                                                                                             | GTX 1660 Ti                                                                                                                                             |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_square_euclidean_fast_grid_stride_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660_Ti_square_euclidean_fast_grid_stride_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_square_euclidean_fast_warp_shfl_resolution=128,256,512,1024,2048_points=64,128,256,512.png)   | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660_Ti_square_euclidean_fast_warp_shfl_resolution=128,256,512,1024,2048_points=64,128,256,512.png)   |
 
 Es hat sich ergeben, dass die Warp mit `shfl_sync` Variante für jede Eingabe eine bessere Laufzeit aufweis.
 
@@ -533,7 +533,7 @@ JFA + 2: 99.5993%
 
 ## Aufgabe 6b - Optimierungen
 
-| RTX-5070 | GTX-1660                                                                                                                                                                                 |
+| RTX 5070 | GTX 1660 Ti                                                                                                                                                                              |
 | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 |          | ![](../data/task6_jfa_runtime_over_stepSize_NVIDIA-GeForce-GTX-1660-Ti_Naive-square-euclidean_Naive-manhattan_Shared-memory-square-euclidean_SoA-square-euclidean_res1024_seeds2000.png) |
 
