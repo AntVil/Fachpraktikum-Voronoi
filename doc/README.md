@@ -658,7 +658,7 @@ Um einen Zugriff auf das globale VRAM zu verhindern, wird der Shared-Memory-Buff
 
 ![](../data/task6b_sharedMemory_Concept.svg)
 
-Die maximale Breite dieses Halos (`MAX_HALO_RADIUS`) leitet sich direkt aus der maximal erlaubten Schrittweite innerhalb des Shared Memorys ab ($\text{JFA\_SHARED\_THRESHOLD} / 2$).
+Die maximale Breite dieses Halos (`MAX_HALO_RADIUS`) leitet sich direkt aus der maximal erlaubten Schrittweite innerhalb des Shared Memorys ab ($\mathrm{JFA\_SHARED\_THRESHOLD} / 2$).
 
 _Kooperatives Laden mittels Grid-Stride-Loop_
 
@@ -674,7 +674,7 @@ _Dimensionierung von `SHARED_MEMORY_SIZE`_
 
 Der Shared-Memory-Buffer wird statisch für den Worst-Case dimensioniert:
 
-$$\text{SHARED\_MEMORY\_SIZE} = \text{BLOCK\_DIM} + 2 \times \text{MAX\_HALO\_RADIUS}$$
+$$\mathrm{SHARED\_MEMORY\_SIZE} = \mathrm{BLOCK\_DIM} + 2 \times \mathrm{MAX\_HALO\_RADIUS}$$
 
 Bei kleiner werdenden Schrittweiten ($2$ und $1$) schrumpft der tatsächlich benötigte Halo-Bereich dynamisch zusammen. Da der Shared-Memory-Buffer jedoch statisch allokiert sein muss, bleibt ein Teil des äußeren Randes in den letzten Schritten ungenutzt. Zudem führt das Halo-Verfahren dazu, dass sich die Speicherbereiche benachbarter Blöcke _"überschneiden"_ und manche Pixeldaten trozdem noch von mehreren Blöcken redundant geladen werden müssen.
 
@@ -682,19 +682,19 @@ Für die Dimensionierung gilt es, das Hardware-Limit von standardmäßig **48 KB
 
 - Für `BLOCK_DIM = 16` und `JFA_SHARED_THRESHOLD = 8` ergeben sich $24 \times 24 = 576$ Pixel-Elemente. Da für jeden Pixel zwei Koordinaten (`x` und `y`) als `int32` (4 Byte) gespeichert werden, belegt der Buffer im Speicher:
 
-$$576 \times 2 \times 4\text{ Byte} = 4608\text{ Byte} \approx 4,6\text{ KB}$$
+$$576 \times 2 \times 4\mathrm{ Byte} = 4608\mathrm{ Byte} \approx 4,6\mathrm{ KB}$$
 
 - Für `JFA_SHARED_THRESHOLD = 16` steigt die Anzahl der Elemente bereits auf $(16 + 2 \times 8)^2 = 1024$ Pixel an, was zu folgendem Speicherbedarf führt:
 
-$$1024 \times 2 \times 4\text{ Byte} = 8192\text{ Byte} = 8\text{ KB}$$
+$$1024 \times 2 \times 4\mathrm{ Byte} = 8192\mathrm{ Byte} = 8\mathrm{ KB}$$
 
 - Für `JFA_SHARED_THRESHOLD = 32` steigt der Speicherbedarf zu:
 
-$$(16 + 2 \times 16)^2 = 48 \times 48 = 2304\text{ Pixel}$$
-$$2304 \times 2 \times 4\text{ Byte} = 18432\text{ Byte} \approx 18,4\text{ KB}$$
+$$(16 + 2 \times 16)^2 = 48 \times 48 = 2304\mathrm{ Pixel}$$
+$$2304 \times 2 \times 4\mathrm{ Byte} = 18432\mathrm{ Byte} \approx 18,4\mathrm{ KB}$$
 
 - Erst bei `JFA_SHARED_THRESHOLD = 64` steigt die Pixelanzahl auf $(16 + 2 \times 32)^2 = 80 \times 80 = 6400$ Pixel. Dies entspricht im Speicher:
-  $$6400 \times 2 \times 4\text{ Byte} = 51200\text{ Byte} = 50\text{ KB}$$
+  $$6400 \times 2 \times 4\mathrm{ Byte} = 51200\mathrm{ Byte} = 50\mathrm{ KB}$$
   Damit wird das Hardware-Limit von **48 KB** ($\approx$ 0xc000 Bytes) gesprengt. Dies wird bereits beim Kompilieren verhindert und bricht mit folgender Fehlermeldung ab:
 
 ```bash
@@ -736,8 +736,8 @@ _Umsetzung für JFA_
 
 Im JFA wird das ursprüngliche Grid der Form `shape=(resolution, resolution, 2)` so angepasst, dass es eine Dimension weniger besitzt, dafür aber die doppelte logische Höhe aufweist: `shape=(resolution * 2, resolution)`. Die Daten für die Seed-X- und Y-Koordinaten werden planar untereinander angeordnet:
 
-- **Obere Hälfte (Zeile $0$ bis $\text{size} - 1$):** Hält die X-Koordinaten der Seeds
-- **Untere Hälfte (Zeile $\text{size}$ bis $2 \times \text{size} - 1$):** Hält die Y-Koordinaten der Seeds
+- **Obere Hälfte (Zeile $0$ bis $\mathrm{size} - 1$):** Hält die X-Koordinaten der Seeds
+- **Untere Hälfte (Zeile $\mathrm{size}$ bis $2 \times \mathrm{size} - 1$):** Hält die Y-Koordinaten der Seeds
 
 Um im Kernel auf die Daten zuzugreifen, muss für die Y-Koordinate lediglich der Offset der Bildauflösung (`size`) auf den Zeilenindex hinzuaddiert werden, während der X-Wert auf der normalen Zeile geladen werden kann:
 
