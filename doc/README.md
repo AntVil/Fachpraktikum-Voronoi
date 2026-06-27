@@ -506,7 +506,12 @@ Die `Compute (SM) Throughput` beziehungsweise `Memory Throughput` Metrik liegt n
 
 Dieser Algorithmus ist nun möglichst effizient implementiert. Im folgenden wollen wir betrachten, ob durch einen alternativen Algorithmus beziehungsweise Ansatz eine weitere Verbesserung der Laufzeit möglich ist.
 
-# Aufgabe 6a - Alternativer Ansatz: Jump Flooding Algorithmus (JFA)
+# Aufgabe 6 - Alternativer Ansatz: Jump Flooding Algorithmus (JFA)
+
+> [!NOTE]
+>
+> - Für die Diastanzberechnung wird im Folgenden die quadrierte euklidische Distanz - beziehungsweise im Exkurs die Manhattan-Distanz - verwendet.
+> - Der in den vorherigen Aufgaben verwendete Algorithmus wird im Folgenden teilweise referenziert und verwendet. Dabei wird er als _"Pixel-Algorithmus"_ bezeichnet.
 
 _Wie funktioniert der Algorithmus?_
 
@@ -533,6 +538,88 @@ JFA + 2: 99.5993%
 ```
 
 ## Aufgabe 6b - Optimierungen
+
+_Können Optimierungen durchgeführt werden? Wenn ja, warum? Wenn nein, warum nicht?_
+
+**1. Integer statt Floats**
+
+Ursprünglich wurde zur Initialisierung der kürzesten Distanz Folgendes verwendet:
+
+```python
+best_dist = np.float32(np.inf)
+```
+
+Ein `.inspect_types()`-Aufruf nach dem Kernel-Lauf zeigt jedoch, dass trotz des expliziten `float32`-Casts eine `float64`-Variable initialisiert wird, was auf der GPU zu ressourcenintensiven Fließkommaoperationen führt:
+
+```plaintext
+#   best_dist = call $122load_attr.14($152load_attr.16, func=$122load_attr.14, args=[Var($152load_attr.16, task6.py:428)], kws=(), vararg=None, varkwarg=None, target=None)  :: (float64,) -> float32
+#   del $152load_attr.16
+#   del $122load_attr.14
+#   best_dist.5 = best_dist  :: float64
+```
+
+Da in dieser Aufgabe die Distanzberechnung auf die quadrierte euklidische Distanz (beziehungsweise im Exkurs auf die Manhattan-Distanz) festgelegt ist und der Kernel auf diskreten Ganzzahl-Koordinaten operiert, ist ein Ausweichen auf Fließkommazahlen mathematisch nicht notwendig: Das Ergebnis einer Summe von Quadraten ganzer Zahlen ist stets wieder eine Ganzzahl. Deshalb wird die kürzeste Distanz (`best_dist`) mit dem maximalen `int64`-Wert initialisiert. Dadurch wird ein Typecast zwischen Float und Integer im GPU-Kernel unterbunden.
+
+Folgender Code zeigt die minimalen und maximalen Werte für den NumPy-Datentyp `int64`:
+
+```python
+info = np.iinfo(np.int64)
+print("Minimum:", info.min)  # -9223372036854775808
+print("Maximum:", info.max)  #  9223372036854775807
+```
+
+Eine feste Begrenzung auf `int32` wird dabei aus zwei Gründen nicht erzwungen:
+
+- **Schutz vor Überlauf (Integer Overflow):** Bei der quadrierten euklidischen Distanz wachsen die Werte quadratisch zur Bildgröße. Ein `int32`-Typ würde bei Bildgrößen ab $32768 \times 32768$ Pixeln die Obergrenze (`2147483647`) überschreiten. Dies wäre für die meisten Auflösungen wahrscheinlich ausreichend. Dennoch würde der resultierende mathematische Überlauf fehlerhafte, negative Distanzen erzeugen und die Logik des Algorithmus zerstören.
+
+- **Automatische Typ-Inferenz (Type Promotion):** Da die Thread-Indizierung mittels `cuda.grid(2)` `int64`-Werte zurückgibt, stuft Numba die damit berechneten Distanzen automatisch auf `int64` hoch.
+
+Anschließend zeigt der Aufruf von `.inspect_types()` die Integer-Verarbeitung:
+
+```plaintext
+#   best_dist = global(INT64_MAX: 9223372036854775807)  :: Literal[int](9223372036854775807)
+#   best_dist.6 = best_dist  :: int64
+
+best_dist = INT64_MAX
+```
+
+**2. Loop Unrolling der 8 "Nachbarschafts-Pixeln"**
+
+Da für die acht Nachbarschaftspixel eine verschachtelte For-Loop mit If-Statement zum Überspringen des zentralen Pixels `(0, 0)` verwendet wird, liegt die Vermutung nahe, dass der Compiler ohne explizite Anweisungen kein Loop Unrolling durchführt:
+
+```python
+for dy in (-1, 0, 1):
+    for dx in (-1, 0, 1):
+        # NOTE: We can skip the pixel that this thread computes
+        if dx == 0 and dy == 0:
+            continue
+		...
+```
+
+Um ein explizites Loop Unrolling zu forcieren, könnte ein flacher Ansatz mit vorberechneten Tupeln gewählt werden:
+
+```python
+OFFSETS = ((-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1))
+for dy, dx in OFFSETS:
+    ...
+```
+
+Diesen Ausdruck würde Numba mit hoher Wahrscheinlichkeit unrollen.
+
+Um zu überprüfen, wie der Compiler den naiven Ansatz tatsächlich übersetzt, wurde die erzeugte [Assembly-Datei]() analysiert. Es zeigt sich ... ????
+==> TODO: Assembly analysieren `uv run .\src\task7.py naive_square_euclidean_jfa`
+
+```diff
+
+```
+
+**3. Shared Memory (nur für kleine `step_size`)**
+
+**4. Datenlayout optimieren (_Structure of Arrays (SoA)_ vs. _Array of Structures (AoS)_)**
+
+**5. Read-Only Cache**
+
+**6. Shuffle**
 
 | RTX 5070 | GTX 1660 Ti                                                                                                                                                                              |
 | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -561,3 +648,8 @@ _Was liefern die Profiling-Tools?_
 > - **Lösung:** Den Aufruf auf positionale Argumente umstellen: `get_thread_position(out_image)`
 >
 > Verwendete Versionen anzeigen: `pip freeze`
+
+> [!NOTE]
+> **Fokussierung der hardwarenahen Optimierung auf die NVIDIA GeForce RTX 5070**
+>
+> Für die Performance-Optimierung werden hardwarespezifische Daten mithilfe der NVIDIA Profiling Tools `nsys`, `ncu` sowie der Numba Funktion `.inspect_asm()` erzeugt. Um eine saubere Vergleichbarkeit der Messergebnisse zu gewährleisten und den Umfang der erzeugten Dateien nicht zu sprengen, beschränken sich die hardwarenahen Analysen auf die **NVIDIA GeForce RTX 5070**. Die Performance-Diagramme werden weiterhin für beide GPUs erstellt.
