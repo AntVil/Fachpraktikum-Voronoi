@@ -537,6 +537,22 @@ JFA + 1: 99.5990%
 JFA + 2: 99.5993%
 ```
 
+_Warp Divergenz_
+
+_Bank Conflicts_
+
+_Was muss bei der Performancemessung beachtet werden?_
+
+| RTX 5070                                                                                                                                      | GTX 1660 Ti                                                                                                                                      |
+| --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     |
+
+| RTX 5070                                                                                                                               | GTX 1660 Ti                                                                                                                               |
+| -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_manhattan_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_manhattan_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_manhattan_jfa_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_manhattan_jfa_resolution=128_points=64,128,256,512.png)                     |
+
 ## Aufgabe 6b - Optimierungen
 
 _Können Optimierungen durchgeführt werden? Wenn ja, warum? Wenn nein, warum nicht?_
@@ -613,17 +629,35 @@ Um zu überprüfen, wie der Compiler den naiven Ansatz tatsächlich übersetzt, 
 
 ```
 
-**3. Shared Memory (nur für kleine `step_size`)**
+**3. Shared Memory**
+
+| RTX 5070                                                                                                                                              | GTX 1660 Ti                                                                                                                                              |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_shared_memory_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_shared_memory_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_shared_memory_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_shared_memory_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     |
 
 **4. Datenlayout optimieren (_Structure of Arrays (SoA)_ vs. _Array of Structures (AoS)_)**
+
+| RTX 5070                                                                                                                                     | GTX 1660 Ti                                                                                                                                     |
+| -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070__SoA_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti__SoA_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070__SoA_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti__SoA_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     |
 
 **5. Read-Only Cache**
 
 **6. Shuffle**
 
-| RTX 5070 | GTX 1660 Ti                                                                                                                                                                              |
-| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|          | ![](../data/task6_jfa_runtime_over_stepSize_NVIDIA-GeForce-GTX-1660-Ti_Naive-square-euclidean_Naive-manhattan_Shared-memory-square-euclidean_SoA-square-euclidean_res1024_seeds2000.png) |
+```bash
+uv run .\src\task7.py all-jfa
+```
+
+```bash
+uv run .\src\task6b.py jfa-performance
+```
+
+| RTX 5070                                                                                                                                                                              | GTX 1660 Ti                                                                                                                                                                              |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/task6_jfa_runtime_over_stepSize_NVIDIA-GeForce-RTX-5070_Naive-square-euclidean_Naive-manhattan_Shared-memory-square-euclidean_SoA-square-euclidean_res1024_seeds2000.png) | ![](../data/task6_jfa_runtime_over_stepSize_NVIDIA-GeForce-GTX-1660-Ti_Naive-square-euclidean_Naive-manhattan_Shared-memory-square-euclidean_SoA-square-euclidean_res1024_seeds2000.png) |
 
 # Aufgabe 7 - Ergebnisse
 
