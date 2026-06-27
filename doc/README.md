@@ -712,7 +712,41 @@ Hier wird der Schwellenwert auf `JFA_SHARED_THRESHOLD = ???` festgelegt.
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_shared_memory_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_shared_memory_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_shared_memory_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_shared_memory_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     |
 
-**4. Datenlayout optimieren (_Structure of Arrays (SoA)_ vs. _Array of Structures (AoS)_)**
+**4. Datenlayout optimieren**
+
+_Structure of Arrays (SoA) vs. Array of Structures (AoS)_
+
+Bei der naiven Implementierung `_jfa_pass_naive_square_euclidean_kernel` eines JFA-Iterationsschritts wird für das Grid ein **Array of Structures (AoS)** Layout verwendet. Das bedeutet, es wird ein 3D-Array der Form `(Height, Width, 2)` genutzt, welches pro Pixel ein Tupel von (x, y) Seed-Koordinaten speichert. Dieses Layout wird häufig verwendet, weil es für den Menschen einfacher vorzustellen und im Code intuitiv zu handhaben ist. Im Speicher liegen die Daten dabei abwechselnd in folgender Form:
+
+```plaintext
+X0 Y0 X1 Y1 X2 Y2 X3 Y3 ...
+```
+
+Allerdings hat dieses Layout in CUDA einen Nachteil bezüglich des Speicherzugriffs: Threads innerhalb eines gemeinsamen Warps (32 Threads) können keine vollständig _coalesced_ Speicherzugriff durchführen. Wenn Thread 0 die X-Koordinate des ersten Pixels und Thread 1 die X-Koordinate des zweiten Pixels laden möchte, liegt im Speicher das `Y0` des ersten Threads im Weg. Die Zugriffe sind somit mit einer Schrittweite von 2 gestreckt, was zu einer höheren Anzahl von Speicher-Transaktionen führt.
+
+Um globale Speicherzugriffe zu bündeln, wird in diesem Optimierungsschritt das gegensätzliche Layout **Structure of Arrays (SoA)** verwendet. Dabei werden die Daten nach Komponenten getrennt im Speicher abgelegt:
+
+```plaintext
+X0 X1 X2 X3 ... Y0 Y1 Y2 Y3 ...
+```
+
+Wenn nun die 32 Threads eines Warps die X-Koordinaten von 32 nebeneinanderliegenden Pixeln abfragen, liegen diese Daten lückenlos hintereinander im Speicher. Die Hardware kann diese Anfrage in einer Speichertransaktion (Coalesced Access) abarbeiten. Das Gleiche gilt anschließend für die Y-Koordinaten (vgl. [hier](https://forums.developer.nvidia.com/t/structures-of-arrays-vs-arrays-of-structures/13581)).
+
+_Umsetzung für JFA_
+
+Im JFA wird das ursprüngliche Grid der Form `shape=(resolution, resolution, 2)` so angepasst, dass es eine Dimension weniger besitzt, dafür aber die doppelte logische Höhe aufweist: `shape=(resolution * 2, resolution)`. Die Daten für die Seed-X- und Y-Koordinaten werden planar untereinander angeordnet:
+
+- **Obere Hälfte (Zeile $0$ bis $\text{size} - 1$):** Hält die X-Koordinaten der Seeds
+- **Untere Hälfte (Zeile $\text{size}$ bis $2 \times \text{size} - 1$):** Hält die Y-Koordinaten der Seeds
+
+Um im Kernel auf die Daten zuzugreifen, muss für die Y-Koordinate lediglich der Offset der Bildauflösung (`size`) auf den Zeilenindex hinzuaddiert werden, während der X-Wert auf der normalen Zeile geladen werden kann:
+
+```python
+grid_in[pixel_y, pixel_x]
+grid_in[pixel_y + size, pixel_x]
+```
+
+Durch diese Anpassung liegen alle Daten für den Warp sequenziell im Speicher.
 
 | RTX 5070                                                                                                                                     | GTX 1660 Ti                                                                                                                                     |
 | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
