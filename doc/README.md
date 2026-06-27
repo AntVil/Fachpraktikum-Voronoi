@@ -631,6 +631,82 @@ Um zu überprüfen, wie der Compiler den naiven Ansatz tatsächlich übersetzt, 
 
 **3. Shared Memory**
 
+Als erster Optimierungsansatz wird **Shared Memory** evaluiert. Der Einsatz von Shared Memory ist primär dann sinnvoll, wenn benachbarte Threads innerhalb eines Blocks redundant auf dieselben Speicheradressen im globalen VRAM der GPU zugreifen müssen. Durch das einmalige, kollektive Laden der Daten aus dem VRAM in das Shared Memory können nachfolgende, mehrfache Lesezugriffe beschleunigt werden.
+
+_Problemstellung bei JFA_
+
+Pro Iteration benötigt jeder Thread die Daten von sich selbst sowie von 8 Nachbarpixeln. Da sich die Suchfenster benachbarter Threads stark überschneiden, kommt es zu redundanten VRAM-Lesezugriffen. Allerdings variiert die Distanz zu den Nachbarn (`step_size`) je nach Iterationsschritt:
+
+- **Große Schrittweiten:** Die benötigten Nachbardaten liegen weit auseinander. Ein Shared-Memory-Buffer müsste sehr groß sein, um diese Distanzen abzudecken, was das Hardware-Limit des GPU-Shared-Memorys sprengen könnte.
+- **Kleine Schrittweiten:** Erst wenn die Schrittweite unter einen bestimmten Schwellenwert fällt, liegen alle von einem Thread-Block benötigten Pixeldaten räumlich so nah beieinander, dass sie gemeinsam in den Shared Memory geladen werden können.
+
+_Die hybride Strategie_
+
+Um diesem Verhalten gerecht zu werden, wurde eine _hybride_ Kernel-Strategie implementiert. Die Konstante `JFA_SHARED_THRESHOLD` dient als Weiche:
+
+- **Schrittweite $<$ Threshold:** Die Shared-Memory-Pipeline wird aktiviert.
+- **Schrittweite $\ge$ Threshold:** Die Threads greifen direkt auf das globale VRAM zu (Fallback-Pipeline).
+
+_Edge Cases und das Halo-Padding_
+
+Für die Implementierung wird das Grid in Blöcke aufgeteilt und pro Block soll ein Shared-Memory-Buffer angelegt werden. Ein Problem bei der Blockaufteilung sind die Rand-Threads (_Edge Cases_). Threads, die sich am äußeren Rand eines $16 \times 16$-Blocks befinden, müssen zur Distanzberechnung Pixel abfragen, die außerhalb ihres eigenen Blocks liegen. Um dieses Problem zu adressieren, stehen unter anderem 2 Möglichkeiten zur Auswahl:
+
+- Für Zugriffe auf Edge Cases wieder auf den Zugriff auf das globale VRAM zurückfallen
+- Den Shared-Memory-Buffer um eine gewisse Größe vergrößern (Abhängig von der `JFA_SHARED_THRESHOLD`)
+
+Um einen Zugriff auf das globale VRAM zu verhindern, wird der Shared-Memory-Buffer um eine Sicherheitszone - dem **Halo** (Heiligenschein) - in alle vier Richtungen erweitert. Das folgende Bild soll die Aufteilung schematisch darstellen.
+
+![](../data/task6b_sharedMemory_Concept.svg)
+
+Die maximale Breite dieses Halos (`MAX_HALO_RADIUS`) leitet sich direkt aus der maximal erlaubten Schrittweite innerhalb des Shared Memorys ab ($\text{JFA\_SHARED\_THRESHOLD} / 2$).
+
+_Kooperatives Laden mittels Grid-Stride-Loop_
+
+Da der Shared-Memory-Buffer inklusive Halo größer ist als die Anzahl der verfügbaren Threads im Block (z.B. $24 \times 24 = 576$ Elemente vs. $16 \times 16 = 256$ Threads), kann nicht jeder Thread einfach genau ein Pixel laden. Um die Daten dennoch komplett ins Shared-Memory-Buffer zu laden, wird eine **Grid-Stride-Loop** verwendet:
+
+1. Das zweidimensionale Array im Shared Memory wird virtuell in ein eindimensionales Array linearisiert.
+2. Die 256 Threads arbeiten sich in Schritten der Blockgröße durch die Elemente und laden die Daten kooperativ.
+3. Falls ein Block am echten Bildrand liegt und der Halo über die Bildauflösung hinausragt, fangen die Threads dies ab und beschreiben das Shared Memory mit einem _Uninitialized-Flag_ (`-1`).
+
+Nach dem Ladevorgang stellt `cuda.syncthreads()` sicher, dass erst alle Elemente im Shared Memory liegen, bevor die Threads mit der eigentlichen JFA-Distanzberechnung starten. Threads, die außerhalb der echten Bildgrenzen liegen, terminieren erst **nach** diesem Sync, da sie beim kooperativen Laden des Halos mithelfen mussten. Die JFA-Distanzberechnung wird dann auf den Pixeldaten im Shared-Memory-Buffer durchgeführt.
+
+_Dimensionierung von `SHARED_MEMORY_SIZE`_
+
+Der Shared-Memory-Buffer wird statisch für den Worst-Case dimensioniert:
+
+$$\text{SHARED\_MEMORY\_SIZE} = \text{BLOCK\_DIM} + 2 \times \text{MAX\_HALO\_RADIUS}$$
+
+Bei kleiner werdenden Schrittweiten ($2$ und $1$) schrumpft der tatsächlich benötigte Halo-Bereich dynamisch zusammen. Da der Shared-Memory-Buffer jedoch statisch allokiert sein muss, bleibt ein Teil des äußeren Randes in den letzten Schritten ungenutzt. Zudem führt das Halo-Verfahren dazu, dass sich die Speicherbereiche benachbarter Blöcke _"überschneiden"_ und manche Pixeldaten trozdem noch von mehreren Blöcken redundant geladen werden müssen.
+
+Für die Dimensionierung gilt es, das Hardware-Limit von standardmäßig **48 KB Shared Memory pro Thread-Block** nicht zu überschreiten (vgl. [Forum-Beitrag](https://forums.developer.nvidia.com/t/question-about-max-shared-memory-in-block-and-multiprocessor/283345)):
+
+- Für `BLOCK_DIM = 16` und `JFA_SHARED_THRESHOLD = 8` ergeben sich $24 \times 24 = 576$ Pixel-Elemente. Da für jeden Pixel zwei Koordinaten (`x` und `y`) als `int32` (4 Byte) gespeichert werden, belegt der Buffer im Speicher:
+
+$$576 \times 2 \times 4\text{ Byte} = 4608\text{ Byte} \approx 4,6\text{ KB}$$
+
+- Für `JFA_SHARED_THRESHOLD = 16` steigt die Anzahl der Elemente bereits auf $(16 + 2 \times 8)^2 = 1024$ Pixel an, was zu folgendem Speicherbedarf führt:
+
+$$1024 \times 2 \times 4\text{ Byte} = 8192\text{ Byte} = 8\text{ KB}$$
+
+- Für `JFA_SHARED_THRESHOLD = 32` steigt der Speicherbedarf zu:
+
+$$(16 + 2 \times 16)^2 = 48 \times 48 = 2304\text{ Pixel}$$
+$$2304 \times 2 \times 4\text{ Byte} = 18432\text{ Byte} \approx 18,4\text{ KB}$$
+
+- Erst bei `JFA_SHARED_THRESHOLD = 64` steigt die Pixelanzahl auf $(16 + 2 \times 32)^2 = 80 \times 80 = 6400$ Pixel. Dies entspricht im Speicher:
+  $$6400 \times 2 \times 4\text{ Byte} = 51200\text{ Byte} = 50\text{ KB}$$
+  Damit wird das Hardware-Limit von **48 KB** ($\approx$ 0xc000 Bytes) gesprengt. Dies wird bereits beim Kompilieren verhindert und bricht mit folgender Fehlermeldung ab:
+
+```bash
+uses too much shared data (0xc800 bytes, 0xc000 max)
+```
+
+
+_TODO: Beim Rumprobieren mit JFA_SHARED_THRESHOLD ist aufgefallen, dass die Performance mit kleinerer Größe steigt, sodass bei 1 die beste Laufzeit erreicht wird. Dies entspricht jedoch einer vollständigen Deaktivierung der Shared-Memory-Pipeline, wodurch der gesamte Ansatz mit Shared Memory keinen Gewinn bringt. Wieso ist das so? Hilft nuc/nsys/asm? Sind die Operationen wie % und // ggf. ein Problem?_
+
+
+Hier wird der Schwellenwert auf `JFA_SHARED_THRESHOLD = ???` festgelegt.
+
 | RTX 5070                                                                                                                                              | GTX 1660 Ti                                                                                                                                              |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_shared_memory_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_shared_memory_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
