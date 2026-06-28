@@ -43,9 +43,40 @@ TODO
 
 _Wie werden im folgenden Performance Analysen durchgeführt?_
 
+Für die Performance-Analyse werden die Aufnahme der Messergebnisse und die daraus resultierende Generierung der Diagramme getrennt.
+
+Aufgrund der unterschiedlichen Algorithmenstrukturen und Kernelsignaturen wurde die Messlogik in zwei nahezu identische Funktionen aufgeteilt (`compute_performance_metrics` und `compute_performance_metrics_jfa`). Dies hält den Code übersichtlich und verhindert übermäßig komplexe Funktionsparameter. Sie unterscheiden sich vor allem in der Allokation der benötigten Daten auf der GPU und dem tatsächlichen Kernelaufruf auf der Host-Seite.
+
+==> TODO: Auf Messproblem beim JFA Kernel eingehen? Python Overhead beim Context-Switch; Hier? Oder in Task6?
+
+Bei der Messung werden für jede Konfiguration mehrere Durchläufe (`run_count`) durchgeführt und einzeln gespeichert. Dabei werden sowohl die Bildauflösung (`resolution_sizes`) als auch die Punkteanzahl (`point_counts`) variiert. Für die folgenden Analysen werden dabei `RUNS = 20` durchgeführt. Die Messfunktionen liefern für die weitere Verarbeitung und Visualisierung ein dreidimensionales Array der Form `(Auflösungen, Punkteanzahlen, Durchläufe)`. Für die anschließende Analyse wird der Median der Durchläufe gebildet, da dieser robuster gegenüber vereinzelten Ausreißern ist.
+
+Zusätzlich wird die Numba-Funktion `.inspect_asm()` verwendet, um für jeden Kernel eine Assembly-Datei zu generieren. Diese wird für spätere Optimierungen herangezogen, um einen direkten Einblick in den tatsächlich erzeugten Maschinencode zu erhalten.
+
 _Wie wird die Zeit für das kompilieren und den Daten-Transfer in der Analyse berücksichtigt?_
 
+Um saubere Messergebnisse zu erhalten, wird zu Beginn ein _Dry Warm-up_ (5 Durchläufe) durchgeführt. Dadurch wird sichergestellt, dass die erste Just-In-Time-Kompilierung (JIT) des Kernels die eigentlichen Performance-Messungen zeitlich nicht verfälscht.
+
+Gemessen wird ausschließlich die reine Ausführungszeit des Kernels auf der GPU für die Berechnung des Voronoi-Diagramms. Es werden **keine** Transferzeiten wie Host-to-Device (H2D) oder Device-to-Host (D2H) berücksichtigt. Zur Messung kommen CUDA-Events (`cuda.event(timing=True)`) zum Einsatz: Ein Start-Event unmittelbar vor dem Kernelaufruf markiert den Beginn und ein End-Event unmittelbar danach das Ende der Messung. Ein `cuda.synchronize()` nach dem Kernelaufruf stellt sicher, dass die GPU alle Berechnungen vollständig abgeschlossen hat, bevor die tatsächliche Laufzeit via `.elapsed_time()` auf der CPU bestimmt wird.
+
 _Welche Eingabe- beziehungsweise Ausgabe-Größen werden verwendet?_
+
+Für die **Eingabe** werden folgende Größen variiert:
+
+| Bildauflösung   | Punkteanzahl |
+| --------------- | ------------ |
+| 128 ($2^7$)     | 64 ($2^6$)   |
+| 256 ($2^8$)     | 128 ($2^7$)  |
+| 512 ($2^9$)     | 256 ($2^8$)  |
+| 1024 ($2^{10}$) | 512 ($2^9$)  |
+| 2048 ($2^{11}$) | TBD          |
+| TBD             | TBD          |
+
+Zur visuellen Auswertung der Ergebnisse (**Ausgabe**) stehen zwei Diagrammtypen zur Verfügung:
+
+- Performance-Vergleichsplot (`create_kernel_performance_plot()`): Dieses Diagramm zeigt die Kernel-Laufzeit in Abhängigkeit von der Punkteanzahl bei einer **festen** Bildauflösung. Sowohl die X-Achse (Input-Größe $N$) als auch die Y-Achse (Laufzeit in ms) nutzen eine logarithmische Skalierung. Da die Funktion eine Liste von Kerneln entgegennehmen kann, ist es möglich, mithilfe dieses Plots mehrere Kernel-Implementierungen direkt miteinander zu vergleichen.
+
+- Performance-Matrix / Heatmap (`create_kernel_performance_matrix()`): Da die Performance auf beide Eingabeparameter (Bildauflösung und Punkteanzahl) reagiert, zeigt diese Matrix die gegenseitige Beeinflussung der beiden Parameter. Die Zeilen repräsentieren die Auflösungen, die Spalten die Punkteanzahlen. In jeder Zelle wird die konkrete Laufzeit angezeigt. Das Diagramm zeigt, ab welchen Auflösungen oder Punktmengen der Algorithmus an seine Grenzen stößt (Skalierbarkeit).
 
 # Aufgabe 3 - Naive Implementation
 
