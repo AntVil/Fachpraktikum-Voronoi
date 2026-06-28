@@ -18,17 +18,53 @@ Zuletzt wird in Abschnitt sieben eine finale Analyse und Zusammenfassung der Erg
 
 _Was ist das Problem?_
 
+Ein Voronoi-Diagramm ist eine Aufteilung eines Raumes, die von der Distanz zu einer Menge von Punkten - auch _Seeds_ genannt - abhängt. Gegeben ist eine Menge von Punkten in einem (zweidimensionalen) Raum. Das Ziel ist es, den Raum so in Regionen (Voronoi-Zellen) zu unterteilen, dass jeder Punkt innerhalb einer Zelle näher an dem zugehörigen Seed liegt als an jedem anderen Seed im Raum. Die Grenzen der Zellen bilden Linien, die exakt den gleichen Abstand zu den jeweils nächstgelegenen Seeds aufweisen.
+
 _2-3 wissenschaftliche Quellen_
 
 _Was sind verwandte Probleme die nicht berücksichtigt werden?_
 
+Um den Rahmen des Projekts abzugrenzen, werden folgende verwandte Problemstellungen nicht berücksichtigt:
+
+==> TODO: Welche?
+
 _Was wird berechnet?_
+
+Da das Diagramm auf der GPU berechnet wird, wird ein Pixelraster (Grid) verwendet. Für jeden Pixel $(x, y)$ des Zielbildes wird der mathematische Abstand zum nächstgelegenen Punkt/Seed bestimmt. Am Ende wird jedem Pixel die eindeutige ID des Seeds zugewiesen, zu dessen Region er gehört.
 
 _Welche Einschränkungen beziehungsweise Annahmen werden gemacht?_
 
+Für dieses Projekt werden die folgenden Einschränkungen und Annahmen getroffen:
+
+- Zweidimensionalität: Die Berechnung ist auf den 2D-Raum beschränkt. Dreidimensionale Räume oder höhere Dimensionen werden ausgeschlossen.
+
+- Quadratischer Raum: Das Diagramm ist **quadratisch**. Es werden keine rechteckigen Auflösungen der Form $W \times H$ unterstützt, sondern ausschließlich Dimensionen der Form $N \times N$.
+
+- Statische Seeds: Die Positionen der Punkte sind nach der Initialisierung fix und verändern sich während der Kernel-Laufzeit nicht.
+
+- TODO: Weitere???
+
+==> TODO (Hier erwähnen?): $N$ muss für JFA eine Zweierpotenz sein (wichtig für die Schrittweitenhalbierung)
+
 _Was ist die Eingabe und Ausgabe und welcher Daten-Typ wird genutzt?_
 
+Für die Berechnung des Voronoi-Diagramms sind folgende Parameter definiert:
+
+| Parameter          | Beschreibung                                                             | Datentyp            |
+| ------------------ | ------------------------------------------------------------------------ | ------------------- |
+| **Bildauflösung**  | Die Seitenlänge des quadratischen Gitters ($N \times N$)                 | `int32` / `int64`   |
+| **Punkte / Seeds** | Ein Array, das die 2D-Koordinaten der im Raum verteilten Zentren enthält | `float32` / `int64` |
+| **Ausgabe-Grid**   | Das resultierende zweidimensionale Bildraster/Voronoi-Diagramm           | `int32`             |
+
 _Welche Parameter sind entscheidend für das Problem und welchen Einfluss haben diese?_
+
+Das Laufzeitverhalten und die Skalierbarkeit des Problems hängen von zwei Parametern ab:
+
+1. Die Bildauflösung ($N$): Mit steigender Auflösung wächst die Anzahl der zu berechnenden Pixel quadratisch ($N^2$).
+
+2. Die Anzahl der im Raum zufällig verteilten Punkte/Seeds, die bei der Distanzberechnung berücksichtigt werden müssen.
+
+==> TODO: Auf JFA-Besonderheit hier schon eingehen?
 
 # Aufgabe 2 - Performance Analyse Konzept
 
