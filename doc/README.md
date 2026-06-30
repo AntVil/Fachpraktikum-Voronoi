@@ -582,11 +582,44 @@ Dieser Algorithmus ist nun möglichst effizient implementiert. Im folgenden woll
 
 _Wie funktioniert der Algorithmus?_
 
+Für den Algorithmus wird ein quadratisches Grid der Größe $N \times N$ definiert. Bevor der Algorithmus startet, wird das leere Grid initialisiert, indem die zuvor zufällig generierten Seed-Koordinaten gesetzt werden: Jeder Seed weiß zu Beginn, zu welchem Pixel er gehört. Alle anderen Pixel werden mit einem **undefinierten** Startzustand initialisiert. Das bedeutet, ein normaler Pixel weiß anfangs nicht, zu welchem Punkt er am nächsten liegt.
+
+Der Jump Flooding Algorithmus (JFA) wird nun in mehreren Schritten iterativ ausgeführt. Die erste Schrittweite beträgt $k = \frac{N}{2}$, wobei $N$ die Auflösung des Grids ist. Für jede Schrittweite $k$ prüft jeder Pixel im Grid seine 8 **Nachbarpixel** (Norden, Nordost, Osten, Südost, Süden, Südwest, Westen, Nordwest), die genau $k$ Pixel entfernt sind. Dabei wird überprüft, ob diese Nachbarn bereits gültige Seed-Koordinaten besitzen (also nicht mehr das _Uninitialized-Flag_ haben):
+
+- Ist das der Fall, übernimmt der aktuelle Pixel die Seed-Koordinaten des Nachbarpixels und betrachtet diesen Seed vorerst als den nächstgelegenen Punkt.
+- Hat ein Nachbarpixel ebenfalls keine Seed-Koordinaten, wird er ignoriert.
+- Wird bei einer späteren Prüfung oder in einem späteren Schritt ein Seed gefunden, dessen Distanz zum aktuellen Pixel kürzer ist als die des bereits gespeicherten Seeds, werden die neuen, näheren Koordinaten übernommen und die alten überschrieben.
+
+Nach jeder Iteration wird die Schrittweite $k$ halbiert ($k = \frac{k}{2}$), bis der Wert **1** erreicht und berechnet wurde.
+
+Aufgrund dieser fortlaufenden Halbierung ist es **zwingend erforderlich**, dass das Grid eine Auflösung mit einer Zweierpotenz ($2^m$) besitzt. Für rechteckige Grids müsste man das schrittweise Halbieren der Schrittweite entlang der längeren Kante durchführen.
+
+_Wie wird der JFA implementiert?_
+
+In dieser **ersten naiven** Implementation wird das Grid als 3D-Array der Form `shape=(resolution, resolution, 2)` vom Typ `int32` definiert. Dieses Layout wird auch als _Array of Structures (AoS)_ bezeichnet, weil es für jeden Pixel die X- und Y-Koordinate des nächstgelegenen Seeds speichert (vgl. `generate_AoS_grid_jfa()`). Für den undefinierten Startzustand der Pixel, die kein Seed sind, wird der Wert `-1` verwendet. Dieser signalisiert, dass der Pixel noch keine Seed-Koordinaten kennt.
+
+Eine Besonderheit liegt in der Steuerung auf der Host-Seite: Das Voronoi-Diagramm wird hier iterativ in einer Schleife nach dem eben beschriebenen Verfahren bestimmt. Die Kernel-Implementierung auf der GPU beinhaltet also keine vollständige Berechnung des gesamten Diagramms, sondern führt nur einen einzelnen **Pass** (einen Iterationsschritt) aus. Der Kernel nimmt folgende Parameter entgegen:
+
+- Ein Eingabe-Grid-Array (`grid_in`)
+- Ein Ausgabe-Grid-Array (`grid_out`)
+- Die aktuelle Schrittweite $k$ für den Pass (`step_size`)
+- Die Auflösung des Diagramms (`size`)
+
+Die Verwendung von zwei getrennten Grids ist notwendig, da das Eingabe-Grid während des Schrittes gelesen wird, um das Ausgabe-Grid parallel zu aktualisieren. Auf der Host-Seite wird der Kernel in einer Schleife so oft aufgerufen, bis die Schrittweite den Wert **1** abgearbeitet hat. Nach jedem Kernel-Aufruf werden das Eingabe- und Ausgabe-Grid getauscht (**Swapping**), sodass ein Ping-Pong-artiges Konstrukt entsteht.
+
+Um am Ende aus dem 3D-Array (das die Seed-Koordinaten als X/Y-Tupel speichert) ein finales 2D-Array mit eindeutigen UIDs der Seeds zu erzeugen, wird für jeden Pixel der berechnete X-Wert mit dem Wert $Y \cdot \mathrm{resolution}$ addiert:
+
+$$\text{UID} = X + (Y \cdot \text{resolution})$$
+
+Dadurch entstehen eindeutige IDs für identische Seed-Koordinaten.
+
+Die folgenden Visualisierungen zeigen den Zustand des Diagramms nach jedem Schritt $k$:
+
 | `JFA - square euclidean distance`                  | `JFA - manhattan distance`                         |
 | -------------------------------------------------- | -------------------------------------------------- |
 | ![](../data/task6_euclidean_jfa_visualization.gif) | ![](../data/task6_manhattan_jfa_visualization.gif) |
 
-_Wo liegen die Unterschiede zum Ansatz der vorherigen Implementierung? (Komplexität)_
+Sowohl bei der quadratischen euklidischen Distanz als auch bei der Manhattan-Distanz ist gut zu erkennen, wie das zu Beginn leere, schwarze Bild mit jedem Schritt "voller" wird. Das typische _"Flooding-Verhalten"_ (Fluten) des Algorithmus wird hierbei in jeder Iteration sichtbar.
 
 _Können Optimierungen durchgeführt werden? wieso Ja/ Nein?_
 
