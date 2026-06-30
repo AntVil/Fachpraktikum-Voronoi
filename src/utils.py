@@ -289,6 +289,19 @@ def calculate_manhattan_distance_fast(
     )
 
 
+@cuda.jit("float32(float32, float32, float32, float32)", device=True, inline=True, fastmath=True)
+def calculate_max_absolute_distance(
+    x_coordinate: np.float32,
+    y_coordinate: np.float32,
+    point_x_coordinate: np.float32,
+    point_y_coordinate: np.float32
+) -> np.float32:
+    return cuda.libdevice.fmaxf( # pyright: ignore[reportAttributeAccessIssue]
+        abs(x_coordinate - point_x_coordinate),
+        abs(y_coordinate - point_y_coordinate)
+    )
+
+
 @cuda.jit("float32(float32, float32, float32, float32)", device=True, inline=True, fastmath=False)
 def calculate_square_euclidean_distance(
     x_coordinate: np.float32,
@@ -386,4 +399,3 @@ def calculate_square_euclidean_distance_int64(
     delta_x = x_coordinate - point_x_coordinate
     delta_y = y_coordinate - point_y_coordinate
     return delta_x * delta_x + delta_y * delta_y
-

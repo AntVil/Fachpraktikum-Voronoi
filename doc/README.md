@@ -18,19 +18,27 @@ Zuletzt wird in Abschnitt sieben eine finale Analyse und Zusammenfassung der Erg
 
 _Was ist das Problem?_
 
-Ein Voronoi-Diagramm ist eine Aufteilung eines Raumes, die von der Distanz zu einer Menge von Punkten - auch _Seeds_ genannt - abhängt. Gegeben ist eine Menge von Punkten in einem (zweidimensionalen) Raum. Das Ziel ist es, den Raum so in Regionen (Voronoi-Zellen) zu unterteilen, dass jeder Punkt innerhalb einer Zelle näher an dem zugehörigen Seed liegt als an jedem anderen Seed im Raum. Die Grenzen der Zellen bilden Linien, die exakt den gleichen Abstand zu den jeweils nächstgelegenen Seeds aufweisen.
+Ein Voronoi-Diagramm ist eine Aufteilung eines Raumes. Für eine gegebene Punkte-Menge wird diese Aufteilung berechnet, wobei jeder Punkt in genau einer Region liegt. Das Ziel ist es, den Raum so in Regionen zu unterteilen, dass alle Punkte innerhalb einer Region als nächst gelegenen Nachbarn den Punkt, der innerhalb der Region liegt, haben. Je nachdem welche Distanz-Metrik verwendet wird sieht das Voronoi-Diagramm unterschiedlich aus.
+
+Als Beispiel wurden folgende Visualisierungen erstellt für die gleiche Punkte-Menge mit Unterschiedlichen Distanz-Funktionen.
+
+| Euklidische Distanz                            | Manhattan Distanz                              | Maximale Distanz                                  |
+| ---------------------------------------------- | ---------------------------------------------- | ------------------------------------------------- |
+| ![](../data/task1_euclidean_visualization.gif) | ![](../data/task1_manhattan_visualization.gif) | ![](../data/task1_max_absolute_visualization.gif) |
+
+Die Regionen im Voronoi-Diagramm werden Voronoi-Regionen genannt.
 
 _2-3 wissenschaftliche Quellen_
 
 _Was sind verwandte Probleme die nicht berücksichtigt werden?_
 
-Um den Rahmen des Projekts abzugrenzen, werden folgende verwandte Problemstellungen nicht berücksichtigt:
-
-==> TODO: Welche?
+Um den Rahmen des Projekts abzugrenzen, werden verwandte Problemstellungen wie die Delaunay Triangulation oder Voronoi-Diagramme im mehr-dimensionalen Raum nicht betrachtet. In diesem Projekt werden lediglich diskrete Voronoi-Diagramme berechnet. Es ist somit nicht von Bedeutung die tatsächlichen Voronoi-Regionen tatsächlich zu bestimmen, sondern nur das tatsächliche Diagramm. Bei den Distanz-Funktionen steht die Euklidische-Distanz im Vordergrund. Die Manhattan-Distanz wird an einigen Stellen als Exkurs betrachtet.
 
 _Was wird berechnet?_
 
-Da das Diagramm auf der GPU berechnet wird, wird ein Pixelraster (Grid) verwendet. Für jeden Pixel $(x, y)$ des Zielbildes wird der mathematische Abstand zum nächstgelegenen Punkt/Seed bestimmt. Am Ende wird jedem Pixel die eindeutige ID des Seeds zugewiesen, zu dessen Region er gehört.
+Da das Diagramm auf der GPU berechnet wird, wird ein Pixelraster (Gitter) verwendet. Für jeden Pixel $(x, y)$ des Zielbildes wird der Abstand zum nächstgelegenen Punkt bestimmt. Am Ende wird jeder Pixel dem Punkt zugewiesen, zu dessen Voronoi-Region dieser gehört.
+
+Es gibt eine Besonderheit die hierbei zu beachten ist. Bei diskreten Pixeln kann es dazu kommen, dass ein Pixel nächster Nachbar zu zwei Punkten wäre. Dieser Sonderfall ist bei dem Voronoi-Diagramm mit Manhattan-Distanz noch stärker ausgeprägt, da hierbei die Grenzen zwischen zwei Voronoi-Regionen sogar Flächen sein können. Um diese Problematik zu umgehen und einen eindeutigen nächsten Nachbar zu garantieren, wird bei zwei Punkten mit gleichem Abstand der Punkt der weiter am Anfang der Eingabe liegt gewählt.
 
 _Welche Einschränkungen beziehungsweise Annahmen werden gemacht?_
 
@@ -40,9 +48,7 @@ Für dieses Projekt werden die folgenden Einschränkungen und Annahmen getroffen
 
 - Quadratischer Raum: Das Diagramm ist **quadratisch**. Es werden keine rechteckigen Auflösungen der Form $W \times H$ unterstützt, sondern ausschließlich Dimensionen der Form $N \times N$.
 
-- Statische Seeds: Die Positionen der Punkte sind nach der Initialisierung fix und verändern sich während der Kernel-Laufzeit nicht.
-
-- TODO: Weitere???
+- Statische Eingabe Punkte: Die Positionen der Punkte sind nach der Initialisierung fix und verändern sich während der Kernel-Laufzeit nicht.
 
 ==> TODO (Hier erwähnen?): $N$ muss für JFA eine Zweierpotenz sein (wichtig für die Schrittweitenhalbierung)
 
