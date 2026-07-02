@@ -53,7 +53,7 @@ def generate_random_seeds_jfa(seed_count: int | np.int64, resolution: int | np.i
     The array contains seed_count entries, with each entry representing the x and y position of a seed within the grid (integer).
     """
 
-    return np.random.randint(low=0, high=int(resolution), size=(int(seed_count), 2))
+    return np.random.randint(low=0, high=int(resolution), size=(int(seed_count), 2)).astype(np.int32)
 
 
 def generate_AoS_grid_jfa(seeds: np.ndarray, resolution: int | np.int64) -> np.ndarray:

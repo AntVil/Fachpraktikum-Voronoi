@@ -734,45 +734,36 @@ _Können Optimierungen durchgeführt werden? Wenn ja, warum? Wenn nein, warum ni
 
 **1. Integer statt Floats**
 
-Ursprünglich wurde zur Initialisierung der kürzesten Distanz Folgendes verwendet:
+Ursprünglich wurde zur Initialisierung der kürzesten Distanz wie beim Pixel-Algorithmus Folgendes verwendet: `best_dist = np.float32(np.inf)`. Ein `.inspect_types()`-Aufruf nach dem Kernel-Lauf zeigt jedoch, dass trotz des expliziten `float32`-Casts eine `float64`-Variable initialisiert wird.
+
+
+
+
+Da in dieser Aufgabe die Distanzberechnung auf die quadrierte euklidische Distanz (beziehungsweise im Exkurs auf die Manhattan-Distanz) festgelegt ist und der Kernel auf diskreten Ganzzahl-Koordinaten operiert, ist ein Ausweichen auf Fließkommazahlen mathematisch nicht notwendig: Das Ergebnis einer Summe von Quadraten ganzer Zahlen ist stets wieder eine Ganzzahl. Deshalb wird die kürzeste Distanz (`best_dist`) mit dem maximalen `int32`-Wert initialisiert. Folgender Code zeigt die minimalen und maximalen Werte für den NumPy-Datentyp `int32`:
 
 ```python
-best_dist = np.float32(np.inf)
+info = np.iinfo(np.int32)
+print("Minimum:", info.min)  # -2147483647
+print("Maximum:", info.max)  #  2147483647
 ```
 
-Ein `.inspect_types()`-Aufruf nach dem Kernel-Lauf zeigt jedoch, dass trotz des expliziten `float32`-Casts eine `float64`-Variable initialisiert wird, was auf der GPU zu ressourcenintensiven Fließkommaoperationen führt:
+Bei der Festlegung auf `int32` muss sichergestellt sein, dass die quadrierte euklidische Distanz das Limit von $2147483647$ nicht überschreitet:
 
-```plaintext
-#   best_dist = call $122load_attr.14($152load_attr.16, func=$122load_attr.14, args=[Var($152load_attr.16, task6.py:428)], kws=(), vararg=None, varkwarg=None, target=None)  :: (float64,) -> float32
-#   del $152load_attr.16
-#   del $122load_attr.14
-#   best_dist.5 = best_dist  :: float64
-```
+$$\mathrm{dist} = \Delta x^2 + \Delta y^2$$
 
-Da in dieser Aufgabe die Distanzberechnung auf die quadrierte euklidische Distanz (beziehungsweise im Exkurs auf die Manhattan-Distanz) festgelegt ist und der Kernel auf diskreten Ganzzahl-Koordinaten operiert, ist ein Ausweichen auf Fließkommazahlen mathematisch nicht notwendig: Das Ergebnis einer Summe von Quadraten ganzer Zahlen ist stets wieder eine Ganzzahl. Deshalb wird die kürzeste Distanz (`best_dist`) mit dem maximalen `int64`-Wert initialisiert. Dadurch wird ein Typecast zwischen Float und Integer im GPU-Kernel unterbunden.
+Geht man von einem quadratischen Bild der Seitenlänge $N \times N$ aus, tritt die maximale Distanz im Worst Case zwischen den diagonal gegenüberliegenden Bildeckpunkten auf. Daraus folgt für die maximale quadrierte Distanz:
 
-Folgender Code zeigt die minimalen und maximalen Werte für den NumPy-Datentyp `int64`:
+$$\mathrm{dist}_{\max} = N^2 + N^2 = 2N^2$$
 
-```python
-info = np.iinfo(np.int64)
-print("Minimum:", info.min)  # -9223372036854775808
-print("Maximum:", info.max)  #  9223372036854775807
-```
+Um einen Überlauf zu verhindern, muss gelten:
 
-Eine feste Begrenzung auf `int32` wird dabei aus zwei Gründen nicht erzwungen:
+$$2N^2 \le 2147483647$$
 
-- **Schutz vor Überlauf (Integer Overflow):** Bei der quadrierten euklidischen Distanz wachsen die Werte quadratisch zur Bildgröße. Ein `int32`-Typ würde bei Bildgrößen ab $32768 \times 32768$ Pixeln die Obergrenze (`2147483647`) überschreiten. Dies wäre für die meisten Auflösungen wahrscheinlich ausreichend. Dennoch würde der resultierende mathematische Überlauf fehlerhafte, negative Distanzen erzeugen und die Logik des Algorithmus zerstören.
+$$N^2 \le 1073741823,5$$
 
-- **Automatische Typ-Inferenz (Type Promotion):** Da die Thread-Indizierung mittels `cuda.grid(2)` `int64`-Werte zurückgibt, stuft Numba die damit berechneten Distanzen automatisch auf `int64` hoch.
+$$N \le \sqrt{1073741823,5} = 32768$$
 
-Anschließend zeigt der Aufruf von `.inspect_types()` die Integer-Verarbeitung:
-
-```plaintext
-#   best_dist = global(INT64_MAX: 9223372036854775807)  :: Literal[int](9223372036854775807)
-#   best_dist.6 = best_dist  :: int64
-
-best_dist = INT64_MAX
-```
+Demnach würde diese Obergrenze bei Bildgrößen ab $32768 \times 32768$ Pixeln überschritten werden, was für die meisten Auflösungen allerdings ausreichend sein sollte.
 
 **2. Loop Unrolling der 8 "Nachbarschafts-Pixeln"**
 
