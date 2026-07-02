@@ -586,6 +586,8 @@ Dieser Algorithmus ist nun möglichst effizient implementiert. Im folgenden woll
 > - Für die Diastanzberechnung wird im Folgenden die quadrierte euklidische Distanz - beziehungsweise im Exkurs die Manhattan-Distanz - verwendet.
 > - Der in den vorherigen Aufgaben verwendete Algorithmus wird im Folgenden teilweise referenziert und verwendet. Dabei wird er als _"Pixel-Algorithmus"_ bezeichnet.
 
+Der JFA wurde im Jahr 2006 von **Guodong Rong** und **Tiow-Seng Tan** auf der Computergrafik-Konferenz _ACM Symposium on Interactive 3D Graphics and Games (I3D)_ in Redwood City vorgestellt (vgl. [Jump Flooding in GPU](https://www.comp.nus.edu.sg/~tants/jfa/i3d06.pdf)). Die Autoren konzipierten den Algorithmus gezielt für die parallele Architektur von GPUs, um geometrische Probleme wie die Berechnung von Voronoi-Diagrammen oder Distanzfeldern zu lösen.
+
 _Wie funktioniert der Algorithmus?_
 
 Für den Algorithmus wird ein quadratisches Grid der Größe $N \times N$ definiert. Bevor der Algorithmus startet, wird das leere Grid initialisiert, indem die zuvor zufällig generierten Seed-Koordinaten gesetzt werden: Jeder Seed weiß zu Beginn, zu welchem Pixel er gehört. Alle anderen Pixel werden mit einem **undefinierten** Startzustand initialisiert. Das bedeutet, ein normaler Pixel weiß anfangs nicht, zu welchem Punkt er am nächsten liegt.
@@ -627,21 +629,37 @@ Die folgenden Visualisierungen zeigen den Zustand des Diagramms nach jedem Schri
 
 Sowohl bei der quadratischen euklidischen Distanz als auch bei der Manhattan-Distanz ist gut zu erkennen, wie das zu Beginn leere, schwarze Bild mit jedem Schritt "voller" wird. Das typische _"Flooding-Verhalten"_ (Fluten) des Algorithmus wird hierbei in jeder Iteration sichtbar.
 
-_Können Optimierungen durchgeführt werden? wieso Ja/ Nein?_
+_Wieso arbeitet der Algorithmus korrekt?_
+
+_Wo liegen die Unterschiede zum Ansatz der vorherigen Implementierung? (Komplexität)_
 
 _Gibt es Qualitätsunterschiede (Pixelfehler) im Diagramm?_
 
-Die folgenden _Error Maps_ zeigen die Abweichungen der verschiedenen JFA-Varianten im Vergleich zum Pixel-Algorithmus, welcher hier als exakte `100%`-Referenz dient (schwarz = identisch, rot = Abweichung).
+In der Literatur wird der Jump Flooding Algorithm (JFA) als Approximations-Algorithmus bezeichnet. Das bedeutet, dass der Algorithmus mathematisch nicht immer ein zu `100%` korrektes Ergebnis liefert. Auch im originalen Paper von Guodong Rong und Tiow-Seng Tan wird dieses Thema explizit behandelt (vgl. [5. Errors in Jump Flooding](https://www.comp.nus.edu.sg/~tants/jfa/i3d06.pdf)). Die Autoren zeigen dort aber auch auf, dass die Fehlerrate in der Praxis minimal ist.
+
+Experimente in der Studie zeigen, dass diese Fehler hauptsächlich entlang der Grenzen von Voronoi-Regionen auftreten. Genauer gesagt: Bei Voronoi-Zellen, die entlang der Gittergrenze liegen, können sich fehlerhafte Gitterpunkte um die Voronoi-Kanten herum ansammeln. Bei den übrigen Voronoi-Zellen sind fast alle fehlerhaften Gitterpunkte überwiegend Voronoi-Eckpunkte oder gruppieren sich um diese herum.
+
+Als Ursache für diese Fehler wird der Informationstransport des JFA über abnehmende Schrittweiten genannt. Ein Pixel im Gitter speichert zu jedem Zeitpunkt immer nur **eine** Information zu einem ihm nächstgelegenen Punkt. Wenn nun in einer Iteration mehrere Punktkoordinaten verglichen werden, speichert das Pixel am Ende nur die aktuell lokal optimalste Koordinate. Andere Koordinaten, die für umliegende Pixel relevant sein könnten, breiten sich über dieses Pixel nicht weiter aus. Man spricht dabei von einem _getöteten_ Punkt (_killed seed_). Für die weiteren Iterationsschritte fehlen nachfolgenden Pixeln im Gitter genau diese verloren gegangenen Informationen, um ihren mathematisch tatsächlich nächstgelegenen Punkt zu finden. Dies resultiert letztlich in einer fehlerhaften Zuordnung der Punktkoordinaten.
+
+Zur Verbesserung der Ergebnisse schlägt die Studie mehrere Varianten vor, um diese Fehler gezielt an den Voronoi-Eckpunkten und entlang der Kanten zu eliminieren - darunter `JFA+1` und `JFA+2`. Dabei wird zunächst der Standard-JFA durchgeführt. Am Ende werden jedoch zusätzliche Durchläufe mit einer Schrittweite von **1** (für `JFA+1`) beziehungsweise **2** und anschließend **1** (für `JFA+2`) angehängt. Diese lokalen Suchen erlauben es den betroffenen Pixeln, korrekte Daten aus ihrer unmittelbaren Nachbarschaft zu übernehmen, selbst wenn der primäre Ausbreitungspfad zuvor blockiert wurde.
+
+Um diesem Aspekt im Projekt quantitativ nachzugehen, wurde der naive JFA-Ansatz mit der quadrierten euklidischen Distanz (`_jfa_pass_naive_square_euclidean_kernel`) mit der Referenzimplementierung aus der vorherigen Aufgabe (`_voroni_square_euclidean_kernel`) verglichen. Der pixelbasierte Algorithmus dient dabei als exakte `100%`-Referenz. Der Vergleich wurde mit einer Auflösung von **$1024 \times 1024$ Pixeln** und **2000** Punkten durchgeführt.
+
+Die folgenden _Error Maps_ visualisieren die Abweichungen der verschiedenen JFA-Varianten, wobei identische Zuordnungen schwarz und fehlerhafte Pixel rot dargestellt werden:
 
 | `Standard JFA`                                                  | `JFA+1`                                                       | `JFA+2`                                                       |
 | --------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------- |
 | ![](../data/task6_error_map_standard_jfa_res1024_seeds2000.png) | ![](../data/task6_error_map_jfa_plus_1_res1024_seeds2000.png) | ![](../data/task6_error_map_jfa_plus_2_res1024_seeds2000.png) |
+
+Die Auswertung der Genauigkeiten lieferte folgende Ergebnisse:
 
 ```bash
 Standard JFA: 99.5950%
 JFA + 1: 99.5990%
 JFA + 2: 99.5993%
 ```
+
+Es ist zu erkennen, dass bereits beim Standard-JFA ohne zusätzliche Durchläufe der Anteil fehlerhafter Pixel im Vergleich zur Gesamtpixelanzahl deutlich unter 1 % liegt. Mit den zusätzlichen Durchläufen von `JFA+1` und `JFA+2` lassen sich im Experiment zwar messbare Verbesserungen der Genauigkeit erzielen, diese fallen bei der gewählten Konstellation jedoch nicht mehr allzu signifikant aus, da die Basisgenauigkeit bereits recht hoch ist.
 
 _Warp Divergenz_
 
