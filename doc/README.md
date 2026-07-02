@@ -667,10 +667,61 @@ _Bank Conflicts_
 
 _Was muss bei der Performancemessung beachtet werden?_
 
+In [Aufgabe 2](#aufgabe-2---performance-analyse-konzept) wurde das Konzept für die Performanceanalyse vorgestellt. Für den JFA ergeben sich hierbei besondere Herausforderungen. Neben der unterschiedlichen Kernel-Signatur ist vor allem die Hostseitige Steuerung ein wesentlicher Unterschied: Während beim Pixel-Algorithmus ein einzelner Kernel-Aufruf das Voronoi-Diagramm vollständig berechnet, benötigt der Standard-JFA mehrere sequenzielle Kernel-Aufrufe. Das beeinflusst, wie die tatsächliche Kernel-Laufzeit korrekt gemessen werden kann.
+
+Zwischen jedem Kernel-Aufruf müssen Ein- und Ausgabe-Grid getauscht (_Ping-Pong-Swap_) und die Schrittweite halbiert werden. Diese Operationen werden vom Python-Interpreter ausgeführt. Die dabei entstehenden Zeiten sollen bei der Laufzeitmessung möglichst nicht erfasst werden.
+
+Da in _Aufgabe 2_ entschieden wurde, CUDA-Events für die Laufzeitmessung zu verwenden, scheidet `time.perf_counter()` aus. Für CUDA-Events stehen zwei Varianten zur Auswahl:
+
+**Variante 1: Events pro Iteration mit Synchronisierung:**
+
+```python
+kernel_time: float = 0.0
+while k >= 1:
+    kernel_start.record()
+    kernel[blocks_per_grid, threads_per_block](grid_in, grid_out, k, resolution)
+    kernel_end.record()
+    cuda.synchronize()
+    kernel_time += kernel_start.elapsed_time(kernel_end)
+    grid_in, grid_out = grid_out, grid_in
+    k //= 2
+```
+
+Hier wird jeder Kernel-Aufruf einzeln geklammert und seine Laufzeit zur Gesamtzeit addiert. Dies entspricht dem Vorgehen beim Pixel-Algorithmus. Der Vorteil ist, dass ausschließlich reine Kernel-Ausführungszeiten summiert werden. Der entscheidende Nachteil ist jedoch, dass `cuda.synchronize()` _innerhalb_ der Schleife die CPU nach jedem Kernel-Aufruf blockiert, bis die GPU fertig ist. Dadurch wird die GPU _serialisiert_: Sie kann erst dann den nächsten Kernel empfangen, wenn die CPU nach der Synchronisierung wieder die Kontrolle übernommen hat.
+
+**Variante 2: Events um die gesamte Ping-Pong-Schleife:**
+
+```python
+kernel_start.record()
+while k >= 1:
+    kernel[blocks_per_grid, threads_per_block](grid_in, grid_out, k, resolution)
+    grid_in, grid_out = grid_out, grid_in
+    k //= 2
+kernel_end.record()
+cuda.synchronize()
+total_ms = kernel_start.elapsed_time(kernel_end)
+```
+
+Das Start-Event wird einmalig vor der Schleife, das End-Event einmalig danach in den GPU-Stream eingetragen. Laut [Numba-Dokumentation](https://numba.readthedocs.io/en/stable/cuda-reference/host.html#numba.cuda.cudadrv.driver.Event) gilt ein Event als eingetreten, sobald alle Aufgaben, die zum Zeitpunkt des Aufrufs von `.record()` in der Warteschlange des Streams standen, abgeschlossen sind. Da Kernel-Aufrufe in Numba standardmäßig asynchron sind und in den Default-Stream eingereiht werden, sieht die GPU den Stream als geordnete Sequenz:
+
+```
+[start_event => kernel_1 => kernel_2 => ... => kernel_N => end_event]
+```
+
+Der Python-Code (Swap, Halbierung von `k`) läuft ausschließlich auf der CPU und erscheint **nicht** in der GPU-Timeline. `elapsed_time` misst daher reine GPU-Zeit zwischen den beiden Markern.
+
+Für die Messungen in _Aufgabe 2_ wurde **Variante 2** gewählt.
+
+_Was liefert die Performance-Analyse?_
+
+Die folgenden Diagramme zeigen die gemessenen Kernellaufzeiten für die quadratische euklidische Distanz:
+
 | RTX 5070                                                                                                                                      | GTX 1660 Ti                                                                                                                                      |
 | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     |
+
+Die folgenden Diagramme zeigen die gemessenen Kernellaufzeiten für die Mannhatten-Distanz:
 
 | RTX 5070                                                                                                                               | GTX 1660 Ti                                                                                                                               |
 | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
