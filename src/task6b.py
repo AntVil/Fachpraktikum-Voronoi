@@ -5,7 +5,7 @@ from typing import Callable
 from matplotlib import pyplot as plt
 
 
-from constants import DATA_FOLDER, INT64_MAX
+from constants import DATA_FOLDER, INT32_MAX
 from task6 import (
     jfa_voronoi_host,
     _jfa_pass_naive_square_euclidean_kernel,
@@ -18,7 +18,7 @@ from utils import (
     generate_SoA_grid_jfa,
     generate_random_seeds_jfa,
     make_grid_configuration,
-    calculate_square_euclidean_distance_int64,
+    calculate_square_euclidean_distance_int32,
     get_device_name,
 )
 
@@ -273,8 +273,8 @@ def create_jfa_performance_plot(
 def _jfa_pass_shared_memory_square_euclidean_kernel(
     grid_in: cuda.devicearray.DeviceNDArray,
     grid_out: cuda.devicearray.DeviceNDArray,
-    step_size: int,
-    size: int,
+    step_size: np.int32,
+    size: np.int32,
 ) -> None:
     """
     Executes a single JFA pass using a hybrid Shared Memory and Global VRAM strategy.
@@ -320,11 +320,13 @@ def _jfa_pass_shared_memory_square_euclidean_kernel(
     thread_y = cuda.threadIdx.y  # row
 
     # Global pixel coordinates within the entire 2D grid
-    pixel_x, pixel_y = cuda.grid(2)  # (col, row)
+    col, row = cuda.grid(2)
+    pixel_x = np.int32(col)
+    pixel_y = np.int32(row)
 
     # Registers tracking the best seed coordinates found by this thread
-    best_seed_x = -1
-    best_seed_y = -1
+    best_seed_x = np.int32(-1)
+    best_seed_y = np.int32(-1)
 
     ###
     # SHARED MEMORY PIPELINE (small step sizes)
@@ -384,9 +386,9 @@ def _jfa_pass_shared_memory_square_euclidean_kernel(
         best_seed_x = shared_buffer[shared_pixel_y, shared_pixel_x, 0]
         best_seed_y = shared_buffer[shared_pixel_y, shared_pixel_x, 1]
 
-        best_dist = INT64_MAX
+        best_dist = np.int32(INT32_MAX)
         if best_seed_x != -1 and best_seed_y != -1:
-            best_dist = calculate_square_euclidean_distance_int64(
+            best_dist = calculate_square_euclidean_distance_int32(
                 pixel_x, pixel_y, best_seed_x, best_seed_y
             )
 
@@ -397,14 +399,14 @@ def _jfa_pass_shared_memory_square_euclidean_kernel(
                     continue
 
                 # The position of the neighbour within shared memory
-                shared_neighbour_x = shared_pixel_x + dx * step_size
-                shared_neighbour_y = shared_pixel_y + dy * step_size
+                shared_neighbour_x = np.int32(shared_pixel_x + np.int32(dx) * step_size)
+                shared_neighbour_y = np.int32(shared_pixel_y + np.int32(dy) * step_size)
 
                 seed_x = shared_buffer[shared_neighbour_y, shared_neighbour_x, 0]
                 seed_y = shared_buffer[shared_neighbour_y, shared_neighbour_x, 1]
 
                 if seed_x != -1 and seed_y != -1:
-                    dist = calculate_square_euclidean_distance_int64(
+                    dist = calculate_square_euclidean_distance_int32(
                         pixel_x, pixel_y, seed_x, seed_y
                     )
                     if dist < best_dist:
@@ -424,9 +426,9 @@ def _jfa_pass_shared_memory_square_euclidean_kernel(
         best_seed_x = grid_in[pixel_y, pixel_x, 0]
         best_seed_y = grid_in[pixel_y, pixel_x, 1]
 
-        best_dist = INT64_MAX
+        best_dist = np.int32(INT32_MAX)
         if best_seed_x != -1 and best_seed_y != -1:
-            best_dist = calculate_square_euclidean_distance_int64(
+            best_dist = calculate_square_euclidean_distance_int32(
                 pixel_x, pixel_y, best_seed_x, best_seed_y
             )
 
@@ -435,15 +437,15 @@ def _jfa_pass_shared_memory_square_euclidean_kernel(
                 if dx == 0 and dy == 0:
                     continue
 
-                neighbour_x = pixel_x + dx * step_size
-                neighbour_y = pixel_y + dy * step_size
+                neighbour_x = np.int32(pixel_x + np.int32(dx) * step_size)
+                neighbour_y = np.int32(pixel_y + np.int32(dy) * step_size)
 
                 if (0 <= neighbour_x < size) and (0 <= neighbour_y < size):
                     seed_x = grid_in[neighbour_y, neighbour_x, 0]
                     seed_y = grid_in[neighbour_y, neighbour_x, 1]
 
                     if seed_x != -1 and seed_y != -1:
-                        dist = calculate_square_euclidean_distance_int64(
+                        dist = calculate_square_euclidean_distance_int32(
                             pixel_x, pixel_y, seed_x, seed_y
                         )
                         if dist < best_dist:
@@ -474,7 +476,9 @@ def _jfa_pass_SoA_square_euclidean_kernel(
     """
 
     # 1 Thread = 1 Pixel
-    pixel_x, pixel_y = cuda.grid(2)  # (column, row)
+    col, row = cuda.grid(2)
+    pixel_x = np.int32(col)
+    pixel_y = np.int32(row)
 
     # Out of bounds check based on the actual resolution (size)
     if pixel_x >= size or pixel_y >= size:
@@ -485,9 +489,9 @@ def _jfa_pass_SoA_square_euclidean_kernel(
     best_seed_y = grid_in[pixel_y + size, pixel_x]
 
     # Calculate initial distance
-    best_dist = INT64_MAX
+    best_dist = np.int32(INT32_MAX)
     if best_seed_x != -1 and best_seed_y != -1:
-        best_dist = calculate_square_euclidean_distance_int64(
+        best_dist = calculate_square_euclidean_distance_int32(
             pixel_x, pixel_y, best_seed_x, best_seed_y
         )
 
@@ -498,8 +502,8 @@ def _jfa_pass_SoA_square_euclidean_kernel(
                 continue
 
             # Calculate the x and y position of the neighbour within the actual image
-            neighbour_x = pixel_x + dx * step_size
-            neighbour_y = pixel_y + dy * step_size
+            neighbour_x = np.int32(pixel_x + np.int32(dx) * step_size)
+            neighbour_y = np.int32(pixel_y + np.int32(dy) * step_size)
 
             # Check if the current neighbour (x, y) is within the actual logical image size range
             if (0 <= neighbour_x < size) and (0 <= neighbour_y < size):
@@ -509,7 +513,7 @@ def _jfa_pass_SoA_square_euclidean_kernel(
 
                 # Check if the neighbour already knows a seed
                 if seed_x != -1 and seed_y != -1:
-                    dist = calculate_square_euclidean_distance_int64(
+                    dist = calculate_square_euclidean_distance_int32(
                         pixel_x, pixel_y, seed_x, seed_y
                     )
                     if dist < best_dist:
