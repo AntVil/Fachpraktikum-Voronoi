@@ -89,9 +89,33 @@ def main() -> None:
         plt.show()
 
     ###
-    # JFA performance analysis
+    # JFA runtime per step size analysis
     ###
-    elif command is None or command == "jfa-performance":
+    elif command is None or command == "naive-jfa-step-analysis":
+        SEED_COUNT = 512
+        RESOLUTION = 2048
+        seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
+        naive_euclidean_data = analyze_runtime_per_step_size(
+            kernel=_jfa_pass_naive_square_euclidean_kernel,
+            make_output_grid=generate_AoS_grid_jfa,
+            seeds=seeds,
+            resolution=RESOLUTION,
+        )
+        print()
+        naive_manhattan_data = analyze_runtime_per_step_size(
+            kernel=_jfa_pass_naive_manhattan_kernel,
+            make_output_grid=generate_AoS_grid_jfa,
+            seeds=seeds,
+            resolution=RESOLUTION,
+        )
+        plot_data = [
+            ("Naive square euclidean", naive_euclidean_data),
+            ("Naive manhattan", naive_manhattan_data),
+        ]
+        create_jfa_runtime_per_step_size_plot(RESOLUTION, SEED_COUNT, plot_data)
+    elif command is None or command == "all-jfa-step-analysis":
+        SEED_COUNT = 512
+        RESOLUTION = 2048
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         naive_euclidean_data = analyze_runtime_per_step_size(
             kernel=_jfa_pass_naive_square_euclidean_kernel,
@@ -126,7 +150,7 @@ def main() -> None:
             ("Shared memory square euclidean", shared_euclidean_data),
             ("SoA square euclidean", soA_euclidean_data),
         ]
-        create_jfa_performance_plot(RESOLUTION, SEED_COUNT, plot_data)
+        create_jfa_runtime_per_step_size_plot(RESOLUTION, SEED_COUNT, plot_data)
 
 
 def analyze_runtime_per_step_size(
@@ -185,14 +209,10 @@ def analyze_runtime_per_step_size(
         grid_in, grid_out = grid_out, grid_in
         k //= 2
 
-    # Terminal print
-    for k_val, t in step_x_kernel_times:
-        print(f"k = {k_val:3d}: {t:.4f} ms")
-
     return step_x_kernel_times
 
 
-def create_jfa_performance_plot(
+def create_jfa_runtime_per_step_size_plot(
     resolution: int,
     seed_count: int,
     performances: list[tuple[str, list[tuple[int, float]]]],
@@ -213,11 +233,35 @@ def create_jfa_performance_plot(
           tuples representing the runtime for each step size.
     """
 
-    # TODO: Add table print
-
-    # Get the device name for the plot title
+    # Get the device name
     device_name = get_device_name()
 
+    ###
+    # Table print
+    ###
+    print(f"\nDevice: {device_name} | Resolution: {resolution} | Seeds: {seed_count}\n")
+    headers = ["Step size ($k$)"] + [perf[0] for perf in performances]
+    header_line = " | ".join(headers)
+    separator_line = " | ".join(["---"] * len(headers))
+    print(f"| {header_line} |")
+    print(f"| {separator_line} |")
+
+    # Since all kernels go through the same steps, we take the k values from the first kernel
+    step_sizes = performances[0][1]
+    for i in range(len(step_sizes)):
+        step_size = step_sizes[i][0]
+        row_cells = [f"{step_size}"]
+
+        # For each kernel, find the appropriate runtime for this step size k
+        for method_name, perf_list in performances:
+            time_ms = perf_list[i][1]
+            row_cells.append(f"{time_ms:.4f} ms")
+        print(f"| { ' | '.join(row_cells) } |")
+    print()
+
+    ###
+    # Plot
+    ###
     fig, ax = plt.subplots(nrows=1, ncols=1)
 
     # Axis in log scale

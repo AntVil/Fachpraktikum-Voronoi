@@ -758,13 +758,45 @@ Während der **Memory Throughput** in Iteration 1 bei `81,59%` liegt, sinkt er i
 
 _Wie verhält sich die Kernel-Laufzeit bei jedem Iterationsschritt?_
 
-```bash
-uv run .\src\task6b.py jfa-performance
-```
+Um dem Ergebnis der ncu-Analyse weiter nachzugehen, wurde die Kernellaufzeit über die Schrittweite k analysiert. Um Vergleiche ziehen zu können, wurden auch hier eine Auflösung von `2048` und eine Punktemenge von `512` gewählt. Die folgenden Diagramme zeigen das Verhalten:
 
-| RTX 5070                                                                                                                                                                              | GTX 1660 Ti                                                                                                                                                                              |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/task6_jfa_runtime_over_stepSize_NVIDIA-GeForce-RTX-5070_Naive-square-euclidean_Naive-manhattan_Shared-memory-square-euclidean_SoA-square-euclidean_res1024_seeds2000.png) | ![](../data/task6_jfa_runtime_over_stepSize_NVIDIA-GeForce-GTX-1660-Ti_Naive-square-euclidean_Naive-manhattan_Shared-memory-square-euclidean_SoA-square-euclidean_res1024_seeds2000.png) |
+| RTX 5070                                                                                                                         | GTX 1660 Ti                                                                                                                         |
+| -------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/task6_jfa_runtime_over_stepSize_NVIDIA-GeForce-RTX-5070_Naive-square-euclidean_Naive-manhattan_res2048_seeds512.png) | ![](../data/task6_jfa_runtime_over_stepSize_NVIDIA-GeForce-GTX-1660-Ti_Naive-square-euclidean_Naive-manhattan_res2048_seeds512.png) |
+
+<table>
+<tr>
+
+<td>
+
+...
+
+</td>
+<td>
+
+NVIDIA GeForce GTX 1660 Ti | Resolution: 2048 | Seeds: 512
+
+| Step size ($k$) | Naive square euclidean | Naive manhattan |
+| --------------- | ---------------------- | --------------- |
+| 1024            | 0.4962 ms              | 0.5618 ms       |
+| 512             | 0.6631 ms              | 0.6772 ms       |
+| 256             | 0.7414 ms              | 0.7391 ms       |
+| 128             | 0.7859 ms              | 0.7825 ms       |
+| 64              | 0.7989 ms              | 0.8042 ms       |
+| 32              | 0.7882 ms              | 0.7977 ms       |
+| 16              | 0.7615 ms              | 0.6992 ms       |
+| 8               | 0.6349 ms              | 0.6922 ms       |
+| 4               | 0.5895 ms              | 0.6164 ms       |
+| 2               | 0.5591 ms              | 0.5783 ms       |
+| 1               | 0.5593 ms              | 0.5731 ms       |
+
+</td>
+</tr>
+</table>
+
+```bash
+uv run .\src\task6b.py naive-jfa-step-analysis
+```
 
 ## Aufgabe 6b - Optimierungen
 
