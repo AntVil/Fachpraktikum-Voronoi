@@ -746,6 +746,16 @@ uv run .\src\task7.py all-jfa
 
 _Was liefert die ncu-Analyse?_
 
+Schaut man sich die ncu-erzeugten Logdateien [square_euclidean_ncu](../data/ncu_NVIDIA-GeForce-RTX-5070_sqaure_euclidean_jfa_resolution=2048_points=512.log) und [manhattan_ncu](../data/ncu_NVIDIA-GeForce-RTX-5070_manhattan_jfa_resolution=2048_points=512.log) an, fällt zunächst auf, dass für jeden Iterationsschritt ein separater Eintrag anlegt wird (Auflösung von `2048` mit `512` Punkten). Die Daten der quadratischen euklidischen Distanz und der Manhattan-Distanz sind hierbei nahezu identisch, weshalb für die weitere Analyse die Ausgabe der euklidischen Metrik betrachtet wird.
+
+Der JFA zeigt bei der sukzessiven Halbierung der Schrittweite eine dreiphasige Transformation seines Engpasses in der _Section: GPU Speed Of Light Throughput_:
+
+- Iteration 1-3: Der Kernel ist primär **memory-bound** (speicherbandbreitenbegrenzt). NCU meldet: _"Memory is more heavily utilized than Compute"_
+- Iteration 4-5: Der Workload zeigt sich ausbalanciert. NCU meldet: _"Compute and Memory are well-balanced"_
+- Iteration 6-11: Ab Iteration 6 kippt das Verhalten in ein **compute-bound** Szenario (rechenleistungsbegrenzt). NCU meldet: _"Compute is more heavily utilized than Memory"_
+
+Während der **Memory Throughput** in Iteration 1 bei `81,59%` liegt, sinkt er in der letzten Iteration auf `45,65%`. Hingegen liegt der **Compute (SM) Throughput** zu Beginn bei `38,72%` und steigt zum Schluss auf `79,39%`. Dies deutet auf ein gegenläufiges Verhalten von _memory-bound_ und _compute-bound_ hin.
+
 _Wie verhält sich die Kernel-Laufzeit bei jedem Iterationsschritt?_
 
 ```bash
