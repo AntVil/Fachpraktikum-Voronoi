@@ -586,13 +586,13 @@ Dieser Algorithmus ist nun möglichst effizient implementiert. Im folgenden woll
 > - Für die Diastanzberechnung wird im Folgenden die quadrierte euklidische Distanz - beziehungsweise im Exkurs die Manhattan-Distanz - verwendet.
 > - Der in den vorherigen Aufgaben verwendete Algorithmus wird im Folgenden teilweise referenziert und verwendet. Dabei wird er als _"Pixel-Algorithmus"_ bezeichnet.
 
-Der JFA wurde im Jahr 2006 von **Guodong Rong** und **Tiow-Seng Tan** auf der Computergrafik-Konferenz _ACM Symposium on Interactive 3D Graphics and Games (I3D)_ in Redwood City vorgestellt (vgl. [Jump Flooding in GPU](https://www.comp.nus.edu.sg/~tants/jfa/i3d06.pdf)). Die Autoren konzipierten den Algorithmus gezielt für die parallele Architektur von GPUs, um geometrische Probleme wie die Berechnung von Voronoi-Diagrammen oder Distanzfeldern zu lösen.
+Der Jump Flooding Algorithmus (JFA) wurde im Jahr 2006 von **Guodong Rong** und **Tiow-Seng Tan** auf der Computergrafik-Konferenz _ACM Symposium on Interactive 3D Graphics and Games (I3D)_ in Redwood City vorgestellt (vgl. [Jump Flooding in GPU](https://www.comp.nus.edu.sg/~tants/jfa/i3d06.pdf)). Die Autoren konzipierten den Algorithmus gezielt für die parallele Architektur von GPUs, um geometrische Probleme wie die Berechnung von Voronoi-Diagrammen oder Distanzfeldern zu lösen.
 
 _Wie funktioniert der Algorithmus?_
 
 Für den Algorithmus wird ein quadratisches Grid der Größe $N \times N$ definiert. Bevor der Algorithmus startet, wird das leere Grid initialisiert, indem die zuvor zufällig generierten Seed-Koordinaten gesetzt werden: Jeder Seed weiß zu Beginn, zu welchem Pixel er gehört. Alle anderen Pixel werden mit einem **undefinierten** Startzustand initialisiert. Das bedeutet, ein normaler Pixel weiß anfangs nicht, zu welchem Punkt er am nächsten liegt.
 
-Der Jump Flooding Algorithmus (JFA) wird nun in mehreren Schritten iterativ ausgeführt. Die erste Schrittweite beträgt $k = \frac{N}{2}$, wobei $N$ die Auflösung des Grids ist. Für jede Schrittweite $k$ prüft jeder Pixel im Grid seine 8 **Nachbarpixel** (Norden, Nordost, Osten, Südost, Süden, Südwest, Westen, Nordwest), die genau $k$ Pixel entfernt sind. Dabei wird überprüft, ob diese Nachbarn bereits gültige Seed-Koordinaten besitzen (also nicht mehr das _Uninitialized-Flag_ haben):
+Der Jump Flooding Algorithmus wird nun in mehreren Schritten iterativ ausgeführt. Die erste Schrittweite beträgt $k = \frac{N}{2}$, wobei $N$ die Auflösung des Grids ist. Für jede Schrittweite $k$ prüft jeder Pixel im Grid seine 8 **Nachbarpixel** (Norden, Nordost, Osten, Südost, Süden, Südwest, Westen, Nordwest), die genau $k$ Pixel entfernt sind. Dabei wird überprüft, ob diese Nachbarn bereits gültige Seed-Koordinaten besitzen (also nicht mehr das _Uninitialized-Flag_ haben):
 
 - Ist das der Fall, übernimmt der aktuelle Pixel die Seed-Koordinaten des Nachbarpixels und betrachtet diesen Seed vorerst als den nächstgelegenen Punkt.
 - Hat ein Nachbarpixel ebenfalls keine Seed-Koordinaten, wird er ignoriert.
@@ -635,7 +635,7 @@ _Wo liegen die Unterschiede zum Ansatz der vorherigen Implementierung? (Komplexi
 
 _Gibt es Qualitätsunterschiede (Pixelfehler) im Diagramm?_
 
-In der Literatur wird der Jump Flooding Algorithm (JFA) als Approximations-Algorithmus bezeichnet. Das bedeutet, dass der Algorithmus mathematisch nicht immer ein zu `100%` korrektes Ergebnis liefert. Auch im originalen Paper von Guodong Rong und Tiow-Seng Tan wird dieses Thema explizit behandelt (vgl. [5. Errors in Jump Flooding](https://www.comp.nus.edu.sg/~tants/jfa/i3d06.pdf)). Die Autoren zeigen dort aber auch auf, dass die Fehlerrate in der Praxis minimal ist.
+In der Literatur wird der JFA als Approximations-Algorithmus bezeichnet. Das bedeutet, dass der Algorithmus mathematisch nicht immer ein zu `100%` korrektes Ergebnis liefert. Auch im originalen Paper von Guodong Rong und Tiow-Seng Tan wird dieses Thema explizit behandelt (vgl. [5. Errors in Jump Flooding](https://www.comp.nus.edu.sg/~tants/jfa/i3d06.pdf)). Die Autoren zeigen dort aber auch auf, dass die Fehlerrate in der Praxis minimal ist.
 
 Experimente in der Studie zeigen, dass diese Fehler hauptsächlich entlang der Grenzen von Voronoi-Regionen auftreten. Genauer gesagt: Bei Voronoi-Zellen, die entlang der Gittergrenze liegen, können sich fehlerhafte Gitterpunkte um die Voronoi-Kanten herum ansammeln. Bei den übrigen Voronoi-Zellen sind fast alle fehlerhaften Gitterpunkte überwiegend Voronoi-Eckpunkte oder gruppieren sich um diese herum.
 
@@ -714,19 +714,47 @@ Für die Messungen in _Aufgabe 2_ wurde **Variante 2** gewählt.
 
 _Was liefert die Performance-Analyse?_
 
-Die folgenden Diagramme zeigen die gemessenen Kernellaufzeiten für die quadratische euklidische Distanz:
+Die folgenden Diagramme zeigen die gemessenen Kernellaufzeiten für die **quadratische euklidische Distanz**:
 
 | RTX 5070                                                                                                                                      | GTX 1660 Ti                                                                                                                                      |
 | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     |
 
-Die folgenden Diagramme zeigen die gemessenen Kernellaufzeiten für die Mannhatten-Distanz:
+Aus den Messungen geht hervor, dass die Kernellaufzeit primär von der Bildauflösung abhängt und unabhängig von der Anzahl der gesetzten Punkte ist. In den _Heatmaps_ ist visuell deutlich zu erkennen, dass der Farbverlauf innerhalb einer Zeile (also bei konstanter Bildauflösung) gleich bleibt und die Laufzeit erst beim Wechsel in die nächste Zeile (steigende Bildauflösung) zunimmt.
+
+Dieses Verhalten spiegelt die Charakteristik des JFA wider: Da der Algorithmus in jedem Schritt das gesamte Gitter parallel durchläuft und die Anzahl der Gesamtschritte durch die Auflösung vorgegeben ist, bleibt der Rechenaufwand pro Pixel konstant - unabhängig davon, wie viele Punkte die Voronoi-Regionen erzeugen. Pro Iterationsschritt besitzt der JFA eine Komplexität von $O(1)$, da ein Thread pro Pixel immer die gleiche Arbeit macht. Bezogen auf die Gesamtgrafik ergibt sich durch die Halbierung der Schrittweite eine logarithmische Laufzeitabhängigkeit von der Auflösung $N$:
+
+$$O(\log_2(N))$$
+
+Auch in den unteren Linien-Diagrammen (Performance-Plots bei einer festen Auflösung von $128 \times 128$) wird dieses Verhalten bei genauerer Betrachtung deutlich. Obwohl die Kurve auf den ersten Blick stark schwankt, zeigt ein Blick auf die Zahlen der Y-Achse, dass sich die Werte in einem kleinen Wertebereich bewegen. Die visuellen Schwankungen resultieren aus der automatischen Skalierung des Diagramms, welches auf die Kurve _"herangezoomt"_ hat. In absoluten Zahlen ausgedrückt sind diese Schwankungen vernachlässigbar und bestätigen die Unabhängigkeit von der Punkteanzahl.
+
+Die folgenden Diagramme zeigen die gemessenen Kernellaufzeiten für die **Mannhatten-Distanz**:
 
 | RTX 5070                                                                                                                               | GTX 1660 Ti                                                                                                                               |
 | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_manhattan_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_manhattan_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_manhattan_jfa_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_manhattan_jfa_resolution=128_points=64,128,256,512.png)                     |
+
+Die Diagramme der Manhattan-Distanz zeigen vergleichbare Laufzeiten und Verhaltensmuster wie die der quadratischen euklidischen Distanz. Die Wahl der Metrik zur Distanzberechnung hat folglich keinen spürbaren Einfluss auf die Gesamtperformance des Kernels.
+
+<!-- Daraus lässt sich schließen, dass der JFA-Kernel primär _memory-bound_ (speicherbandbreitenbegrenzt) und nicht _compute-bound_ (rechenleistungsbegrenzt) ist. In jeder Iteration müssen die Threads auf die Informationen der 8 benachbarten Pixel zugreifen. Der Aufwand für das Laden dieser Daten aus dem globalen VRAM dominiert die Laufzeit. Ob im Rechenwerk anschließend eine Multiplikation mehr durchgeführt wird (wie bei der euklidischen Distanz: $dx \cdot dx + dy \cdot dy$) oder eine Betragsfunktion (Manhattan: $\left|dx\right| + \left|dy\right|$), fällt leistungstechnisch nicht ins Gewicht. -->
+
+```bash
+uv run .\src\task7.py all-jfa
+```
+
+_Was liefert die ncu-Analyse?_
+
+_Wie verhält sich die Kernel-Laufzeit bei jedem Iterationsschritt?_
+
+```bash
+uv run .\src\task6b.py jfa-performance
+```
+
+| RTX 5070                                                                                                                                                                              | GTX 1660 Ti                                                                                                                                                                              |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/task6_jfa_runtime_over_stepSize_NVIDIA-GeForce-RTX-5070_Naive-square-euclidean_Naive-manhattan_Shared-memory-square-euclidean_SoA-square-euclidean_res1024_seeds2000.png) | ![](../data/task6_jfa_runtime_over_stepSize_NVIDIA-GeForce-GTX-1660-Ti_Naive-square-euclidean_Naive-manhattan_Shared-memory-square-euclidean_SoA-square-euclidean_res1024_seeds2000.png) |
 
 ## Aufgabe 6b - Optimierungen
 
@@ -735,9 +763,6 @@ _Können Optimierungen durchgeführt werden? Wenn ja, warum? Wenn nein, warum ni
 **1. Integer statt Floats**
 
 Ursprünglich wurde zur Initialisierung der kürzesten Distanz wie beim Pixel-Algorithmus Folgendes verwendet: `best_dist = np.float32(np.inf)`. Ein `.inspect_types()`-Aufruf nach dem Kernel-Lauf zeigt jedoch, dass trotz des expliziten `float32`-Casts eine `float64`-Variable initialisiert wird.
-
-
-
 
 Da in dieser Aufgabe die Distanzberechnung auf die quadrierte euklidische Distanz (beziehungsweise im Exkurs auf die Manhattan-Distanz) festgelegt ist und der Kernel auf diskreten Ganzzahl-Koordinaten operiert, ist ein Ausweichen auf Fließkommazahlen mathematisch nicht notwendig: Das Ergebnis einer Summe von Quadraten ganzer Zahlen ist stets wieder eine Ganzzahl. Deshalb wird die kürzeste Distanz (`best_dist`) mit dem maximalen `int32`-Wert initialisiert. Folgender Code zeigt die minimalen und maximalen Werte für den NumPy-Datentyp `int32`:
 
@@ -922,18 +947,6 @@ Durch diese Anpassung liegen alle Daten für den Warp sequenziell im Speicher.
 **5. Read-Only Cache**
 
 **6. Shuffle**
-
-```bash
-uv run .\src\task7.py all-jfa
-```
-
-```bash
-uv run .\src\task6b.py jfa-performance
-```
-
-| RTX 5070                                                                                                                                                                              | GTX 1660 Ti                                                                                                                                                                              |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/task6_jfa_runtime_over_stepSize_NVIDIA-GeForce-RTX-5070_Naive-square-euclidean_Naive-manhattan_Shared-memory-square-euclidean_SoA-square-euclidean_res1024_seeds2000.png) | ![](../data/task6_jfa_runtime_over_stepSize_NVIDIA-GeForce-GTX-1660-Ti_Naive-square-euclidean_Naive-manhattan_Shared-memory-square-euclidean_SoA-square-euclidean_res1024_seeds2000.png) |
 
 # Aufgabe 7 - Ergebnisse
 
