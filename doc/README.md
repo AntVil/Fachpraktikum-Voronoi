@@ -58,8 +58,8 @@ Für die Berechnung des Voronoi-Diagramms sind folgende Parameter definiert:
 
 | Parameter          | Beschreibung                                                             | Datentyp            |
 | ------------------ | ------------------------------------------------------------------------ | ------------------- |
-| **Bildauflösung**  | Die Seitenlänge des quadratischen Gitters ($N \times N$)                 | `int32` / `int64`   |
-| **Punkte / Seeds** | Ein Array, das die 2D-Koordinaten der im Raum verteilten Zentren enthält | `float32` / `int64` |
+| **Bildauflösung**  | Die Seitenlänge des quadratischen Gitters ($N \times N$)                 | `int32`             |
+| **Punkte / Seeds** | Ein Array, das die 2D-Koordinaten der im Raum verteilten Zentren enthält | `float32` / `int32` |
 | **Ausgabe-Grid**   | Das resultierende zweidimensionale Bildraster/Voronoi-Diagramm           | `int32`             |
 
 _Welche Parameter sind entscheidend für das Problem und welchen Einfluss haben diese?_
@@ -633,6 +633,66 @@ _Wieso arbeitet der Algorithmus korrekt?_
 
 _Wo liegen die Unterschiede zum Ansatz der vorherigen Implementierung? (Komplexität)_
 
+**Integer statt Float**
+
+Ursprünglich wurde zur Initialisierung der kürzesten Distanz wie beim Pixel-Algorithmus Folgendes verwendet: `best_dist = np.float32(np.inf)`. Ein `.inspect_types()`-Aufruf nach dem Kernel-Lauf zeigt jedoch, dass trotz des expliziten `float32`-Casts eine `float64`-Variable initialisiert wird.
+
+Da in dieser Aufgabe die Distanzberechnung auf die quadrierte euklidische Distanz (beziehungsweise im Exkurs auf die Manhattan-Distanz) festgelegt ist und der Kernel auf diskreten Ganzzahl-Koordinaten operiert, ist ein Ausweichen auf Fließkommazahlen mathematisch nicht notwendig: Das Ergebnis einer Summe von Quadraten ganzer Zahlen ist stets wieder eine Ganzzahl. Deshalb wird die kürzeste Distanz (`best_dist`) mit dem maximalen `int32`-Wert initialisiert. Folgender Code zeigt die minimalen und maximalen Werte für den NumPy-Datentyp `int32`:
+
+```python
+info = np.iinfo(np.int32)
+print("Minimum:", info.min)  # -2147483647
+print("Maximum:", info.max)  #  2147483647
+```
+
+Bei der Festlegung auf `int32` muss sichergestellt sein, dass die quadrierte euklidische Distanz das Limit von $2147483647$ nicht überschreitet:
+
+$$\mathrm{dist} = \Delta x^2 + \Delta y^2$$
+
+Geht man von einem quadratischen Bild der Seitenlänge $N \times N$ aus, tritt die maximale Distanz im Worst Case zwischen den diagonal gegenüberliegenden Bildeckpunkten auf. Daraus folgt für die maximale quadrierte Distanz:
+
+$$\mathrm{dist}_{\max} = N^2 + N^2 = 2N^2$$
+
+Um einen Überlauf zu verhindern, muss gelten:
+
+$$2N^2 \le 2147483647$$
+
+$$N^2 \le 1073741823,5$$
+
+$$N \le \sqrt{1073741823,5} = 32768$$
+
+Demnach würde diese Obergrenze bei Bildgrößen ab $32768 \times 32768$ Pixeln überschritten werden, was für die meisten Auflösungen allerdings ausreichend sein sollte. Da beim JFA zudem nie zwei diagonal gegenüberliegende Bildeckpunkte verwendet werden - aufgrund der höchsten Schritte von $\frac{N}{2}$ zu Beginn - ist die tatsächliche maximale Grenze für den JFA nochmal höher.
+
+**Loop Unrolling der 8 "Nachbarschafts-Pixeln"**
+
+Da für die acht Nachbarschaftspixel eine verschachtelte For-Loop mit If-Statement zum Überspringen des zentralen Pixels `(0, 0)` verwendet wird, liegt die Vermutung nahe, dass der Compiler ohne explizite Anweisungen kein Loop Unrolling durchführt:
+
+```python
+for dy in (-1, 0, 1):
+    for dx in (-1, 0, 1):
+        # NOTE: We can skip the pixel that this thread computes
+        if dx == 0 and dy == 0:
+            continue
+		...
+```
+
+Um ein explizites Loop Unrolling zu forcieren, könnte ein flacher Ansatz mit vorberechneten Tupeln gewählt werden:
+
+```python
+OFFSETS = ((-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1))
+for dy, dx in OFFSETS:
+    ...
+```
+
+Diesen Ausdruck würde Numba mit hoher Wahrscheinlichkeit unrollen.
+
+Um zu überprüfen, wie der Compiler den naiven Ansatz tatsächlich übersetzt, wurde die erzeugte [Assembly-Datei]() analysiert. Es zeigt sich ... ????
+==> TODO: Assembly analysieren `uv run .\src\task7.py naive_square_euclidean_jfa`
+
+```diff
+
+```
+
 _Gibt es Qualitätsunterschiede (Pixelfehler) im Diagramm?_
 
 In der Literatur wird der JFA als Approximations-Algorithmus bezeichnet. Das bedeutet, dass der Algorithmus mathematisch nicht immer ein zu `100%` korrektes Ergebnis liefert. Auch im originalen Paper von Guodong Rong und Tiow-Seng Tan wird dieses Thema explizit behandelt (vgl. [5. Errors in Jump Flooding](https://www.comp.nus.edu.sg/~tants/jfa/i3d06.pdf)). Die Autoren zeigen dort aber auch auf, dass die Fehlerrate in der Praxis minimal ist.
@@ -802,67 +862,7 @@ uv run .\src\task6b.py naive-jfa-step-analysis
 
 _Können Optimierungen durchgeführt werden? Wenn ja, warum? Wenn nein, warum nicht?_
 
-**1. Integer statt Floats**
-
-Ursprünglich wurde zur Initialisierung der kürzesten Distanz wie beim Pixel-Algorithmus Folgendes verwendet: `best_dist = np.float32(np.inf)`. Ein `.inspect_types()`-Aufruf nach dem Kernel-Lauf zeigt jedoch, dass trotz des expliziten `float32`-Casts eine `float64`-Variable initialisiert wird.
-
-Da in dieser Aufgabe die Distanzberechnung auf die quadrierte euklidische Distanz (beziehungsweise im Exkurs auf die Manhattan-Distanz) festgelegt ist und der Kernel auf diskreten Ganzzahl-Koordinaten operiert, ist ein Ausweichen auf Fließkommazahlen mathematisch nicht notwendig: Das Ergebnis einer Summe von Quadraten ganzer Zahlen ist stets wieder eine Ganzzahl. Deshalb wird die kürzeste Distanz (`best_dist`) mit dem maximalen `int32`-Wert initialisiert. Folgender Code zeigt die minimalen und maximalen Werte für den NumPy-Datentyp `int32`:
-
-```python
-info = np.iinfo(np.int32)
-print("Minimum:", info.min)  # -2147483647
-print("Maximum:", info.max)  #  2147483647
-```
-
-Bei der Festlegung auf `int32` muss sichergestellt sein, dass die quadrierte euklidische Distanz das Limit von $2147483647$ nicht überschreitet:
-
-$$\mathrm{dist} = \Delta x^2 + \Delta y^2$$
-
-Geht man von einem quadratischen Bild der Seitenlänge $N \times N$ aus, tritt die maximale Distanz im Worst Case zwischen den diagonal gegenüberliegenden Bildeckpunkten auf. Daraus folgt für die maximale quadrierte Distanz:
-
-$$\mathrm{dist}_{\max} = N^2 + N^2 = 2N^2$$
-
-Um einen Überlauf zu verhindern, muss gelten:
-
-$$2N^2 \le 2147483647$$
-
-$$N^2 \le 1073741823,5$$
-
-$$N \le \sqrt{1073741823,5} = 32768$$
-
-Demnach würde diese Obergrenze bei Bildgrößen ab $32768 \times 32768$ Pixeln überschritten werden, was für die meisten Auflösungen allerdings ausreichend sein sollte.
-
-**2. Loop Unrolling der 8 "Nachbarschafts-Pixeln"**
-
-Da für die acht Nachbarschaftspixel eine verschachtelte For-Loop mit If-Statement zum Überspringen des zentralen Pixels `(0, 0)` verwendet wird, liegt die Vermutung nahe, dass der Compiler ohne explizite Anweisungen kein Loop Unrolling durchführt:
-
-```python
-for dy in (-1, 0, 1):
-    for dx in (-1, 0, 1):
-        # NOTE: We can skip the pixel that this thread computes
-        if dx == 0 and dy == 0:
-            continue
-		...
-```
-
-Um ein explizites Loop Unrolling zu forcieren, könnte ein flacher Ansatz mit vorberechneten Tupeln gewählt werden:
-
-```python
-OFFSETS = ((-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1))
-for dy, dx in OFFSETS:
-    ...
-```
-
-Diesen Ausdruck würde Numba mit hoher Wahrscheinlichkeit unrollen.
-
-Um zu überprüfen, wie der Compiler den naiven Ansatz tatsächlich übersetzt, wurde die erzeugte [Assembly-Datei]() analysiert. Es zeigt sich ... ????
-==> TODO: Assembly analysieren `uv run .\src\task7.py naive_square_euclidean_jfa`
-
-```diff
-
-```
-
-**3. Shared Memory**
+**Shared Memory**
 
 Als erster Optimierungsansatz wird **Shared Memory** evaluiert. Der Einsatz von Shared Memory ist primär dann sinnvoll, wenn benachbarte Threads innerhalb eines Blocks redundant auf dieselben Speicheradressen im globalen VRAM der GPU zugreifen müssen. Durch das einmalige, kollektive Laden der Daten aus dem VRAM in das Shared Memory können nachfolgende, mehrfache Lesezugriffe beschleunigt werden.
 
@@ -934,9 +934,7 @@ $$2304 \times 2 \times 4\mathrm{ Byte} = 18432\mathrm{ Byte} \approx 18,4\mathrm
 uses too much shared data (0xc800 bytes, 0xc000 max)
 ```
 
-
 _TODO: Beim Rumprobieren mit JFA_SHARED_THRESHOLD ist aufgefallen, dass die Performance mit kleinerer Größe steigt, sodass bei 1 die beste Laufzeit erreicht wird. Dies entspricht jedoch einer vollständigen Deaktivierung der Shared-Memory-Pipeline, wodurch der gesamte Ansatz mit Shared Memory keinen Gewinn bringt. Wieso ist das so? Hilft nuc/nsys/asm? Sind die Operationen wie % und // ggf. ein Problem?_
-
 
 Hier wird der Schwellenwert auf `JFA_SHARED_THRESHOLD = ???` festgelegt.
 
@@ -945,7 +943,7 @@ Hier wird der Schwellenwert auf `JFA_SHARED_THRESHOLD = ???` festgelegt.
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_shared_memory_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_shared_memory_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_shared_memory_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_shared_memory_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     |
 
-**4. Datenlayout optimieren**
+**Datenlayout optimieren**
 
 _Structure of Arrays (SoA) vs. Array of Structures (AoS)_
 
@@ -986,9 +984,13 @@ Durch diese Anpassung liegen alle Daten für den Warp sequenziell im Speicher.
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070__SoA_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti__SoA_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070__SoA_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti__SoA_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     |
 
-**5. Read-Only Cache**
+**Shuffle**
 
-**6. Shuffle**
+**Read-Only Cache**
+
+**Ausblick: JFA+ und JFA\***
+
+[PDF](https://maciejczyzewski.github.io/fast_gpu_voronoi/slides_small.pdf)
 
 # Aufgabe 7 - Ergebnisse
 
