@@ -10,240 +10,243 @@
 .target sm_120
 .address_size 64
 
-	// .globl	_ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii
-.common .global .align 8 .u64 _ZN08NumbaEnv6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii;
+	// .globl	_ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii
+.common .global .align 8 .u64 _ZN08NumbaEnv6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii;
 
-.visible .entry _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii(
-	.param .u64 .ptr .align 1 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_0,
-	.param .u64 .ptr .align 1 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_1,
-	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_2,
-	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_3,
-	.param .u64 .ptr .align 1 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_4,
-	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_5,
-	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_6,
-	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_7,
-	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_8,
-	.param .u64 .ptr .align 1 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_9,
-	.param .u64 .ptr .align 1 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_10,
-	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_11,
-	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_12,
-	.param .u64 .ptr .align 1 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_13,
-	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_14,
-	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_15,
-	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_16,
-	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_17,
-	.param .u32 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_18,
-	.param .u32 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_19
+.visible .entry _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii(
+	.param .u64 .ptr .align 1 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_0,
+	.param .u64 .ptr .align 1 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_1,
+	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_2,
+	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_3,
+	.param .u64 .ptr .align 1 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_4,
+	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_5,
+	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_6,
+	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_7,
+	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_8,
+	.param .u64 .ptr .align 1 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_9,
+	.param .u64 .ptr .align 1 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_10,
+	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_11,
+	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_12,
+	.param .u64 .ptr .align 1 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_13,
+	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_14,
+	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_15,
+	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_16,
+	.param .u64 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_17,
+	.param .u32 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_18,
+	.param .u32 _ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_19
 )
 {
-	.reg .pred 	%p<36>;
-	.reg .b32 	%r<22>;
-	.reg .b64 	%rd<89>;
+	.reg .pred 	%p<50>;
+	.reg .b32 	%r<52>;
+	.reg .b64 	%rd<48>;
 
-	ld.param.b64 	%rd17, [_ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_4];
-	ld.param.b64 	%rd18, [_ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_7];
-	ld.param.b64 	%rd19, [_ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_8];
-	ld.param.b32 	%r6, [_ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_18];
-	ld.param.b32 	%r7, [_ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_19];
-	mov.u32 	%r8, %tid.x;
-	cvt.u64.u32 	%rd20, %r8;
-	mov.u32 	%r9, %ntid.x;
-	mov.u32 	%r10, %ctaid.x;
-	mul.wide.u32 	%rd21, %r9, %r10;
-	add.s64 	%rd1, %rd21, %rd20;
-	mov.u32 	%r11, %tid.y;
-	mov.u32 	%r12, %ntid.y;
-	mov.u32 	%r13, %ctaid.y;
-	mad.lo.s32 	%r14, %r12, %r13, %r11;
-	cvt.u64.u32 	%rd2, %r14;
-	cvt.s64.s32 	%rd22, %r7;
-	setp.lt.s64 	%p1, %rd1, %rd22;
-	setp.lt.s32 	%p2, %r14, %r7;
-	and.pred 	%p3, %p1, %p2;
-	@%p3 bra 	$L__BB0_2;
+	ld.param.b64 	%rd11, [_ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_4];
+	ld.param.b64 	%rd12, [_ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_6];
+	ld.param.b64 	%rd13, [_ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_7];
+	ld.param.b64 	%rd14, [_ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_8];
+	ld.param.b64 	%rd15, [_ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_15];
+	ld.param.b64 	%rd16, [_ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_16];
+	ld.param.b32 	%r7, [_ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_18];
+	ld.param.b32 	%r8, [_ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_19];
+	mov.u32 	%r9, %tid.x;
+	mov.u32 	%r10, %ntid.x;
+	mov.u32 	%r11, %ctaid.x;
+	mad.lo.s32 	%r1, %r10, %r11, %r9;
+	mov.u32 	%r12, %tid.y;
+	mov.u32 	%r13, %ntid.y;
+	mov.u32 	%r14, %ctaid.y;
+	mad.lo.s32 	%r15, %r13, %r14, %r12;
+	max.s32 	%r16, %r1, %r15;
+	setp.lt.s32 	%p4, %r16, %r8;
+	@%p4 bra 	$L__BB0_2;
 $L__BB0_1:
 	ret;
 $L__BB0_2:
-	mul.lo.s64 	%rd23, %rd19, %rd1;
-	mad.lo.s64 	%rd24, %rd18, %rd2, %rd17;
-	add.s64 	%rd25, %rd24, %rd23;
-	ld.b32 	%r21, [%rd25];
-	cvt.u64.u32 	%rd3, %r7;
-	add.s64 	%rd4, %rd3, %rd2;
-	add.s64 	%rd5, %rd23, %rd17;
-	mad.lo.s64 	%rd26, %rd4, %rd18, %rd5;
-	ld.b32 	%r20, [%rd26];
-	setp.eq.b32 	%p4, %r21, -1;
-	setp.eq.b32 	%p5, %r20, -1;
-	or.pred 	%p6, %p4, %p5;
-	mov.b64 	%rd87, 9223372036854775807;
-	@%p6 bra 	$L__BB0_4;
-	cvt.s64.s32 	%rd27, %r21;
-	sub.s64 	%rd28, %rd1, %rd27;
-	cvt.s64.s32 	%rd29, %r20;
-	sub.s64 	%rd30, %rd2, %rd29;
-	mul.lo.s64 	%rd31, %rd28, %rd28;
-	mad.lo.s64 	%rd87, %rd30, %rd30, %rd31;
+	cvt.u64.u32 	%rd1, %r15;
+	cvt.s64.s32 	%rd2, %r1;
+	setp.lt.s32 	%p5, %r1, 0;
+	selp.b64 	%rd17, %rd12, 0, %p5;
+	add.s64 	%rd18, %rd17, %rd2;
+	mul.lo.s64 	%rd19, %rd14, %rd18;
+	mad.lo.s64 	%rd20, %rd13, %rd1, %rd11;
+	add.s64 	%rd21, %rd20, %rd19;
+	ld.b32 	%r50, [%rd21];
+	cvt.u64.u32 	%rd3, %r8;
+	add.s64 	%rd4, %rd3, %rd1;
+	add.s64 	%rd22, %rd19, %rd11;
+	mad.lo.s64 	%rd23, %rd4, %rd13, %rd22;
+	ld.b32 	%r49, [%rd23];
+	setp.eq.b32 	%p6, %r50, -1;
+	setp.eq.b32 	%p7, %r49, -1;
+	or.pred 	%p8, %p6, %p7;
+	mov.b32 	%r48, 2147483647;
+	@%p8 bra 	$L__BB0_4;
+	sub.s32 	%r17, %r1, %r50;
+	sub.s32 	%r18, %r15, %r49;
+	mul.lo.s32 	%r19, %r17, %r17;
+	mad.lo.s32 	%r48, %r18, %r18, %r19;
 $L__BB0_4:
-	cvt.s64.s32 	%rd6, %r6;
-	sub.s64 	%rd7, %rd1, %rd6;
-	mul.lo.s64 	%rd8, %rd7, %rd19;
-	add.s64 	%rd9, %rd1, %rd6;
-	mul.lo.s64 	%rd10, %rd9, %rd19;
-	mov.b64 	%rd11, 0;
+	sub.s32 	%r20, %r1, %r7;
+	setp.gt.s32 	%p9, %r20, -1;
+	setp.lt.s32 	%p10, %r20, %r8;
+	and.pred 	%p1, %p9, %p10;
+	cvt.u64.u32 	%rd24, %r20;
+	mul.lo.s64 	%rd5, %rd14, %rd24;
+	cvt.u64.u32 	%rd25, %r1;
+	mul.lo.s64 	%rd6, %rd14, %rd25;
+	add.s32 	%r21, %r7, %r1;
+	setp.gt.s32 	%p11, %r21, -1;
+	setp.lt.s32 	%p12, %r21, %r8;
+	and.pred 	%p2, %p11, %p12;
+	cvt.u64.u32 	%rd26, %r21;
+	mul.lo.s64 	%rd7, %rd14, %rd26;
+	mov.b64 	%rd8, 0;
 $L__BB0_5:
-	mov.b64 	%rd88, -1;
-	mov.pred 	%p35, 0;
-	setp.eq.b64 	%p7, %rd11, 2;
-	@%p7 bra 	$L__BB0_26;
-	setp.eq.b64 	%p8, %rd11, 1;
-	@%p8 bra 	$L__BB0_25;
+	mov.b32 	%r51, -1;
+	mov.pred 	%p49, 0;
+	setp.eq.b64 	%p13, %rd8, 2;
+	@%p13 bra 	$L__BB0_26;
+	setp.eq.b64 	%p14, %rd8, 1;
+	@%p14 bra 	$L__BB0_25;
 $L__BB0_7:
-	add.s64 	%rd11, %rd11, 1;
-	mul.lo.s64 	%rd32, %rd88, %rd6;
-	add.s64 	%rd12, %rd32, %rd2;
-	mul.lo.s64 	%rd13, %rd12, %rd18;
-	add.s64 	%rd14, %rd13, %rd17;
-	add.s64 	%rd33, %rd4, %rd32;
-	mul.lo.s64 	%rd15, %rd33, %rd18;
-	add.s64 	%rd16, %rd15, %rd17;
-	@%p35 bra 	$L__BB0_8;
+	add.s64 	%rd8, %rd8, 1;
+	mad.lo.s32 	%r22, %r51, %r7, %r15;
+	setp.gt.s32 	%p15, %r22, -1;
+	setp.lt.s32 	%p16, %r22, %r8;
+	and.pred 	%p3, %p15, %p16;
+	cvt.u64.u32 	%rd27, %r22;
+	mad.lo.s64 	%rd9, %rd13, %rd27, %rd11;
+	add.s64 	%rd28, %rd27, %rd3;
+	mad.lo.s64 	%rd10, %rd28, %rd13, %rd11;
+	@%p49 bra 	$L__BB0_8;
 	bra.uni 	$L__BB0_14;
 $L__BB0_8:
-	max.u64 	%rd61, %rd7, %rd12;
-	setp.lt.u64 	%p24, %rd61, %rd3;
-	@%p24 bra 	$L__BB0_9;
+	and.pred 	%p36, %p1, %p3;
+	@%p36 bra 	$L__BB0_9;
 	bra.uni 	$L__BB0_11;
 $L__BB0_9:
-	add.s64 	%rd62, %rd14, %rd8;
-	ld.b32 	%r1, [%rd62];
-	add.s64 	%rd63, %rd16, %rd8;
-	ld.b32 	%r18, [%rd63];
-	setp.eq.b32 	%p25, %r1, -1;
-	setp.eq.b32 	%p26, %r18, -1;
-	or.pred 	%p27, %p25, %p26;
-	@%p27 bra 	$L__BB0_11;
-	cvt.s64.s32 	%rd64, %r1;
-	cvt.s64.s32 	%rd65, %r18;
-	sub.s64 	%rd66, %rd1, %rd64;
-	sub.s64 	%rd67, %rd2, %rd65;
-	mul.lo.s64 	%rd68, %rd66, %rd66;
-	mad.lo.s64 	%rd69, %rd67, %rd67, %rd68;
-	setp.lt.s64 	%p28, %rd69, %rd87;
-	min.s64 	%rd87, %rd69, %rd87;
-	selp.b32 	%r20, %r18, %r20, %p28;
-	selp.b32 	%r21, %r1, %r21, %p28;
+	add.s64 	%rd35, %rd9, %rd5;
+	ld.b32 	%r2, [%rd35];
+	add.s64 	%rd36, %rd10, %rd5;
+	ld.b32 	%r38, [%rd36];
+	setp.eq.b32 	%p37, %r2, -1;
+	setp.eq.b32 	%p38, %r38, -1;
+	or.pred 	%p39, %p37, %p38;
+	@%p39 bra 	$L__BB0_11;
+	sub.s32 	%r39, %r1, %r2;
+	sub.s32 	%r40, %r15, %r38;
+	mul.lo.s32 	%r41, %r39, %r39;
+	mad.lo.s32 	%r42, %r40, %r40, %r41;
+	setp.lt.s32 	%p40, %r42, %r48;
+	min.s32 	%r48, %r42, %r48;
+	selp.b32 	%r49, %r38, %r49, %p40;
+	selp.b32 	%r50, %r2, %r50, %p40;
 $L__BB0_11:
-	max.u64 	%rd70, %rd9, %rd12;
-	setp.ge.u64 	%p29, %rd70, %rd3;
-	@%p29 bra 	$L__BB0_23;
-	add.s64 	%rd71, %rd14, %rd10;
-	ld.b32 	%r2, [%rd71];
-	add.s64 	%rd72, %rd16, %rd10;
-	ld.b32 	%r19, [%rd72];
-	setp.eq.b32 	%p30, %r2, -1;
-	setp.eq.b32 	%p31, %r19, -1;
-	or.pred 	%p32, %p30, %p31;
-	@%p32 bra 	$L__BB0_23;
-	cvt.s64.s32 	%rd73, %r2;
-	cvt.s64.s32 	%rd74, %r19;
-	sub.s64 	%rd75, %rd1, %rd73;
-	sub.s64 	%rd76, %rd2, %rd74;
-	mul.lo.s64 	%rd77, %rd75, %rd75;
-	mad.lo.s64 	%rd78, %rd76, %rd76, %rd77;
-	setp.lt.s64 	%p33, %rd78, %rd87;
-	min.s64 	%rd87, %rd78, %rd87;
-	selp.b32 	%r20, %r19, %r20, %p33;
-	selp.b32 	%r21, %r2, %r21, %p33;
+	and.pred 	%p41, %p2, %p3;
+	not.pred 	%p42, %p41;
+	@%p42 bra 	$L__BB0_23;
+	add.s64 	%rd37, %rd9, %rd7;
+	ld.b32 	%r3, [%rd37];
+	add.s64 	%rd38, %rd10, %rd7;
+	ld.b32 	%r43, [%rd38];
+	setp.eq.b32 	%p43, %r3, -1;
+	setp.eq.b32 	%p44, %r43, -1;
+	or.pred 	%p45, %p43, %p44;
+	@%p45 bra 	$L__BB0_23;
+	sub.s32 	%r44, %r1, %r3;
+	sub.s32 	%r45, %r15, %r43;
+	mul.lo.s32 	%r46, %r44, %r44;
+	mad.lo.s32 	%r47, %r45, %r45, %r46;
+	setp.lt.s32 	%p46, %r47, %r48;
+	min.s32 	%r48, %r47, %r48;
+	selp.b32 	%r49, %r43, %r49, %p46;
+	selp.b32 	%r50, %r3, %r50, %p46;
 	bra.uni 	$L__BB0_23;
 $L__BB0_14:
-	max.u64 	%rd34, %rd7, %rd12;
-	setp.ge.u64 	%p9, %rd34, %rd3;
-	@%p9 bra 	$L__BB0_17;
-	add.s64 	%rd35, %rd14, %rd8;
-	ld.b32 	%r3, [%rd35];
-	add.s64 	%rd36, %rd16, %rd8;
-	ld.b32 	%r15, [%rd36];
-	setp.eq.b32 	%p10, %r3, -1;
-	setp.eq.b32 	%p11, %r15, -1;
-	or.pred 	%p12, %p10, %p11;
-	@%p12 bra 	$L__BB0_17;
-	cvt.s64.s32 	%rd37, %r3;
-	cvt.s64.s32 	%rd38, %r15;
-	sub.s64 	%rd39, %rd1, %rd37;
-	sub.s64 	%rd40, %rd2, %rd38;
-	mul.lo.s64 	%rd41, %rd39, %rd39;
-	mad.lo.s64 	%rd42, %rd40, %rd40, %rd41;
-	setp.lt.s64 	%p13, %rd42, %rd87;
-	min.s64 	%rd87, %rd42, %rd87;
-	selp.b32 	%r20, %r15, %r20, %p13;
-	selp.b32 	%r21, %r3, %r21, %p13;
+	and.pred 	%p17, %p1, %p3;
+	not.pred 	%p18, %p17;
+	@%p18 bra 	$L__BB0_17;
+	add.s64 	%rd29, %rd9, %rd5;
+	ld.b32 	%r4, [%rd29];
+	add.s64 	%rd30, %rd10, %rd5;
+	ld.b32 	%r23, [%rd30];
+	setp.eq.b32 	%p19, %r4, -1;
+	setp.eq.b32 	%p20, %r23, -1;
+	or.pred 	%p21, %p19, %p20;
+	@%p21 bra 	$L__BB0_17;
+	sub.s32 	%r24, %r1, %r4;
+	sub.s32 	%r25, %r15, %r23;
+	mul.lo.s32 	%r26, %r24, %r24;
+	mad.lo.s32 	%r27, %r25, %r25, %r26;
+	setp.lt.s32 	%p22, %r27, %r48;
+	min.s32 	%r48, %r27, %r48;
+	selp.b32 	%r49, %r23, %r49, %p22;
+	selp.b32 	%r50, %r4, %r50, %p22;
 $L__BB0_17:
-	max.u64 	%rd43, %rd1, %rd12;
-	setp.ge.u64 	%p14, %rd43, %rd3;
-	@%p14 bra 	$L__BB0_20;
-	add.s64 	%rd44, %rd5, %rd13;
-	ld.b32 	%r4, [%rd44];
-	add.s64 	%rd45, %rd5, %rd15;
-	ld.b32 	%r16, [%rd45];
-	setp.eq.b32 	%p15, %r4, -1;
-	setp.eq.b32 	%p16, %r16, -1;
-	or.pred 	%p17, %p15, %p16;
-	@%p17 bra 	$L__BB0_20;
-	cvt.s64.s32 	%rd46, %r4;
-	cvt.s64.s32 	%rd47, %r16;
-	sub.s64 	%rd48, %rd1, %rd46;
-	sub.s64 	%rd49, %rd2, %rd47;
-	mul.lo.s64 	%rd50, %rd48, %rd48;
-	mad.lo.s64 	%rd51, %rd49, %rd49, %rd50;
-	setp.lt.s64 	%p18, %rd51, %rd87;
-	min.s64 	%rd87, %rd51, %rd87;
-	selp.b32 	%r20, %r16, %r20, %p18;
-	selp.b32 	%r21, %r4, %r21, %p18;
+	setp.lt.s32 	%p23, %r1, 0;
+	not.pred 	%p24, %p3;
+	or.pred 	%p25, %p23, %p24;
+	@%p25 bra 	$L__BB0_20;
+	add.s64 	%rd31, %rd9, %rd6;
+	ld.b32 	%r5, [%rd31];
+	add.s64 	%rd32, %rd10, %rd6;
+	ld.b32 	%r28, [%rd32];
+	setp.eq.b32 	%p26, %r5, -1;
+	setp.eq.b32 	%p27, %r28, -1;
+	or.pred 	%p28, %p26, %p27;
+	@%p28 bra 	$L__BB0_20;
+	sub.s32 	%r29, %r1, %r5;
+	sub.s32 	%r30, %r15, %r28;
+	mul.lo.s32 	%r31, %r29, %r29;
+	mad.lo.s32 	%r32, %r30, %r30, %r31;
+	setp.lt.s32 	%p29, %r32, %r48;
+	min.s32 	%r48, %r32, %r48;
+	selp.b32 	%r49, %r28, %r49, %p29;
+	selp.b32 	%r50, %r5, %r50, %p29;
 $L__BB0_20:
-	max.u64 	%rd52, %rd9, %rd12;
-	setp.ge.u64 	%p19, %rd52, %rd3;
-	@%p19 bra 	$L__BB0_23;
-	add.s64 	%rd53, %rd14, %rd10;
-	ld.b32 	%r5, [%rd53];
-	add.s64 	%rd54, %rd16, %rd10;
-	ld.b32 	%r17, [%rd54];
-	setp.eq.b32 	%p20, %r5, -1;
-	setp.eq.b32 	%p21, %r17, -1;
-	or.pred 	%p22, %p20, %p21;
-	@%p22 bra 	$L__BB0_23;
-	cvt.s64.s32 	%rd55, %r5;
-	cvt.s64.s32 	%rd56, %r17;
-	sub.s64 	%rd57, %rd1, %rd55;
-	sub.s64 	%rd58, %rd2, %rd56;
-	mul.lo.s64 	%rd59, %rd57, %rd57;
-	mad.lo.s64 	%rd60, %rd58, %rd58, %rd59;
-	setp.lt.s64 	%p23, %rd60, %rd87;
-	min.s64 	%rd87, %rd60, %rd87;
-	selp.b32 	%r20, %r17, %r20, %p23;
-	selp.b32 	%r21, %r5, %r21, %p23;
+	and.pred 	%p30, %p2, %p3;
+	not.pred 	%p31, %p30;
+	@%p31 bra 	$L__BB0_23;
+	add.s64 	%rd33, %rd9, %rd7;
+	ld.b32 	%r6, [%rd33];
+	add.s64 	%rd34, %rd10, %rd7;
+	ld.b32 	%r33, [%rd34];
+	setp.eq.b32 	%p32, %r6, -1;
+	setp.eq.b32 	%p33, %r33, -1;
+	or.pred 	%p34, %p32, %p33;
+	@%p34 bra 	$L__BB0_23;
+	sub.s32 	%r34, %r1, %r6;
+	sub.s32 	%r35, %r15, %r33;
+	mul.lo.s32 	%r36, %r34, %r34;
+	mad.lo.s32 	%r37, %r35, %r35, %r36;
+	setp.lt.s32 	%p35, %r37, %r48;
+	min.s32 	%r48, %r37, %r48;
+	selp.b32 	%r49, %r33, %r49, %p35;
+	selp.b32 	%r50, %r6, %r50, %p35;
 $L__BB0_23:
-	setp.eq.b64 	%p34, %rd11, 3;
-	@%p34 bra 	$L__BB0_24;
+	setp.eq.b64 	%p47, %rd8, 3;
+	@%p47 bra 	$L__BB0_24;
 	bra.uni 	$L__BB0_5;
 $L__BB0_24:
-	ld.param.b64 	%rd86, [_ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_17];
-	ld.param.b64 	%rd85, [_ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_16];
-	ld.param.b64 	%rd84, [_ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v86B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_13];
-	mul.lo.s64 	%rd79, %rd86, %rd1;
-	mad.lo.s64 	%rd80, %rd85, %rd2, %rd84;
-	add.s64 	%rd81, %rd80, %rd79;
-	st.b32 	[%rd81], %r21;
-	add.s64 	%rd82, %rd79, %rd84;
-	mad.lo.s64 	%rd83, %rd4, %rd85, %rd82;
-	st.b32 	[%rd83], %r20;
+	ld.param.b64 	%rd47, [_ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_17];
+	ld.param.b64 	%rd46, [_ZN6task6b37_jfa_pass_SoA_square_euclidean_kernelB3v87B114cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3dE5ArrayIiLi2E1A7mutable7alignedE5ArrayIiLi2E1A7mutable7alignedEii_param_13];
+	setp.lt.s32 	%p48, %r1, 0;
+	selp.b64 	%rd39, %rd15, 0, %p48;
+	add.s64 	%rd40, %rd39, %rd2;
+	mul.lo.s64 	%rd41, %rd47, %rd40;
+	mad.lo.s64 	%rd42, %rd16, %rd1, %rd46;
+	add.s64 	%rd43, %rd42, %rd41;
+	st.b32 	[%rd43], %r50;
+	add.s64 	%rd44, %rd41, %rd46;
+	mad.lo.s64 	%rd45, %rd4, %rd16, %rd44;
+	st.b32 	[%rd45], %r49;
 	bra.uni 	$L__BB0_1;
 $L__BB0_25:
-	mov.b64 	%rd88, 0;
-	mov.pred 	%p35, -1;
+	mov.b32 	%r51, 0;
+	mov.pred 	%p49, -1;
 	bra.uni 	$L__BB0_7;
 $L__BB0_26:
-	mov.b64 	%rd88, 1;
+	mov.b32 	%r51, 1;
 	bra.uni 	$L__BB0_7;
 
 }
