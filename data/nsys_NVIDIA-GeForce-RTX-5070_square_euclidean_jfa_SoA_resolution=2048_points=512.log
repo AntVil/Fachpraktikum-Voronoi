@@ -1,4 +1,8 @@
-Generating SQLite file data/_square_euclidean_jfa_SoA.sqlite from data/_square_euclidean_jfa_SoA.nsys-rep
+
+NOTICE: Existing SQLite export found: data/_square_euclidean_jfa_SoA.sqlite
+        It is assumed file was previously exported from: data/_square_euclidean_jfa_SoA.nsys-rep
+        Consider using --force-export=true if needed.
+
 Processing [data/_square_euclidean_jfa_SoA.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/nvtx_sum.py]... 
 SKIPPED: data/_square_euclidean_jfa_SoA.sqlite does not contain NV Tools Extension (NVTX) data.
 

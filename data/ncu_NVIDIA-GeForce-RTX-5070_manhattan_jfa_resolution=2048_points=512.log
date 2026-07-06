@@ -1,4 +1,4 @@
-==PROF== Connected to process 14954 (/usr/bin/python3.12)
+==PROF== Connected to process 11993 (/usr/bin/python3.12)
 ==PROF== Profiling "_jfa_pass_naive_manhattan_ker..." - 0: 0%....50%....100% - 9 passes
 ==PROF== Profiling "_jfa_pass_naive_manhattan_ker..." - 1: 0%....50%....100% - 9 passes
 ==PROF== Profiling "_jfa_pass_naive_manhattan_ker..." - 2: 0%....50%....100% - 9 passes
@@ -10,23 +10,23 @@
 ==PROF== Profiling "_jfa_pass_naive_manhattan_ker..." - 8: 0%....50%....100% - 9 passes
 ==PROF== Profiling "_jfa_pass_naive_manhattan_ker..." - 9: 0%....50%....100% - 9 passes
 ==PROF== Profiling "_jfa_pass_naive_manhattan_ker..." - 10: 0%....50%....100% - 9 passes
-==PROF== Disconnected from process 14954
-[14954] python3.12@127.0.0.1
-  _jfa_pass_naive_manhattan_kernel[v57,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
+==PROF== Disconnected from process 11993
+[11993] python3.12@127.0.0.1
+  _jfa_pass_naive_manhattan_kernel[v58,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
     Section: GPU Speed Of Light Throughput
     ----------------------- ----------- ------------
     Metric Name             Metric Unit Metric Value
     ----------------------- ----------- ------------
     DRAM Frequency                  Ghz        13,79
-    SM Frequency                    Ghz         2,52
-    Elapsed Cycles                cycle      296.439
-    Memory Throughput                 %        81,58
-    DRAM Throughput                   %        81,58
-    Duration                         us       117,38
-    L1/TEX Cache Throughput           %        31,15
-    L2 Cache Throughput               %        41,83
-    SM Active Cycles              cycle      278.109
-    Compute (SM) Throughput           %        40,05
+    SM Frequency                    Ghz         2,54
+    Elapsed Cycles                cycle      374.794
+    Memory Throughput                 %        85,93
+    DRAM Throughput                   %        85,93
+    Duration                         us       147,74
+    L1/TEX Cache Throughput           %        30,90
+    L2 Cache Throughput               %        33,16
+    SM Active Cycles              cycle   280.240,83
+    Compute (SM) Throughput           %        27,74
     ----------------------- ----------- ------------
 
     INF   This workload is utilizing greater than 80.0% of the available compute or memory performance of this device.  
@@ -43,7 +43,7 @@
     Function Cache Configuration                     CachePreferNone
     Grid Size                                                 16.384
     Preferred Cluster Size                                         0
-    Registers Per Thread             register/thread              33
+    Registers Per Thread             register/thread              28
     Shared Memory Configuration Size           Kbyte           16,38
     Driver Shared Memory Per Block       Kbyte/block            1,02
     Dynamic Shared Memory Per Block       byte/block               0
@@ -67,17 +67,17 @@
     Cluster Occupancy                         %            0
     Block Limit Barriers                  block           24
     Block Limit SM                        block           24
-    Block Limit Registers                 block            6
+    Block Limit Registers                 block            8
     Block Limit Shared Mem                block           16
     Block Limit Warps                     block            6
     Theoretical Active Warps per SM        warp           48
     Theoretical Occupancy                     %          100
-    Achieved Occupancy                        %        82,50
-    Achieved Active Warps Per SM           warp        39,60
+    Achieved Occupancy                        %        82,06
+    Achieved Active Warps Per SM           warp        39,39
     ------------------------------- ----------- ------------
 
-    OPT   Est. Local Speedup: 17.5%                                                                                     
-          The difference between calculated theoretical (100.0%) and measured achieved occupancy (82.5%) can be the     
+    OPT   Est. Local Speedup: 17.94%                                                                                    
+          The difference between calculated theoretical (100.0%) and measured achieved occupancy (82.1%) can be the     
           result of warp scheduling overheads or workload imbalances during the kernel execution. Load imbalances can   
           occur between warps within a block as well as across blocks of the same kernel. See the CUDA Best Practices   
           Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#occupancy) for more details on     
@@ -87,33 +87,33 @@
     -------------------------- ----------- ------------
     Metric Name                Metric Unit Metric Value
     -------------------------- ----------- ------------
-    Average DRAM Active Cycles       cycle    1.320.192
-    Total DRAM Elapsed Cycles        cycle    9.709.568
-    Average L1 Active Cycles         cycle      278.109
-    Total L1 Elapsed Cycles          cycle   14.222.740
-    Average L2 Active Cycles         cycle   245.392,08
-    Total L2 Elapsed Cycles          cycle    6.279.168
-    Average SM Active Cycles         cycle      278.109
-    Total SM Elapsed Cycles          cycle   14.222.740
-    Average SMSP Active Cycles       cycle   277.613,28
-    Total SMSP Elapsed Cycles        cycle   56.890.960
+    Average DRAM Active Cycles       cycle 1.750.213,33
+    Total DRAM Elapsed Cycles        cycle   12.220.416
+    Average L1 Active Cycles         cycle   280.240,83
+    Total L1 Elapsed Cycles          cycle   17.979.526
+    Average L2 Active Cycles         cycle   284.713,79
+    Total L2 Elapsed Cycles          cycle    7.913.280
+    Average SM Active Cycles         cycle   280.240,83
+    Total SM Elapsed Cycles          cycle   17.979.526
+    Average SMSP Active Cycles       cycle   279.626,31
+    Total SMSP Elapsed Cycles        cycle   71.918.104
     -------------------------- ----------- ------------
 
-  _jfa_pass_naive_manhattan_kernel[v57,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
+  _jfa_pass_naive_manhattan_kernel[v58,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
     Section: GPU Speed Of Light Throughput
     ----------------------- ----------- ------------
     Metric Name             Metric Unit Metric Value
     ----------------------- ----------- ------------
-    DRAM Frequency                  Ghz        13,78
+    DRAM Frequency                  Ghz        13,79
     SM Frequency                    Ghz         2,53
-    Elapsed Cycles                cycle      325.276
-    Memory Throughput                 %        70,18
-    DRAM Throughput                   %        70,18
-    Duration                         us       128,61
-    L1/TEX Cache Throughput           %        46,38
-    L2 Cache Throughput               %        54,93
-    SM Active Cycles              cycle   290.605,90
-    Compute (SM) Throughput           %        44,18
+    Elapsed Cycles                cycle      339.380
+    Memory Throughput                 %        74,42
+    DRAM Throughput                   %        74,42
+    Duration                         us       133,86
+    L1/TEX Cache Throughput           %        40,24
+    L2 Cache Throughput               %        52,61
+    SM Active Cycles              cycle   334.314,58
+    Compute (SM) Throughput           %        37,83
     ----------------------- ----------- ------------
 
     OPT   Memory is more heavily utilized than Compute: Look at the Memory Workload Analysis section to identify the    
@@ -131,7 +131,7 @@
     Function Cache Configuration                     CachePreferNone
     Grid Size                                                 16.384
     Preferred Cluster Size                                         0
-    Registers Per Thread             register/thread              33
+    Registers Per Thread             register/thread              28
     Shared Memory Configuration Size           Kbyte           16,38
     Driver Shared Memory Per Block       Kbyte/block            1,02
     Dynamic Shared Memory Per Block       byte/block               0
@@ -155,17 +155,17 @@
     Cluster Occupancy                         %            0
     Block Limit Barriers                  block           24
     Block Limit SM                        block           24
-    Block Limit Registers                 block            6
+    Block Limit Registers                 block            8
     Block Limit Shared Mem                block           16
     Block Limit Warps                     block            6
     Theoretical Active Warps per SM        warp           48
     Theoretical Occupancy                     %          100
-    Achieved Occupancy                        %        88,03
-    Achieved Active Warps Per SM           warp        42,26
+    Achieved Occupancy                        %        87,09
+    Achieved Active Warps Per SM           warp        41,80
     ------------------------------- ----------- ------------
 
-    OPT   Est. Local Speedup: 11.97%                                                                                    
-          The difference between calculated theoretical (100.0%) and measured achieved occupancy (88.0%) can be the     
+    OPT   Est. Local Speedup: 12.91%                                                                                    
+          The difference between calculated theoretical (100.0%) and measured achieved occupancy (87.1%) can be the     
           result of warp scheduling overheads or workload imbalances during the kernel execution. Load imbalances can   
           occur between warps within a block as well as across blocks of the same kernel. See the CUDA Best Practices   
           Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#occupancy) for more details on     
@@ -175,33 +175,297 @@
     -------------------------- ----------- ------------
     Metric Name                Metric Unit Metric Value
     -------------------------- ----------- ------------
-    Average DRAM Active Cycles       cycle 1.244.170,67
-    Total DRAM Elapsed Cycles        cycle   10.636.288
-    Average L1 Active Cycles         cycle   290.605,90
-    Total L1 Elapsed Cycles          cycle   15.607.620
-    Average L2 Active Cycles         cycle   259.011,79
-    Total L2 Elapsed Cycles          cycle    6.880.224
-    Average SM Active Cycles         cycle   290.605,90
-    Total SM Elapsed Cycles          cycle   15.607.620
-    Average SMSP Active Cycles       cycle   290.482,29
-    Total SMSP Elapsed Cycles        cycle   62.430.480
+    Average DRAM Active Cycles       cycle 1.373.141,33
+    Total DRAM Elapsed Cycles        cycle   11.071.488
+    Average L1 Active Cycles         cycle   334.314,58
+    Total L1 Elapsed Cycles          cycle   16.283.454
+    Average L2 Active Cycles         cycle   297.836,62
+    Total L2 Elapsed Cycles          cycle    7.169.160
+    Average SM Active Cycles         cycle   334.314,58
+    Total SM Elapsed Cycles          cycle   16.283.454
+    Average SMSP Active Cycles       cycle   334.214,80
+    Total SMSP Elapsed Cycles        cycle   65.133.816
     -------------------------- ----------- ------------
 
-  _jfa_pass_naive_manhattan_kernel[v57,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
+  _jfa_pass_naive_manhattan_kernel[v58,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
+    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- ------------
+    Metric Name             Metric Unit Metric Value
+    ----------------------- ----------- ------------
+    DRAM Frequency                  Ghz        13,78
+    SM Frequency                    Ghz         2,52
+    Elapsed Cycles                cycle      341.120
+    Memory Throughput                 %        72,70
+    DRAM Throughput                   %        72,70
+    Duration                         us       135,39
+    L1/TEX Cache Throughput           %        53,51
+    L2 Cache Throughput               %        61,36
+    SM Active Cycles              cycle   304.482,08
+    Compute (SM) Throughput           %        42,08
+    ----------------------- ----------- ------------
+
+    OPT   Memory is more heavily utilized than Compute: Look at the Memory Workload Analysis section to identify the    
+          DRAM bottleneck. Check memory replay (coalescing) metrics to make sure you're efficiently utilizing the       
+          bytes transferred. Also consider whether it is possible to do more work per memory access (kernel fusion) or  
+          whether there are values you can (re)compute.                                                                 
+
+    Section: Launch Statistics
+    -------------------------------- --------------- ---------------
+    Metric Name                          Metric Unit    Metric Value
+    -------------------------------- --------------- ---------------
+    Block Size                                                   256
+    Cluster Scheduling Policy                           PolicySpread
+    Cluster Size                                                   0
+    Function Cache Configuration                     CachePreferNone
+    Grid Size                                                 16.384
+    Preferred Cluster Size                                         0
+    Registers Per Thread             register/thread              28
+    Shared Memory Configuration Size           Kbyte           16,38
+    Driver Shared Memory Per Block       Kbyte/block            1,02
+    Dynamic Shared Memory Per Block       byte/block               0
+    Static Shared Memory Per Block        byte/block               0
+    # SMs                                         SM              48
+    Stack Size                                                 1.024
+    Threads                                   thread       4.194.304
+    # TPCs                                                        24
+    Enabled TPC IDs                                              all
+    Uses Green Context                                             0
+    Waves Per SM                                               56,89
+    -------------------------------- --------------- ---------------
+
+    Section: Occupancy
+    ------------------------------- ----------- ------------
+    Metric Name                     Metric Unit Metric Value
+    ------------------------------- ----------- ------------
+    Max Active Clusters                 cluster            0
+    Max Cluster Size                      block            8
+    Overall GPU Occupancy                     %            0
+    Cluster Occupancy                         %            0
+    Block Limit Barriers                  block           24
+    Block Limit SM                        block           24
+    Block Limit Registers                 block            8
+    Block Limit Shared Mem                block           16
+    Block Limit Warps                     block            6
+    Theoretical Active Warps per SM        warp           48
+    Theoretical Occupancy                     %          100
+    Achieved Occupancy                        %        89,13
+    Achieved Active Warps Per SM           warp        42,78
+    ------------------------------- ----------- ------------
+
+    OPT   Est. Local Speedup: 10.87%                                                                                    
+          The difference between calculated theoretical (100.0%) and measured achieved occupancy (89.1%) can be the     
+          result of warp scheduling overheads or workload imbalances during the kernel execution. Load imbalances can   
+          occur between warps within a block as well as across blocks of the same kernel. See the CUDA Best Practices   
+          Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#occupancy) for more details on     
+          optimizing occupancy.                                                                                         
+
+    Section: GPU and Memory Workload Distribution
+    -------------------------- ----------- ------------
+    Metric Name                Metric Unit Metric Value
+    -------------------------- ----------- ------------
+    Average DRAM Active Cycles       cycle 1.356.666,67
+    Total DRAM Elapsed Cycles        cycle   11.197.440
+    Average L1 Active Cycles         cycle   304.482,08
+    Total L1 Elapsed Cycles          cycle   16.366.280
+    Average L2 Active Cycles         cycle   270.929,38
+    Total L2 Elapsed Cycles          cycle    7.240.968
+    Average SM Active Cycles         cycle   304.482,08
+    Total SM Elapsed Cycles          cycle   16.366.280
+    Average SMSP Active Cycles       cycle   304.370,15
+    Total SMSP Elapsed Cycles        cycle   65.465.120
+    -------------------------- ----------- ------------
+
+  _jfa_pass_naive_manhattan_kernel[v58,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
+    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- ------------
+    Metric Name             Metric Unit Metric Value
+    ----------------------- ----------- ------------
+    DRAM Frequency                  Ghz        13,79
+    SM Frequency                    Ghz         2,50
+    Elapsed Cycles                cycle      338.927
+    Memory Throughput                 %        68,20
+    DRAM Throughput                   %        68,20
+    Duration                         us       135,26
+    L1/TEX Cache Throughput           %        55,22
+    L2 Cache Throughput               %        66,80
+    SM Active Cycles              cycle   323.557,04
+    Compute (SM) Throughput           %        46,31
+    ----------------------- ----------- ------------
+
+    OPT   Memory is more heavily utilized than Compute: Look at the Memory Workload Analysis section to identify the    
+          DRAM bottleneck. Check memory replay (coalescing) metrics to make sure you're efficiently utilizing the       
+          bytes transferred. Also consider whether it is possible to do more work per memory access (kernel fusion) or  
+          whether there are values you can (re)compute.                                                                 
+
+    Section: Launch Statistics
+    -------------------------------- --------------- ---------------
+    Metric Name                          Metric Unit    Metric Value
+    -------------------------------- --------------- ---------------
+    Block Size                                                   256
+    Cluster Scheduling Policy                           PolicySpread
+    Cluster Size                                                   0
+    Function Cache Configuration                     CachePreferNone
+    Grid Size                                                 16.384
+    Preferred Cluster Size                                         0
+    Registers Per Thread             register/thread              28
+    Shared Memory Configuration Size           Kbyte           16,38
+    Driver Shared Memory Per Block       Kbyte/block            1,02
+    Dynamic Shared Memory Per Block       byte/block               0
+    Static Shared Memory Per Block        byte/block               0
+    # SMs                                         SM              48
+    Stack Size                                                 1.024
+    Threads                                   thread       4.194.304
+    # TPCs                                                        24
+    Enabled TPC IDs                                              all
+    Uses Green Context                                             0
+    Waves Per SM                                               56,89
+    -------------------------------- --------------- ---------------
+
+    Section: Occupancy
+    ------------------------------- ----------- ------------
+    Metric Name                     Metric Unit Metric Value
+    ------------------------------- ----------- ------------
+    Max Active Clusters                 cluster            0
+    Max Cluster Size                      block            8
+    Overall GPU Occupancy                     %            0
+    Cluster Occupancy                         %            0
+    Block Limit Barriers                  block           24
+    Block Limit SM                        block           24
+    Block Limit Registers                 block            8
+    Block Limit Shared Mem                block           16
+    Block Limit Warps                     block            6
+    Theoretical Active Warps per SM        warp           48
+    Theoretical Occupancy                     %          100
+    Achieved Occupancy                        %        89,05
+    Achieved Active Warps Per SM           warp        42,74
+    ------------------------------- ----------- ------------
+
+    OPT   Est. Local Speedup: 10.95%                                                                                    
+          The difference between calculated theoretical (100.0%) and measured achieved occupancy (89.0%) can be the     
+          result of warp scheduling overheads or workload imbalances during the kernel execution. Load imbalances can   
+          occur between warps within a block as well as across blocks of the same kernel. See the CUDA Best Practices   
+          Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#occupancy) for more details on     
+          optimizing occupancy.                                                                                         
+
+    Section: GPU and Memory Workload Distribution
+    -------------------------- ----------- ------------
+    Metric Name                Metric Unit Metric Value
+    -------------------------- ----------- ------------
+    Average DRAM Active Cycles       cycle 1.271.781,33
+    Total DRAM Elapsed Cycles        cycle   11.188.224
+    Average L1 Active Cycles         cycle   323.557,04
+    Total L1 Elapsed Cycles          cycle   16.261.398
+    Average L2 Active Cycles         cycle   284.618,08
+    Total L2 Elapsed Cycles          cycle    7.212.864
+    Average SM Active Cycles         cycle   323.557,04
+    Total SM Elapsed Cycles          cycle   16.261.398
+    Average SMSP Active Cycles       cycle   323.431,66
+    Total SMSP Elapsed Cycles        cycle   65.045.592
+    -------------------------- ----------- ------------
+
+  _jfa_pass_naive_manhattan_kernel[v58,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
     Section: GPU Speed Of Light Throughput
     ----------------------- ----------- ------------
     Metric Name             Metric Unit Metric Value
     ----------------------- ----------- ------------
     DRAM Frequency                  Ghz        13,79
     SM Frequency                    Ghz         2,51
-    Elapsed Cycles                cycle      327.930
-    Memory Throughput                 %        63,82
-    DRAM Throughput                   %        61,47
-    Duration                         us       130,53
-    L1/TEX Cache Throughput           %        51,27
-    L2 Cache Throughput               %        63,82
-    SM Active Cycles              cycle   318.042,79
-    Compute (SM) Throughput           %        50,15
+    Elapsed Cycles                cycle      353.066
+    Memory Throughput                 %        70,19
+    DRAM Throughput                   %        70,19
+    Duration                         us       140,90
+    L1/TEX Cache Throughput           %        56,00
+    L2 Cache Throughput               %        66,44
+    SM Active Cycles              cycle   332.520,31
+    Compute (SM) Throughput           %        49,82
+    ----------------------- ----------- ------------
+
+    OPT   Memory is more heavily utilized than Compute: Look at the Memory Workload Analysis section to identify the    
+          DRAM bottleneck. Check memory replay (coalescing) metrics to make sure you're efficiently utilizing the       
+          bytes transferred. Also consider whether it is possible to do more work per memory access (kernel fusion) or  
+          whether there are values you can (re)compute.                                                                 
+
+    Section: Launch Statistics
+    -------------------------------- --------------- ---------------
+    Metric Name                          Metric Unit    Metric Value
+    -------------------------------- --------------- ---------------
+    Block Size                                                   256
+    Cluster Scheduling Policy                           PolicySpread
+    Cluster Size                                                   0
+    Function Cache Configuration                     CachePreferNone
+    Grid Size                                                 16.384
+    Preferred Cluster Size                                         0
+    Registers Per Thread             register/thread              28
+    Shared Memory Configuration Size           Kbyte           16,38
+    Driver Shared Memory Per Block       Kbyte/block            1,02
+    Dynamic Shared Memory Per Block       byte/block               0
+    Static Shared Memory Per Block        byte/block               0
+    # SMs                                         SM              48
+    Stack Size                                                 1.024
+    Threads                                   thread       4.194.304
+    # TPCs                                                        24
+    Enabled TPC IDs                                              all
+    Uses Green Context                                             0
+    Waves Per SM                                               56,89
+    -------------------------------- --------------- ---------------
+
+    Section: Occupancy
+    ------------------------------- ----------- ------------
+    Metric Name                     Metric Unit Metric Value
+    ------------------------------- ----------- ------------
+    Max Active Clusters                 cluster            0
+    Max Cluster Size                      block            8
+    Overall GPU Occupancy                     %            0
+    Cluster Occupancy                         %            0
+    Block Limit Barriers                  block           24
+    Block Limit SM                        block           24
+    Block Limit Registers                 block            8
+    Block Limit Shared Mem                block           16
+    Block Limit Warps                     block            6
+    Theoretical Active Warps per SM        warp           48
+    Theoretical Occupancy                     %          100
+    Achieved Occupancy                        %        89,57
+    Achieved Active Warps Per SM           warp        42,99
+    ------------------------------- ----------- ------------
+
+    OPT   Est. Local Speedup: 10.43%                                                                                    
+          The difference between calculated theoretical (100.0%) and measured achieved occupancy (89.6%) can be the     
+          result of warp scheduling overheads or workload imbalances during the kernel execution. Load imbalances can   
+          occur between warps within a block as well as across blocks of the same kernel. See the CUDA Best Practices   
+          Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#occupancy) for more details on     
+          optimizing occupancy.                                                                                         
+
+    Section: GPU and Memory Workload Distribution
+    -------------------------- ----------- ------------
+    Metric Name                Metric Unit Metric Value
+    -------------------------- ----------- ------------
+    Average DRAM Active Cycles       cycle 1.363.541,33
+    Total DRAM Elapsed Cycles        cycle   11.655.168
+    Average L1 Active Cycles         cycle   332.520,31
+    Total L1 Elapsed Cycles          cycle   16.942.806
+    Average L2 Active Cycles         cycle   303.524,25
+    Total L2 Elapsed Cycles          cycle    7.533.984
+    Average SM Active Cycles         cycle   332.520,31
+    Total SM Elapsed Cycles          cycle   16.942.806
+    Average SMSP Active Cycles       cycle   332.402,78
+    Total SMSP Elapsed Cycles        cycle   67.771.224
+    -------------------------- ----------- ------------
+
+  _jfa_pass_naive_manhattan_kernel[v58,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
+    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- ------------
+    Metric Name             Metric Unit Metric Value
+    ----------------------- ----------- ------------
+    DRAM Frequency                  Ghz        13,78
+    SM Frequency                    Ghz         2,48
+    Elapsed Cycles                cycle      357.977
+    Memory Throughput                 %        64,92
+    DRAM Throughput                   %        63,73
+    Duration                         us       144,16
+    L1/TEX Cache Throughput           %        52,97
+    L2 Cache Throughput               %        64,92
+    SM Active Cycles              cycle   350.982,65
+    Compute (SM) Throughput           %        53,62
     ----------------------- ----------- ------------
 
     OPT   Memory is more heavily utilized than Compute: Look at the Memory Workload Analysis section to identify the L2 
@@ -219,7 +483,7 @@
     Function Cache Configuration                     CachePreferNone
     Grid Size                                                 16.384
     Preferred Cluster Size                                         0
-    Registers Per Thread             register/thread              33
+    Registers Per Thread             register/thread              28
     Shared Memory Configuration Size           Kbyte           16,38
     Driver Shared Memory Per Block       Kbyte/block            1,02
     Dynamic Shared Memory Per Block       byte/block               0
@@ -243,17 +507,17 @@
     Cluster Occupancy                         %            0
     Block Limit Barriers                  block           24
     Block Limit SM                        block           24
-    Block Limit Registers                 block            6
+    Block Limit Registers                 block            8
     Block Limit Shared Mem                block           16
     Block Limit Warps                     block            6
     Theoretical Active Warps per SM        warp           48
     Theoretical Occupancy                     %          100
-    Achieved Occupancy                        %        89,18
-    Achieved Active Warps Per SM           warp        42,81
+    Achieved Occupancy                        %        89,67
+    Achieved Active Warps Per SM           warp        43,04
     ------------------------------- ----------- ------------
 
-    OPT   Est. Local Speedup: 10.82%                                                                                    
-          The difference between calculated theoretical (100.0%) and measured achieved occupancy (89.2%) can be the     
+    OPT   Est. Local Speedup: 10.33%                                                                                    
+          The difference between calculated theoretical (100.0%) and measured achieved occupancy (89.7%) can be the     
           result of warp scheduling overheads or workload imbalances during the kernel execution. Load imbalances can   
           occur between warps within a block as well as across blocks of the same kernel. See the CUDA Best Practices   
           Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#occupancy) for more details on     
@@ -263,123 +527,39 @@
     -------------------------- ----------- ------------
     Metric Name                Metric Unit Metric Value
     -------------------------- ----------- ------------
-    Average DRAM Active Cycles       cycle 1.106.074,67
-    Total DRAM Elapsed Cycles        cycle   10.797.056
-    Average L1 Active Cycles         cycle   318.042,79
-    Total L1 Elapsed Cycles          cycle   15.734.268
-    Average L2 Active Cycles         cycle   281.913,83
-    Total L2 Elapsed Cycles          cycle    6.977.976
-    Average SM Active Cycles         cycle   318.042,79
-    Total SM Elapsed Cycles          cycle   15.734.268
-    Average SMSP Active Cycles       cycle   317.907,75
-    Total SMSP Elapsed Cycles        cycle   62.937.072
+    Average DRAM Active Cycles       cycle    1.266.128
+    Total DRAM Elapsed Cycles        cycle   11.920.384
+    Average L1 Active Cycles         cycle   350.982,65
+    Total L1 Elapsed Cycles          cycle   17.179.716
+    Average L2 Active Cycles         cycle   306.507,92
+    Total L2 Elapsed Cycles          cycle    7.700.640
+    Average SM Active Cycles         cycle   350.982,65
+    Total SM Elapsed Cycles          cycle   17.179.716
+    Average SMSP Active Cycles       cycle   350.838,92
+    Total SMSP Elapsed Cycles        cycle   68.718.864
     -------------------------- ----------- ------------
 
-  _jfa_pass_naive_manhattan_kernel[v57,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
-    Section: GPU Speed Of Light Throughput
-    ----------------------- ----------- ------------
-    Metric Name             Metric Unit Metric Value
-    ----------------------- ----------- ------------
-    DRAM Frequency                  Ghz        13,79
-    SM Frequency                    Ghz         2,51
-    Elapsed Cycles                cycle      347.778
-    Memory Throughput                 %        65,45
-    DRAM Throughput                   %        54,62
-    Duration                         us       138,24
-    L1/TEX Cache Throughput           %        52,45
-    L2 Cache Throughput               %        65,45
-    SM Active Cycles              cycle   341.051,33
-    Compute (SM) Throughput           %        55,66
-    ----------------------- ----------- ------------
-
-    INF   Compute and Memory are well-balanced: To reduce runtime, both computation and memory traffic must be reduced. 
-          Check both the Compute Workload Analysis and Memory Workload Analysis sections.                               
-
-    Section: Launch Statistics
-    -------------------------------- --------------- ---------------
-    Metric Name                          Metric Unit    Metric Value
-    -------------------------------- --------------- ---------------
-    Block Size                                                   256
-    Cluster Scheduling Policy                           PolicySpread
-    Cluster Size                                                   0
-    Function Cache Configuration                     CachePreferNone
-    Grid Size                                                 16.384
-    Preferred Cluster Size                                         0
-    Registers Per Thread             register/thread              33
-    Shared Memory Configuration Size           Kbyte           16,38
-    Driver Shared Memory Per Block       Kbyte/block            1,02
-    Dynamic Shared Memory Per Block       byte/block               0
-    Static Shared Memory Per Block        byte/block               0
-    # SMs                                         SM              48
-    Stack Size                                                 1.024
-    Threads                                   thread       4.194.304
-    # TPCs                                                        24
-    Enabled TPC IDs                                              all
-    Uses Green Context                                             0
-    Waves Per SM                                               56,89
-    -------------------------------- --------------- ---------------
-
-    Section: Occupancy
-    ------------------------------- ----------- ------------
-    Metric Name                     Metric Unit Metric Value
-    ------------------------------- ----------- ------------
-    Max Active Clusters                 cluster            0
-    Max Cluster Size                      block            8
-    Overall GPU Occupancy                     %            0
-    Cluster Occupancy                         %            0
-    Block Limit Barriers                  block           24
-    Block Limit SM                        block           24
-    Block Limit Registers                 block            6
-    Block Limit Shared Mem                block           16
-    Block Limit Warps                     block            6
-    Theoretical Active Warps per SM        warp           48
-    Theoretical Occupancy                     %          100
-    Achieved Occupancy                        %        88,55
-    Achieved Active Warps Per SM           warp        42,50
-    ------------------------------- ----------- ------------
-
-    OPT   Est. Local Speedup: 11.45%                                                                                    
-          The difference between calculated theoretical (100.0%) and measured achieved occupancy (88.5%) can be the     
-          result of warp scheduling overheads or workload imbalances during the kernel execution. Load imbalances can   
-          occur between warps within a block as well as across blocks of the same kernel. See the CUDA Best Practices   
-          Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#occupancy) for more details on     
-          optimizing occupancy.                                                                                         
-
-    Section: GPU and Memory Workload Distribution
-    -------------------------- ----------- ------------
-    Metric Name                Metric Unit Metric Value
-    -------------------------- ----------- ------------
-    Average DRAM Active Cycles       cycle 1.040.981,33
-    Total DRAM Elapsed Cycles        cycle   11.435.008
-    Average L1 Active Cycles         cycle   341.051,33
-    Total L1 Elapsed Cycles          cycle   16.688.022
-    Average L2 Active Cycles         cycle   302.612,50
-    Total L2 Elapsed Cycles          cycle    7.390.536
-    Average SM Active Cycles         cycle   341.051,33
-    Total SM Elapsed Cycles          cycle   16.688.022
-    Average SMSP Active Cycles       cycle   340.864,57
-    Total SMSP Elapsed Cycles        cycle   66.752.088
-    -------------------------- ----------- ------------
-
-  _jfa_pass_naive_manhattan_kernel[v57,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
+  _jfa_pass_naive_manhattan_kernel[v58,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
     Section: GPU Speed Of Light Throughput
     ----------------------- ----------- ------------
     Metric Name             Metric Unit Metric Value
     ----------------------- ----------- ------------
     DRAM Frequency                  Ghz        13,78
-    SM Frequency                    Ghz         2,51
-    Elapsed Cycles                cycle      388.414
-    Memory Throughput                 %        60,84
-    DRAM Throughput                   %        57,64
-    Duration                         us       154,62
-    L1/TEX Cache Throughput           %        49,70
-    L2 Cache Throughput               %        60,84
-    SM Active Cycles              cycle   376.580,38
-    Compute (SM) Throughput           %        64,44
+    SM Frequency                    Ghz         2,48
+    Elapsed Cycles                cycle      380.519
+    Memory Throughput                 %        64,25
+    DRAM Throughput                   %        64,25
+    Duration                         us       153,44
+    L1/TEX Cache Throughput           %        53,46
+    L2 Cache Throughput               %        60,60
+    SM Active Cycles              cycle   343.917,48
+    Compute (SM) Throughput           %        51,16
     ----------------------- ----------- ------------
 
-    INF   Compute and Memory are well-balanced: To reduce runtime, both computation and memory traffic must be reduced. 
-          Check both the Compute Workload Analysis and Memory Workload Analysis sections.                               
+    OPT   Memory is more heavily utilized than Compute: Look at the Memory Workload Analysis section to identify the    
+          DRAM bottleneck. Check memory replay (coalescing) metrics to make sure you're efficiently utilizing the       
+          bytes transferred. Also consider whether it is possible to do more work per memory access (kernel fusion) or  
+          whether there are values you can (re)compute.                                                                 
 
     Section: Launch Statistics
     -------------------------------- --------------- ---------------
@@ -391,7 +571,7 @@
     Function Cache Configuration                     CachePreferNone
     Grid Size                                                 16.384
     Preferred Cluster Size                                         0
-    Registers Per Thread             register/thread              33
+    Registers Per Thread             register/thread              28
     Shared Memory Configuration Size           Kbyte           16,38
     Driver Shared Memory Per Block       Kbyte/block            1,02
     Dynamic Shared Memory Per Block       byte/block               0
@@ -415,138 +595,52 @@
     Cluster Occupancy                         %            0
     Block Limit Barriers                  block           24
     Block Limit SM                        block           24
-    Block Limit Registers                 block            6
+    Block Limit Registers                 block            8
     Block Limit Shared Mem                block           16
     Block Limit Warps                     block            6
     Theoretical Active Warps per SM        warp           48
     Theoretical Occupancy                     %          100
-    Achieved Occupancy                        %        89,12
-    Achieved Active Warps Per SM           warp        42,78
-    ------------------------------- ----------- ------------
-
-    OPT   Est. Local Speedup: 10.88%                                                                                    
-          The difference between calculated theoretical (100.0%) and measured achieved occupancy (89.1%) can be the     
-          result of warp scheduling overheads or workload imbalances during the kernel execution. Load imbalances can   
-          occur between warps within a block as well as across blocks of the same kernel. See the CUDA Best Practices   
-          Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#occupancy) for more details on     
-          optimizing occupancy.                                                                                         
-
-    Section: GPU and Memory Workload Distribution
-    -------------------------- ----------- ------------
-    Metric Name                Metric Unit Metric Value
-    -------------------------- ----------- ------------
-    Average DRAM Active Cycles       cycle 1.228.234,67
-    Total DRAM Elapsed Cycles        cycle   12.785.664
-    Average L1 Active Cycles         cycle   376.580,38
-    Total L1 Elapsed Cycles          cycle   18.638.722
-    Average L2 Active Cycles         cycle   333.814,21
-    Total L2 Elapsed Cycles          cycle    8.269.368
-    Average SM Active Cycles         cycle   376.580,38
-    Total SM Elapsed Cycles          cycle   18.638.722
-    Average SMSP Active Cycles       cycle   376.391,34
-    Total SMSP Elapsed Cycles        cycle   74.554.888
-    -------------------------- ----------- ------------
-
-  _jfa_pass_naive_manhattan_kernel[v57,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
-    Section: GPU Speed Of Light Throughput
-    ----------------------- ----------- ------------
-    Metric Name             Metric Unit Metric Value
-    ----------------------- ----------- ------------
-    DRAM Frequency                  Ghz        13,78
-    SM Frequency                    Ghz         2,51
-    Elapsed Cycles                cycle      414.050
-    Memory Throughput                 %        56,93
-    DRAM Throughput                   %        45,04
-    Duration                         us       164,99
-    L1/TEX Cache Throughput           %        45,74
-    L2 Cache Throughput               %        56,93
-    SM Active Cycles              cycle   408.899,31
-    Compute (SM) Throughput           %        72,55
-    ----------------------- ----------- ------------
-
-    OPT   Compute is more heavily utilized than Memory: Look at the Compute Workload Analysis section to see what the   
-          compute pipelines are spending their time doing. Also, consider whether any computation is redundant and      
-          could be reduced or moved to look-up tables.                                                                  
-
-    Section: Launch Statistics
-    -------------------------------- --------------- ---------------
-    Metric Name                          Metric Unit    Metric Value
-    -------------------------------- --------------- ---------------
-    Block Size                                                   256
-    Cluster Scheduling Policy                           PolicySpread
-    Cluster Size                                                   0
-    Function Cache Configuration                     CachePreferNone
-    Grid Size                                                 16.384
-    Preferred Cluster Size                                         0
-    Registers Per Thread             register/thread              33
-    Shared Memory Configuration Size           Kbyte           16,38
-    Driver Shared Memory Per Block       Kbyte/block            1,02
-    Dynamic Shared Memory Per Block       byte/block               0
-    Static Shared Memory Per Block        byte/block               0
-    # SMs                                         SM              48
-    Stack Size                                                 1.024
-    Threads                                   thread       4.194.304
-    # TPCs                                                        24
-    Enabled TPC IDs                                              all
-    Uses Green Context                                             0
-    Waves Per SM                                               56,89
-    -------------------------------- --------------- ---------------
-
-    Section: Occupancy
-    ------------------------------- ----------- ------------
-    Metric Name                     Metric Unit Metric Value
-    ------------------------------- ----------- ------------
-    Max Active Clusters                 cluster            0
-    Max Cluster Size                      block            8
-    Overall GPU Occupancy                     %            0
-    Cluster Occupancy                         %            0
-    Block Limit Barriers                  block           24
-    Block Limit SM                        block           24
-    Block Limit Registers                 block            6
-    Block Limit Shared Mem                block           16
-    Block Limit Warps                     block            6
-    Theoretical Active Warps per SM        warp           48
-    Theoretical Occupancy                     %          100
-    Achieved Occupancy                        %        91,13
-    Achieved Active Warps Per SM           warp        43,74
+    Achieved Occupancy                        %        90,68
+    Achieved Active Warps Per SM           warp        43,53
     ------------------------------- ----------- ------------
 
     Section: GPU and Memory Workload Distribution
     -------------------------- ----------- ------------
     Metric Name                Metric Unit Metric Value
     -------------------------- ----------- ------------
-    Average DRAM Active Cycles       cycle    1.024.432
-    Total DRAM Elapsed Cycles        cycle   13.645.824
-    Average L1 Active Cycles         cycle   408.899,31
-    Total L1 Elapsed Cycles          cycle   19.870.306
-    Average L2 Active Cycles         cycle      368.849
-    Total L2 Elapsed Cycles          cycle    8.824.680
-    Average SM Active Cycles         cycle   408.899,31
-    Total SM Elapsed Cycles          cycle   19.870.306
-    Average SMSP Active Cycles       cycle   408.712,85
-    Total SMSP Elapsed Cycles        cycle   79.481.224
+    Average DRAM Active Cycles       cycle 1.359.002,67
+    Total DRAM Elapsed Cycles        cycle   12.690.432
+    Average L1 Active Cycles         cycle   343.917,48
+    Total L1 Elapsed Cycles          cycle   18.259.428
+    Average L2 Active Cycles         cycle   318.496,67
+    Total L2 Elapsed Cycles          cycle    8.164.992
+    Average SM Active Cycles         cycle   343.917,48
+    Total SM Elapsed Cycles          cycle   18.259.428
+    Average SMSP Active Cycles       cycle   343.740,49
+    Total SMSP Elapsed Cycles        cycle   73.037.712
     -------------------------- ----------- ------------
 
-  _jfa_pass_naive_manhattan_kernel[v57,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
+  _jfa_pass_naive_manhattan_kernel[v58,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
     Section: GPU Speed Of Light Throughput
     ----------------------- ----------- ------------
     Metric Name             Metric Unit Metric Value
     ----------------------- ----------- ------------
     DRAM Frequency                  Ghz        13,79
     SM Frequency                    Ghz         2,49
-    Elapsed Cycles                cycle      415.684
-    Memory Throughput                 %        55,58
-    DRAM Throughput                   %        44,74
-    Duration                         us       166,82
-    L1/TEX Cache Throughput           %        44,77
-    L2 Cache Throughput               %        55,58
-    SM Active Cycles              cycle   411.140,27
-    Compute (SM) Throughput           %        73,88
+    Elapsed Cycles                cycle      347.233
+    Memory Throughput                 %        69,34
+    DRAM Throughput                   %        69,34
+    Duration                         us       139,68
+    L1/TEX Cache Throughput           %        45,42
+    L2 Cache Throughput               %        36,29
+    SM Active Cycles              cycle   343.679,94
+    Compute (SM) Throughput           %        56,27
     ----------------------- ----------- ------------
 
-    OPT   Compute is more heavily utilized than Memory: Look at the Compute Workload Analysis section to see what the   
-          compute pipelines are spending their time doing. Also, consider whether any computation is redundant and      
-          could be reduced or moved to look-up tables.                                                                  
+    OPT   Memory is more heavily utilized than Compute: Look at the Memory Workload Analysis section to identify the    
+          DRAM bottleneck. Check memory replay (coalescing) metrics to make sure you're efficiently utilizing the       
+          bytes transferred. Also consider whether it is possible to do more work per memory access (kernel fusion) or  
+          whether there are values you can (re)compute.                                                                 
 
     Section: Launch Statistics
     -------------------------------- --------------- ---------------
@@ -558,7 +652,7 @@
     Function Cache Configuration                     CachePreferNone
     Grid Size                                                 16.384
     Preferred Cluster Size                                         0
-    Registers Per Thread             register/thread              33
+    Registers Per Thread             register/thread              28
     Shared Memory Configuration Size           Kbyte           16,38
     Driver Shared Memory Per Block       Kbyte/block            1,02
     Dynamic Shared Memory Per Block       byte/block               0
@@ -582,51 +676,59 @@
     Cluster Occupancy                         %            0
     Block Limit Barriers                  block           24
     Block Limit SM                        block           24
-    Block Limit Registers                 block            6
+    Block Limit Registers                 block            8
     Block Limit Shared Mem                block           16
     Block Limit Warps                     block            6
     Theoretical Active Warps per SM        warp           48
     Theoretical Occupancy                     %          100
-    Achieved Occupancy                        %        91,65
-    Achieved Active Warps Per SM           warp        43,99
+    Achieved Occupancy                        %        82,41
+    Achieved Active Warps Per SM           warp        39,55
     ------------------------------- ----------- ------------
+
+    OPT   Est. Local Speedup: 17.59%                                                                                    
+          The difference between calculated theoretical (100.0%) and measured achieved occupancy (82.4%) can be the     
+          result of warp scheduling overheads or workload imbalances during the kernel execution. Load imbalances can   
+          occur between warps within a block as well as across blocks of the same kernel. See the CUDA Best Practices   
+          Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#occupancy) for more details on     
+          optimizing occupancy.                                                                                         
 
     Section: GPU and Memory Workload Distribution
     -------------------------- ----------- ------------
     Metric Name                Metric Unit Metric Value
     -------------------------- ----------- ------------
-    Average DRAM Active Cycles       cycle    1.028.848
-    Total DRAM Elapsed Cycles        cycle   13.797.376
-    Average L1 Active Cycles         cycle   411.140,27
-    Total L1 Elapsed Cycles          cycle   19.946.812
-    Average L2 Active Cycles         cycle   367.044,08
-    Total L2 Elapsed Cycles          cycle    8.918.160
-    Average SM Active Cycles         cycle   411.140,27
-    Total SM Elapsed Cycles          cycle   19.946.812
-    Average SMSP Active Cycles       cycle   410.953,62
-    Total SMSP Elapsed Cycles        cycle   79.787.248
+    Average DRAM Active Cycles       cycle 1.335.301,33
+    Total DRAM Elapsed Cycles        cycle   11.553.792
+    Average L1 Active Cycles         cycle   343.679,94
+    Total L1 Elapsed Cycles          cycle   16.662.140
+    Average L2 Active Cycles         cycle   304.576,96
+    Total L2 Elapsed Cycles          cycle    7.447.872
+    Average SM Active Cycles         cycle   343.679,94
+    Total SM Elapsed Cycles          cycle   16.662.140
+    Average SMSP Active Cycles       cycle   343.401,94
+    Total SMSP Elapsed Cycles        cycle   66.648.560
     -------------------------- ----------- ------------
 
-  _jfa_pass_naive_manhattan_kernel[v57,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
+  _jfa_pass_naive_manhattan_kernel[v58,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
     Section: GPU Speed Of Light Throughput
     ----------------------- ----------- ------------
     Metric Name             Metric Unit Metric Value
     ----------------------- ----------- ------------
     DRAM Frequency                  Ghz        13,78
     SM Frequency                    Ghz         2,49
-    Elapsed Cycles                cycle      408.278
-    Memory Throughput                 %        54,02
-    DRAM Throughput                   %        54,02
-    Duration                         us       164,19
-    L1/TEX Cache Throughput           %        38,58
-    L2 Cache Throughput               %        31,11
-    SM Active Cycles              cycle   399.679,25
-    Compute (SM) Throughput           %        75,59
+    Elapsed Cycles                cycle      331.265
+    Memory Throughput                 %        73,48
+    DRAM Throughput                   %        73,48
+    Duration                         us       132,80
+    L1/TEX Cache Throughput           %        46,01
+    L2 Cache Throughput               %        32,15
+    SM Active Cycles              cycle   328.281,38
+    Compute (SM) Throughput           %        58,75
     ----------------------- ----------- ------------
 
-    OPT   Compute is more heavily utilized than Memory: Look at the Compute Workload Analysis section to see what the   
-          compute pipelines are spending their time doing. Also, consider whether any computation is redundant and      
-          could be reduced or moved to look-up tables.                                                                  
+    OPT   Memory is more heavily utilized than Compute: Look at the Memory Workload Analysis section to identify the    
+          DRAM bottleneck. Check memory replay (coalescing) metrics to make sure you're efficiently utilizing the       
+          bytes transferred. Also consider whether it is possible to do more work per memory access (kernel fusion) or  
+          whether there are values you can (re)compute.                                                                 
 
     Section: Launch Statistics
     -------------------------------- --------------- ---------------
@@ -638,7 +740,7 @@
     Function Cache Configuration                     CachePreferNone
     Grid Size                                                 16.384
     Preferred Cluster Size                                         0
-    Registers Per Thread             register/thread              33
+    Registers Per Thread             register/thread              28
     Shared Memory Configuration Size           Kbyte           16,38
     Driver Shared Memory Per Block       Kbyte/block            1,02
     Dynamic Shared Memory Per Block       byte/block               0
@@ -662,17 +764,17 @@
     Cluster Occupancy                         %            0
     Block Limit Barriers                  block           24
     Block Limit SM                        block           24
-    Block Limit Registers                 block            6
+    Block Limit Registers                 block            8
     Block Limit Shared Mem                block           16
     Block Limit Warps                     block            6
     Theoretical Active Warps per SM        warp           48
     Theoretical Occupancy                     %          100
-    Achieved Occupancy                        %        85,31
-    Achieved Active Warps Per SM           warp        40,95
+    Achieved Occupancy                        %        78,00
+    Achieved Active Warps Per SM           warp        37,44
     ------------------------------- ----------- ------------
 
-    OPT   Est. Local Speedup: 14.69%                                                                                    
-          The difference between calculated theoretical (100.0%) and measured achieved occupancy (85.3%) can be the     
+    OPT   Est. Local Speedup: 22%                                                                                       
+          The difference between calculated theoretical (100.0%) and measured achieved occupancy (78.0%) can be the     
           result of warp scheduling overheads or workload imbalances during the kernel execution. Load imbalances can   
           occur between warps within a block as well as across blocks of the same kernel. See the CUDA Best Practices   
           Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#occupancy) for more details on     
@@ -682,38 +784,127 @@
     -------------------------- ----------- ------------
     Metric Name                Metric Unit Metric Value
     -------------------------- ----------- ------------
-    Average DRAM Active Cycles       cycle    1.222.672
-    Total DRAM Elapsed Cycles        cycle   13.580.288
-    Average L1 Active Cycles         cycle   399.679,25
-    Total L1 Elapsed Cycles          cycle   19.591.432
-    Average L2 Active Cycles         cycle   356.443,46
-    Total L2 Elapsed Cycles          cycle    8.763.336
-    Average SM Active Cycles         cycle   399.679,25
-    Total SM Elapsed Cycles          cycle   19.591.432
-    Average SMSP Active Cycles       cycle   399.436,64
-    Total SMSP Elapsed Cycles        cycle   78.365.728
+    Average DRAM Active Cycles       cycle 1.345.098,67
+    Total DRAM Elapsed Cycles        cycle   10.983.424
+    Average L1 Active Cycles         cycle   328.281,38
+    Total L1 Elapsed Cycles          cycle   15.895.922
+    Average L2 Active Cycles         cycle   290.143,33
+    Total L2 Elapsed Cycles          cycle    7.096.128
+    Average SM Active Cycles         cycle   328.281,38
+    Total SM Elapsed Cycles          cycle   15.895.922
+    Average SMSP Active Cycles       cycle   328.082,56
+    Total SMSP Elapsed Cycles        cycle   63.583.688
     -------------------------- ----------- ------------
 
-  _jfa_pass_naive_manhattan_kernel[v57,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
+  _jfa_pass_naive_manhattan_kernel[v58,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
+    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- ------------
+    Metric Name             Metric Unit Metric Value
+    ----------------------- ----------- ------------
+    DRAM Frequency                  Ghz        13,78
+    SM Frequency                    Ghz         2,49
+    Elapsed Cycles                cycle      320.391
+    Memory Throughput                 %        75,61
+    DRAM Throughput                   %        75,61
+    Duration                         us       128,38
+    L1/TEX Cache Throughput           %        49,86
+    L2 Cache Throughput               %        29,33
+    SM Active Cycles              cycle   297.113,85
+    Compute (SM) Throughput           %        60,53
+    ----------------------- ----------- ------------
+
+    OPT   Memory is more heavily utilized than Compute: Look at the Memory Workload Analysis section to identify the    
+          DRAM bottleneck. Check memory replay (coalescing) metrics to make sure you're efficiently utilizing the       
+          bytes transferred. Also consider whether it is possible to do more work per memory access (kernel fusion) or  
+          whether there are values you can (re)compute.                                                                 
+
+    Section: Launch Statistics
+    -------------------------------- --------------- ---------------
+    Metric Name                          Metric Unit    Metric Value
+    -------------------------------- --------------- ---------------
+    Block Size                                                   256
+    Cluster Scheduling Policy                           PolicySpread
+    Cluster Size                                                   0
+    Function Cache Configuration                     CachePreferNone
+    Grid Size                                                 16.384
+    Preferred Cluster Size                                         0
+    Registers Per Thread             register/thread              28
+    Shared Memory Configuration Size           Kbyte           16,38
+    Driver Shared Memory Per Block       Kbyte/block            1,02
+    Dynamic Shared Memory Per Block       byte/block               0
+    Static Shared Memory Per Block        byte/block               0
+    # SMs                                         SM              48
+    Stack Size                                                 1.024
+    Threads                                   thread       4.194.304
+    # TPCs                                                        24
+    Enabled TPC IDs                                              all
+    Uses Green Context                                             0
+    Waves Per SM                                               56,89
+    -------------------------------- --------------- ---------------
+
+    Section: Occupancy
+    ------------------------------- ----------- ------------
+    Metric Name                     Metric Unit Metric Value
+    ------------------------------- ----------- ------------
+    Max Active Clusters                 cluster            0
+    Max Cluster Size                      block            8
+    Overall GPU Occupancy                     %            0
+    Cluster Occupancy                         %            0
+    Block Limit Barriers                  block           24
+    Block Limit SM                        block           24
+    Block Limit Registers                 block            8
+    Block Limit Shared Mem                block           16
+    Block Limit Warps                     block            6
+    Theoretical Active Warps per SM        warp           48
+    Theoretical Occupancy                     %          100
+    Achieved Occupancy                        %        77,26
+    Achieved Active Warps Per SM           warp        37,09
+    ------------------------------- ----------- ------------
+
+    OPT   Est. Local Speedup: 22.74%                                                                                    
+          The difference between calculated theoretical (100.0%) and measured achieved occupancy (77.3%) can be the     
+          result of warp scheduling overheads or workload imbalances during the kernel execution. Load imbalances can   
+          occur between warps within a block as well as across blocks of the same kernel. See the CUDA Best Practices   
+          Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#occupancy) for more details on     
+          optimizing occupancy.                                                                                         
+
+    Section: GPU and Memory Workload Distribution
+    -------------------------- ----------- ------------
+    Metric Name                Metric Unit Metric Value
+    -------------------------- ----------- ------------
+    Average DRAM Active Cycles       cycle 1.337.861,33
+    Total DRAM Elapsed Cycles        cycle   10.616.832
+    Average L1 Active Cycles         cycle   297.113,85
+    Total L1 Elapsed Cycles          cycle   15.375.080
+    Average L2 Active Cycles         cycle   282.215,21
+    Total L2 Elapsed Cycles          cycle    6.841.176
+    Average SM Active Cycles         cycle   297.113,85
+    Total SM Elapsed Cycles          cycle   15.375.080
+    Average SMSP Active Cycles       cycle   296.911,48
+    Total SMSP Elapsed Cycles        cycle   61.500.320
+    -------------------------- ----------- ------------
+
+  _jfa_pass_naive_manhattan_kernel[v58,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
     Section: GPU Speed Of Light Throughput
     ----------------------- ----------- ------------
     Metric Name             Metric Unit Metric Value
     ----------------------- ----------- ------------
     DRAM Frequency                  Ghz        13,79
-    SM Frequency                    Ghz         2,51
-    Elapsed Cycles                cycle      398.276
-    Memory Throughput                 %        46,80
-    DRAM Throughput                   %        46,80
-    Duration                         us       158,69
-    L1/TEX Cache Throughput           %        37,99
-    L2 Cache Throughput               %        26,96
-    SM Active Cycles              cycle   393.047,02
-    Compute (SM) Throughput           %        77,33
+    SM Frequency                    Ghz         2,49
+    Elapsed Cycles                cycle      312.813
+    Memory Throughput                 %        77,97
+    DRAM Throughput                   %        77,97
+    Duration                         us       125,50
+    L1/TEX Cache Throughput           %        49,64
+    L2 Cache Throughput               %        28,81
+    SM Active Cycles              cycle   294.190,27
+    Compute (SM) Throughput           %        61,99
     ----------------------- ----------- ------------
 
-    OPT   Compute is more heavily utilized than Memory: Look at the Compute Workload Analysis section to see what the   
-          compute pipelines are spending their time doing. Also, consider whether any computation is redundant and      
-          could be reduced or moved to look-up tables.                                                                  
+    OPT   Memory is more heavily utilized than Compute: Look at the Memory Workload Analysis section to identify the    
+          DRAM bottleneck. Check memory replay (coalescing) metrics to make sure you're efficiently utilizing the       
+          bytes transferred. Also consider whether it is possible to do more work per memory access (kernel fusion) or  
+          whether there are values you can (re)compute.                                                                 
 
     Section: Launch Statistics
     -------------------------------- --------------- ---------------
@@ -725,7 +916,7 @@
     Function Cache Configuration                     CachePreferNone
     Grid Size                                                 16.384
     Preferred Cluster Size                                         0
-    Registers Per Thread             register/thread              33
+    Registers Per Thread             register/thread              28
     Shared Memory Configuration Size           Kbyte           16,38
     Driver Shared Memory Per Block       Kbyte/block            1,02
     Dynamic Shared Memory Per Block       byte/block               0
@@ -749,17 +940,17 @@
     Cluster Occupancy                         %            0
     Block Limit Barriers                  block           24
     Block Limit SM                        block           24
-    Block Limit Registers                 block            6
+    Block Limit Registers                 block            8
     Block Limit Shared Mem                block           16
     Block Limit Warps                     block            6
     Theoretical Active Warps per SM        warp           48
     Theoretical Occupancy                     %          100
-    Achieved Occupancy                        %        80,21
-    Achieved Active Warps Per SM           warp        38,50
+    Achieved Occupancy                        %        77,78
+    Achieved Active Warps Per SM           warp        37,34
     ------------------------------- ----------- ------------
 
-    OPT   Est. Local Speedup: 19.79%                                                                                    
-          The difference between calculated theoretical (100.0%) and measured achieved occupancy (80.2%) can be the     
+    OPT   Est. Local Speedup: 22.22%                                                                                    
+          The difference between calculated theoretical (100.0%) and measured achieved occupancy (77.8%) can be the     
           result of warp scheduling overheads or workload imbalances during the kernel execution. Load imbalances can   
           occur between warps within a block as well as across blocks of the same kernel. See the CUDA Best Practices   
           Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#occupancy) for more details on     
@@ -769,189 +960,15 @@
     -------------------------- ----------- ------------
     Metric Name                Metric Unit Metric Value
     -------------------------- ----------- ------------
-    Average DRAM Active Cycles       cycle 1.023.866,67
-    Total DRAM Elapsed Cycles        cycle   13.125.632
-    Average L1 Active Cycles         cycle   393.047,02
-    Total L1 Elapsed Cycles          cycle   19.113.212
-    Average L2 Active Cycles         cycle   349.329,33
-    Total L2 Elapsed Cycles          cycle    8.484.096
-    Average SM Active Cycles         cycle   393.047,02
-    Total SM Elapsed Cycles          cycle   19.113.212
-    Average SMSP Active Cycles       cycle   392.787,64
-    Total SMSP Elapsed Cycles        cycle   76.452.848
-    -------------------------- ----------- ------------
-
-  _jfa_pass_naive_manhattan_kernel[v57,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
-    Section: GPU Speed Of Light Throughput
-    ----------------------- ----------- ------------
-    Metric Name             Metric Unit Metric Value
-    ----------------------- ----------- ------------
-    DRAM Frequency                  Ghz        13,79
-    SM Frequency                    Ghz         2,51
-    Elapsed Cycles                cycle      386.670
-    Memory Throughput                 %        47,80
-    DRAM Throughput                   %        47,80
-    Duration                         us       154,14
-    L1/TEX Cache Throughput           %        38,37
-    L2 Cache Throughput               %        24,40
-    SM Active Cycles              cycle   381.510,67
-    Compute (SM) Throughput           %        79,49
-    ----------------------- ----------- ------------
-
-    OPT   Compute is more heavily utilized than Memory: Look at the Compute Workload Analysis section to see what the   
-          compute pipelines are spending their time doing. Also, consider whether any computation is redundant and      
-          could be reduced or moved to look-up tables.                                                                  
-
-    Section: Launch Statistics
-    -------------------------------- --------------- ---------------
-    Metric Name                          Metric Unit    Metric Value
-    -------------------------------- --------------- ---------------
-    Block Size                                                   256
-    Cluster Scheduling Policy                           PolicySpread
-    Cluster Size                                                   0
-    Function Cache Configuration                     CachePreferNone
-    Grid Size                                                 16.384
-    Preferred Cluster Size                                         0
-    Registers Per Thread             register/thread              33
-    Shared Memory Configuration Size           Kbyte           16,38
-    Driver Shared Memory Per Block       Kbyte/block            1,02
-    Dynamic Shared Memory Per Block       byte/block               0
-    Static Shared Memory Per Block        byte/block               0
-    # SMs                                         SM              48
-    Stack Size                                                 1.024
-    Threads                                   thread       4.194.304
-    # TPCs                                                        24
-    Enabled TPC IDs                                              all
-    Uses Green Context                                             0
-    Waves Per SM                                               56,89
-    -------------------------------- --------------- ---------------
-
-    Section: Occupancy
-    ------------------------------- ----------- ------------
-    Metric Name                     Metric Unit Metric Value
-    ------------------------------- ----------- ------------
-    Max Active Clusters                 cluster            0
-    Max Cluster Size                      block            8
-    Overall GPU Occupancy                     %            0
-    Cluster Occupancy                         %            0
-    Block Limit Barriers                  block           24
-    Block Limit SM                        block           24
-    Block Limit Registers                 block            6
-    Block Limit Shared Mem                block           16
-    Block Limit Warps                     block            6
-    Theoretical Active Warps per SM        warp           48
-    Theoretical Occupancy                     %          100
-    Achieved Occupancy                        %        82,23
-    Achieved Active Warps Per SM           warp        39,47
-    ------------------------------- ----------- ------------
-
-    OPT   Est. Local Speedup: 17.77%                                                                                    
-          The difference between calculated theoretical (100.0%) and measured achieved occupancy (82.2%) can be the     
-          result of warp scheduling overheads or workload imbalances during the kernel execution. Load imbalances can   
-          occur between warps within a block as well as across blocks of the same kernel. See the CUDA Best Practices   
-          Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#occupancy) for more details on     
-          optimizing occupancy.                                                                                         
-
-    Section: GPU and Memory Workload Distribution
-    -------------------------- ----------- ------------
-    Metric Name                Metric Unit Metric Value
-    -------------------------- ----------- ------------
-    Average DRAM Active Cycles       cycle 1.015.818,67
-    Total DRAM Elapsed Cycles        cycle   12.749.824
-    Average L1 Active Cycles         cycle   381.510,67
-    Total L1 Elapsed Cycles          cycle   18.556.310
-    Average L2 Active Cycles         cycle   339.298,83
-    Total L2 Elapsed Cycles          cycle    8.243.904
-    Average SM Active Cycles         cycle   381.510,67
-    Total SM Elapsed Cycles          cycle   18.556.310
-    Average SMSP Active Cycles       cycle   381.275,96
-    Total SMSP Elapsed Cycles        cycle   74.225.240
-    -------------------------- ----------- ------------
-
-  _jfa_pass_naive_manhattan_kernel[v57,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3BI6ygAjbQFJT1g0KOlAiRhSIJDEkBNRDAJJE_2fZVqvDglrdSgFqvTpQEsgzrtUEAA_3d_3d](Array<int, 3, A, mutable, aligned>, Array<int, 3, A, mutable, aligned>, int, int) (128, 128, 1)x(16, 16, 1), Context 1, Stream 7, Device 0, CC 12.0
-    Section: GPU Speed Of Light Throughput
-    ----------------------- ----------- ------------
-    Metric Name             Metric Unit Metric Value
-    ----------------------- ----------- ------------
-    DRAM Frequency                  Ghz        13,79
-    SM Frequency                    Ghz         2,51
-    Elapsed Cycles                cycle      386.307
-    Memory Throughput                 %        48,28
-    DRAM Throughput                   %        48,28
-    Duration                         us       153,82
-    L1/TEX Cache Throughput           %        37,88
-    L2 Cache Throughput               %        23,48
-    SM Active Cycles              cycle   381.738,17
-    Compute (SM) Throughput           %        79,58
-    ----------------------- ----------- ------------
-
-    OPT   Compute is more heavily utilized than Memory: Look at the Compute Workload Analysis section to see what the   
-          compute pipelines are spending their time doing. Also, consider whether any computation is redundant and      
-          could be reduced or moved to look-up tables.                                                                  
-
-    Section: Launch Statistics
-    -------------------------------- --------------- ---------------
-    Metric Name                          Metric Unit    Metric Value
-    -------------------------------- --------------- ---------------
-    Block Size                                                   256
-    Cluster Scheduling Policy                           PolicySpread
-    Cluster Size                                                   0
-    Function Cache Configuration                     CachePreferNone
-    Grid Size                                                 16.384
-    Preferred Cluster Size                                         0
-    Registers Per Thread             register/thread              33
-    Shared Memory Configuration Size           Kbyte           16,38
-    Driver Shared Memory Per Block       Kbyte/block            1,02
-    Dynamic Shared Memory Per Block       byte/block               0
-    Static Shared Memory Per Block        byte/block               0
-    # SMs                                         SM              48
-    Stack Size                                                 1.024
-    Threads                                   thread       4.194.304
-    # TPCs                                                        24
-    Enabled TPC IDs                                              all
-    Uses Green Context                                             0
-    Waves Per SM                                               56,89
-    -------------------------------- --------------- ---------------
-
-    Section: Occupancy
-    ------------------------------- ----------- ------------
-    Metric Name                     Metric Unit Metric Value
-    ------------------------------- ----------- ------------
-    Max Active Clusters                 cluster            0
-    Max Cluster Size                      block            8
-    Overall GPU Occupancy                     %            0
-    Cluster Occupancy                         %            0
-    Block Limit Barriers                  block           24
-    Block Limit SM                        block           24
-    Block Limit Registers                 block            6
-    Block Limit Shared Mem                block           16
-    Block Limit Warps                     block            6
-    Theoretical Active Warps per SM        warp           48
-    Theoretical Occupancy                     %          100
-    Achieved Occupancy                        %        82,66
-    Achieved Active Warps Per SM           warp        39,68
-    ------------------------------- ----------- ------------
-
-    OPT   Est. Local Speedup: 17.34%                                                                                    
-          The difference between calculated theoretical (100.0%) and measured achieved occupancy (82.7%) can be the     
-          result of warp scheduling overheads or workload imbalances during the kernel execution. Load imbalances can   
-          occur between warps within a block as well as across blocks of the same kernel. See the CUDA Best Practices   
-          Guide (https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#occupancy) for more details on     
-          optimizing occupancy.                                                                                         
-
-    Section: GPU and Memory Workload Distribution
-    -------------------------- ----------- ------------
-    Metric Name                Metric Unit Metric Value
-    -------------------------- ----------- ------------
-    Average DRAM Active Cycles       cycle 1.023.845,33
-    Total DRAM Elapsed Cycles        cycle   12.724.224
-    Average L1 Active Cycles         cycle   381.738,17
-    Total L1 Elapsed Cycles          cycle   18.538.024
-    Average L2 Active Cycles         cycle   338.980,75
-    Total L2 Elapsed Cycles          cycle    8.228.328
-    Average SM Active Cycles         cycle   381.738,17
-    Total SM Elapsed Cycles          cycle   18.538.024
-    Average SMSP Active Cycles       cycle   381.404,65
-    Total SMSP Elapsed Cycles        cycle   74.152.096
+    Average DRAM Active Cycles       cycle 1.349.130,67
+    Total DRAM Elapsed Cycles        cycle   10.382.336
+    Average L1 Active Cycles         cycle   294.190,27
+    Total L1 Elapsed Cycles          cycle   15.011.630
+    Average L2 Active Cycles         cycle   261.199,88
+    Total L2 Elapsed Cycles          cycle    6.708.792
+    Average SM Active Cycles         cycle   294.190,27
+    Total SM Elapsed Cycles          cycle   15.011.630
+    Average SMSP Active Cycles       cycle   293.851,04
+    Total SMSP Elapsed Cycles        cycle   60.046.520
     -------------------------- ----------- ------------
 
