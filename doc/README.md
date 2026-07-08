@@ -801,24 +801,28 @@ Die Diagramme der Manhattan-Distanz zeigen vergleichbare Laufzeiten und Verhalte
 <!-- Daraus lässt sich schließen, dass der JFA-Kernel primär _memory-bound_ (speicherbandbreitenbegrenzt) und nicht _compute-bound_ (rechenleistungsbegrenzt) ist. In jeder Iteration müssen die Threads auf die Informationen der 8 benachbarten Pixel zugreifen. Der Aufwand für das Laden dieser Daten aus dem globalen VRAM dominiert die Laufzeit. Ob im Rechenwerk anschließend eine Multiplikation mehr durchgeführt wird (wie bei der euklidischen Distanz: $dx \cdot dx + dy \cdot dy$) oder eine Betragsfunktion (Manhattan: $\left|dx\right| + \left|dy\right|$), fällt leistungstechnisch nicht ins Gewicht. -->
 
 ```bash
-uv run .\src\task7.py all-jfa
+uv run .\src\task7.py naive_manhattan_jfa
 ```
 
 _Was liefert die ncu-Analyse?_
 
-Schaut man sich die ncu-erzeugten Logdateien [square_euclidean_ncu](../data/ncu_NVIDIA-GeForce-RTX-5070_sqaure_euclidean_jfa_resolution=2048_points=512.log) und [manhattan_ncu](../data/ncu_NVIDIA-GeForce-RTX-5070_manhattan_jfa_resolution=2048_points=512.log) an, fällt zunächst auf, dass für jeden Iterationsschritt ein separater Eintrag anlegt wird (Auflösung von `2048` mit `512` Punkten). Die Daten der quadratischen euklidischen Distanz und der Manhattan-Distanz sind hierbei nahezu identisch, weshalb für die weitere Analyse die Ausgabe der euklidischen Metrik betrachtet wird.
+Schaut man sich die ncu-erzeugten Logdateien [square_euclidean_ncu](../data/ncu_NVIDIA-GeForce-RTX-5070_sqaure_euclidean_jfa_resolution=2048_points=512.log) und [manhattan_ncu](../data/ncu_NVIDIA-GeForce-RTX-5070_manhattan_jfa_resolution=2048_points=512.log) an, fällt zunächst auf, dass für jeden Iterationsschritt ein separater Eintrag anlegt wird (Auflösung von `2048` mit `512` Punkten). Dies liegt daran, dass ncu für jeden der insgesamt **11** Kernelaufrufe ($\log_2(2048) = 11$) eine separate Analyse durchführt. Da die Performance-Metriken der quadratischen euklidischen Distanz und der Manhattan-Distanz nahezu identisch sind, beschränkt sich die weitere Analyse exemplarisch auf die euklidische Metrik.
 
-Der JFA zeigt bei der sukzessiven Halbierung der Schrittweite eine dreiphasige Transformation seines Engpasses in der _Section: GPU Speed Of Light Throughput_:
+Ein interessanter Aspekt ist die Betrachtung der Laufzeit (_Duration_) auf der GPU in der _Section: GPU Speed Of Light Throughput_. Summiert man die Werte aller 11 Iterationen, erhält man die kumulierte Kernellaufzeit - ohne Overhead des Python-Interpreters für das Tauschen der Gitter und der Berechnung der neuen Schrittweite:
 
-- Iteration 1-3: Der Kernel ist primär **memory-bound** (speicherbandbreitenbegrenzt). NCU meldet: _"Memory is more heavily utilized than Compute"_
-- Iteration 4-5: Der Workload zeigt sich ausbalanciert. NCU meldet: _"Compute and Memory are well-balanced"_
-- Iteration 6-11: Ab Iteration 6 kippt das Verhalten in ein **compute-bound** Szenario (rechenleistungsbegrenzt). NCU meldet: _"Compute is more heavily utilized than Memory"_
+$$t_{\mathrm{kernel}} = 158.34 + 140.83 + 138.75 + 139.78 + 140.13 + 141.28 + 144.64 + 132.51 + 128.58 + 125.18 + 125.66 = 1515.68 \mathrm{µs}$$
 
-Während der **Memory Throughput** in Iteration 1 bei `81,59%` liegt, sinkt er in der letzten Iteration auf `45,65%`. Hingegen liegt der **Compute (SM) Throughput** zu Beginn bei `38,72%` und steigt zum Schluss auf `79,39%`. Dies deutet auf ein gegenläufiges Verhalten von _memory-bound_ und _compute-bound_ hin.
+Vergleicht man diese ca. **1,516 ms** mit dem in der Performancemessung (Heatmap) ermittelten Gesamtwert von **1,592 ms** (Auflösung=$2048$, Punkte=$512$, quadratische euklidische Distanz, `RTX 5070`), zeigt sich eine sehr hohe Übereinstimmung. Die geringe Differenz von rund **0,076 ms** lässt sich auf den CPU- und Synchronisations-Overhead zurückführen, der mit steigender Iterationsanzahl leicht zunimmt. Dies verifiziert, dass die verwendete Methode zur Leistungsmessung valide und nah arbeitet.
+
+Darüber hinaus identifiziert die ncu-Analyse auch den primären Flaschenhals des JFA: Der Kernel ist **memory-bound** (speicherbandbreitenbegrenzt). Zwar scheint die Auslastung in einzelnen Iterationen ausgewogen (NCU meldet: _"Compute and Memory are well-balanced"_), der überwiegende Hinweis ist jedoch, dass der Speicher stärker genutzt wird als der Compute: _"Memory is more heavily utilized than Compute"_. Bei der Manhattan-Distanz ist dies noch deutlicher zu erkennen. Der Durchsatz des Speichers (_Memory Throughput_) liegt in der ersten Iteration bei `81,08 %` und sinkt in den späteren Verläufen leicht auf Werte um die `70 %`. Im Gegensatz dazu starten die Recheneinheiten (_Compute (SM) Throughput_) bei lediglich `30,42 %` und erreichen zum Ende hin `65,21 %`. Ausschlaggebend ist hierbei die Auslastung der Caches L1 und L2. Zu Beginn des Algorithmus ist die Schrittweite sehr groß. Benachbarte Threads eines Warps fragen Pixeldaten ab, die im globalen Speicher weit auseinanderliegen. Die Caches können diese verstreuten Daten kaum puffern, weshalb die Recheneinheiten auf Daten warten müssen und blockieren. Bei kleinen Schrittweiten am Ende des Algorithmus liegen die benötigten Nachbarpixel im Speicher hingegen nah beieinander. Das zeigt auch der _L1/TEX Cache Throughput_ bzw. _L2 Cache Throughput_: Zu Beginn ist die Aulastung bei `23,00 %` bzw. `30,82 %` und erreicht im Laufe des JFA maximale Werte von `55,06 %` bzw. `66,95 %`. Dadurch kann der Zugriff auf den globalen VRAM reduziert und die Rechenauslastung teilweise erhöht werden. Nichtsdestotrotz dominieren die Speicherzugriffe die Kernellaufzeit (**memory-bound**).
 
 _Wie verhält sich die Kernel-Laufzeit bei jedem Iterationsschritt?_
 
-Um dem Ergebnis der ncu-Analyse weiter nachzugehen, wurde die Kernellaufzeit über die Schrittweite k analysiert. Um Vergleiche ziehen zu können, wurden auch hier eine Auflösung von `2048` und eine Punktemenge von `512` gewählt. Die folgenden Diagramme zeigen das Verhalten:
+Um dem Ergebnis der ncu-Analyse weiter nachzugehen, wurde die Kernellaufzeit über die Schrittweite $k$ analysiert. Um Vergleiche ziehen zu können, wurden auch hier eine Auflösung von `2048` und eine Punktemenge von `512` gewählt. Die folgenden Diagramme zeigen das Verhalten:
+
+```bash
+uv run .\src\task6b.py naive-jfa-step-analysis
+```
 
 | RTX 5070                                                                                                                         | GTX 1660 Ti                                                                                                                         |
 | -------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
@@ -854,9 +858,11 @@ NVIDIA GeForce GTX 1660 Ti | Resolution: 2048 | Seeds: 512
 </tr>
 </table>
 
-```bash
-uv run .\src\task6b.py naive-jfa-step-analysis
-```
+Für die `RTX 5070` ist die Laufzeit zu Beginn ($k = 1024) maximal und sinkt in der nächsten Iteration stark auf einen Wert, um den sich die Laufzeiten der folgenden Iterationen bewegen. Das unterstützt die Annahme, dass die Laufzeit für die großen Schrittweiten stark durch die globalen Speicherzugriffe begrenzt ist und die Caches L1 und L2 keine Daten zwischenspeichern können (vgl. ncu-Analyse). Ab einer gewissen Größe - in diesem Fall bei der Schrittweite $k = 512$ - reicht die Größe des Caches aus, sodass die Daten überwiegend gepuffert werden können und folglich weniger Zeit für die Speicherzugriffe benötigt wird. Dies wirkt sich auf eine erhöhte Rechenauslastung und eine kürzere Kernellaufzeit aus.
+
+Bei der `GTX 1660 Ti` verhält es sich anders: Die Laufzeit ist zu Beginn ($k = 1024$) recht niedrig, steigt dann für die mittleren Schrittweiten an und flacht für die kleinen wieder ab (parabelförmiges Verhalten). Bei $k = 1024$ liegen viele Nachbarpixel außerhalb des logischen Bildes und müssen somit gar nicht geprüft werden. Dadurch muss keine Speicheranfrage an das globale VRAM gestellt werden, was zu einer reduzierten Kernellaufzeit führt (_Out-of-Bounds-Effekt_). Mit abnehmender Schrittweite liegen immer mehr Nachbarpixel im Raster, wodurch mehr Daten geladen werden müssen und die Kernellaufzeit steigt. Ab $k = 32$ greift dann auch bei der GTX der oben beschriebene Cache-Effekt, der in einer reduzierten Kernellaufzeit resultiert und die Kurve somit abflacht.
+
+Zu beachten ist, dass die ncu-Analyse hier mit der `RTX 5070` durchgeführt wurde (vgl. [Anhang](#anhang)) und es starke Hardwareunterschiede zu der `GTX 1660 Ti` gibt. Das aus der ncu-Analyse resultierende Verhalten muss nicht direkt für die `GTX 1660 Ti` gelten. Der L1- und L2-Cache der `RTX 5070` ist beispielsweise deutlich größer als der der `GTX 1660 Ti`, weshalb der Effekt deutlich früher eintritt (vgl. [Vergleich](https://technical.city/de/video/GeForce-GTX-1660-Ti-vs-GeForce-RTX-5070)).
 
 ## Aufgabe 6b - Optimierungen
 
