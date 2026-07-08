@@ -92,6 +92,7 @@ def main() -> None:
     # JFA runtime per step size analysis
     ###
     elif command is None or command == "naive-jfa-step-analysis":
+        # NOTE: The same resolution and seed count as used for ncu
         SEED_COUNT = 512
         RESOLUTION = 2048
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)

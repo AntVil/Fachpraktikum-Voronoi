@@ -776,6 +776,10 @@ _Was liefert die Performance-Analyse?_
 
 Die folgenden Diagramme zeigen die gemessenen Kernellaufzeiten für die **quadratische euklidische Distanz**:
 
+```bash
+uv run .\src\task7.py naive_square_euclidean_jfa
+```
+
 | RTX 5070                                                                                                                                      | GTX 1660 Ti                                                                                                                                      |
 | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
@@ -791,18 +795,17 @@ Auch in den unteren Linien-Diagrammen (Performance-Plots bei einer festen Auflö
 
 Die folgenden Diagramme zeigen die gemessenen Kernellaufzeiten für die **Mannhatten-Distanz**:
 
-| RTX 5070                                                                                                                               | GTX 1660 Ti                                                                                                                               |
-| -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_manhattan_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_manhattan_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_manhattan_jfa_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_manhattan_jfa_resolution=128_points=64,128,256,512.png)                     |
-
-Die Diagramme der Manhattan-Distanz zeigen vergleichbare Laufzeiten und Verhaltensmuster wie die der quadratischen euklidischen Distanz. Die Wahl der Metrik zur Distanzberechnung hat folglich keinen spürbaren Einfluss auf die Gesamtperformance des Kernels.
-
-<!-- Daraus lässt sich schließen, dass der JFA-Kernel primär _memory-bound_ (speicherbandbreitenbegrenzt) und nicht _compute-bound_ (rechenleistungsbegrenzt) ist. In jeder Iteration müssen die Threads auf die Informationen der 8 benachbarten Pixel zugreifen. Der Aufwand für das Laden dieser Daten aus dem globalen VRAM dominiert die Laufzeit. Ob im Rechenwerk anschließend eine Multiplikation mehr durchgeführt wird (wie bei der euklidischen Distanz: $dx \cdot dx + dy \cdot dy$) oder eine Betragsfunktion (Manhattan: $\left|dx\right| + \left|dy\right|$), fällt leistungstechnisch nicht ins Gewicht. -->
-
 ```bash
 uv run .\src\task7.py naive_manhattan_jfa
+uv run .\src\task7.py compare-naive_square_euclidean_jfa-naive_manhattan_jfa
 ```
+
+| RTX 5070                                                                                                                                      | GTX 1660 Ti                                                                                                                                      |
+| --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_manhattan_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_manhattan_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_naive_manhattan_jfa_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_naive_manhattan_jfa_resolution=128_points=64,128,256,512.png) |
+
+Die Diagramme der Manhattan-Distanz zeigen vergleichbare Laufzeiten und Verhaltensmuster wie die der quadratischen euklidischen Distanz. Die Wahl der Metrik zur Distanzberechnung hat folglich keinen spürbaren Einfluss auf die Gesamtperformance des Kernels. Daraus lässt sich schließen, dass der JFA-Kernel primär _memory-bound_ (speicherbandbreitenbegrenzt) und nicht _compute-bound_ (rechenleistungsbegrenzt) ist. In jeder Iteration müssen die Threads auf die Informationen der 8 benachbarten Pixel zugreifen. Der Aufwand für das Laden dieser Daten aus dem globalen VRAM dominiert die Laufzeit. Ob im Rechenwerk anschließend eine Multiplikation mehr durchgeführt wird (wie bei der euklidischen Distanz: $dx \cdot dx + dy \cdot dy$) oder eine Betragsfunktion (Manhattan: $\left|dx\right| + \left|dy\right|$), fällt leistungstechnisch nicht ins Gewicht.
 
 _Was liefert die ncu-Analyse?_
 
@@ -944,10 +947,15 @@ _TODO: Beim Rumprobieren mit JFA_SHARED_THRESHOLD ist aufgefallen, dass die Perf
 
 Hier wird der Schwellenwert auf `JFA_SHARED_THRESHOLD = ???` festgelegt.
 
-| RTX 5070                                                                                                                                              | GTX 1660 Ti                                                                                                                                              |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_shared_memory_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_shared_memory_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_shared_memory_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_shared_memory_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     |
+```bash
+uv run .\src\task7.py shared_memory_square_euclidean_jfa
+uv run .\src\task7.py compare-naive_square_euclidean_jfa-shared_memory_square_euclidean_jfa
+```
+
+| RTX 5070                                                                                                                                                     | GTX 1660 Ti                                                                                                                                                     |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_shared_memory_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_shared_memory_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_shared_memory_square_euclidean_jfa_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_shared_memory_square_euclidean_jfa_resolution=128_points=64,128,256,512.png) |
 
 **Datenlayout optimieren**
 
@@ -985,10 +993,15 @@ grid_in[pixel_y + size, pixel_x]
 
 Durch diese Anpassung liegen alle Daten für den Warp sequenziell im Speicher.
 
-| RTX 5070                                                                                                                                     | GTX 1660 Ti                                                                                                                                     |
-| -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070__SoA_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti__SoA_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070__SoA_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti__SoA_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     |
+```bash
+uv run .\src\task7.py SoA_square_euclidean_jfa
+uv run .\src\task7.py compare-naive_square_euclidean_jfa-SoA_square_euclidean_jfa
+```
+
+| RTX 5070                                                                                                                                           | GTX 1660 Ti                                                                                                                                           |
+| -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_SoA_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_SoA_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_SoA_square_euclidean_jfa_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_SoA_square_euclidean_jfa_resolution=128_points=64,128,256,512.png) |
 
 **Shuffle**
 

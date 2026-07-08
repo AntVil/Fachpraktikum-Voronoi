@@ -102,11 +102,15 @@ def kernel_performance_analysis_jfa(
     with open(os.path.join(DATA_FOLDER, f"compiled_asm_{device_name}_{kernel_name.replace(" ", "_")}.asm"), "w") as f:
         f.write(kernel.inspect_asm(kernel.signatures[0])) # type: ignore
 
+    # NOTE: Generate a file for type inspection
+    # with open(os.path.join(DATA_FOLDER, f"inspect_types_{device_name}_{kernel_name.replace(" ", "_")}.txt"), "w") as f:
+    #     kernel.inspect_types(file=f) # type: ignore
+
     metrics = compute_performance_metrics_jfa(
         kernel=kernel,
         make_output_grid=make_output_grid,
-        point_counts=POINT_COUNTS,
         resolution_sizes=RESOLUTION_SIZES,
+        point_counts=POINT_COUNTS,
         run_count=RUNS,
     )
     create_kernel_performance_plot(
@@ -131,6 +135,33 @@ def kernel_performance_analysis_compare(
         metrics = compute_performance_metrics(
             kernel=kernel,
             make_output_grid=make_output_grid,
+            resolution_sizes=RESOLUTION_SIZES,
+            point_counts=POINT_COUNTS,
+            run_count=RUNS
+        )
+
+        performances.append(
+            (
+                kernel_name,
+                np.median(metrics[0], axis=1)
+            )
+        )
+
+    create_kernel_performance_plot(
+        resolution=RESOLUTION_SIZES[0],
+        input_sizes=POINT_COUNTS,
+        performances=performances
+    )
+
+
+def kernel_performance_analysis_compare_jfa(
+    data: list[tuple[str, Callable[[cuda.devicearray.DeviceNDArray, cuda.devicearray.DeviceNDArray], None]]],
+) -> None:
+    performances: list[tuple[str, np.ndarray[tuple[int], np.dtype[np.float32] | np.dtype[np.float64]]]] = []
+    for kernel_name, callable_data in data:
+        metrics = compute_performance_metrics_jfa(
+            kernel=callable_data[0],
+            make_output_grid=callable_data[1],
             resolution_sizes=RESOLUTION_SIZES,
             point_counts=POINT_COUNTS,
             run_count=RUNS
@@ -273,7 +304,6 @@ def compute_performance_metrics_jfa(
                 # Measure kernel
                 kernel_start.record()
                 while k >= 1:
-                    # Measure kernel
                     kernel[blocks_per_grid, threads_per_block](grid_in, grid_out, k, resolution)
                     grid_in, grid_out = grid_out, grid_in
                     k //= 2

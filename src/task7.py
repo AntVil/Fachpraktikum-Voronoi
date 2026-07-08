@@ -11,6 +11,7 @@ from task2 import (
     kernel_performance_analysis,
     kernel_performance_analysis_jfa,
     kernel_performance_analysis_compare,
+    kernel_performance_analysis_compare_jfa,
 )
 from task3 import (
     _voroni_euclidean_hypot_kernel,
@@ -71,7 +72,7 @@ def main() -> None:
             _jfa_pass_shared_memory_square_euclidean_kernel,
             generate_AoS_grid_jfa,
         ),
-        "_SoA_square_euclidean_jfa": (
+        "SoA_square_euclidean_jfa": (
             _jfa_pass_SoA_square_euclidean_kernel,
             generate_SoA_grid_jfa,
         ),
@@ -97,20 +98,30 @@ def main() -> None:
             exit(1)
         kernel1 = match[1]
         kernel2 = match[2]
-        kernel_performance_analysis_compare(
-            kernels=[
-                (kernel1, pixel_based[kernel1]),
-                (kernel2, pixel_based[kernel2])
-            ],
-            make_output_grid=make_empty_voronoi_output
-        )
+        if kernel1 in pixel_based and kernel2 in pixel_based:
+            kernel_performance_analysis_compare(
+                kernels=[
+                    (kernel1, pixel_based[kernel1]),
+                    (kernel2, pixel_based[kernel2])
+                ],
+                make_output_grid=make_empty_voronoi_output
+            )
+        elif kernel1 in jfa_based and kernel2 in jfa_based:
+            kernel_performance_analysis_compare_jfa(
+                data=[
+                    (kernel1, (jfa_based[kernel1][0], jfa_based[kernel1][1])),
+                    (kernel2, (jfa_based[kernel2][0], jfa_based[kernel2][1])),
+                ]
+            )
+        else:
+            print(f"Error: unknown kernel combination '{kernel1} x {kernel2}'")
     elif command in jfa_based:
         kernel_performance_analysis_jfa(
             kernel_name=command,
             kernel=jfa_based[command][0],
             make_output_grid=jfa_based[command][1],
         )
-    elif command == "all-jfa":
+    elif command == "all_jfa":
         for kernel_name, jfa_data in jfa_based.items():
             kernel_performance_analysis_jfa(
                 kernel_name=kernel_name,
