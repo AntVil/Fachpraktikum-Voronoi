@@ -980,7 +980,7 @@ Bei der naiven Implementierung `_jfa_pass_naive_square_euclidean_kernel` eines J
 X0 Y0 X1 Y1 X2 Y2 X3 Y3 ...
 ```
 
-Allerdings hat dieses Layout in CUDA einen Nachteil bezüglich des Speicherzugriffs: Threads innerhalb eines gemeinsamen Warps (32 Threads) können keine vollständig _coalesced_ Speicherzugriff durchführen. Wenn Thread 0 die X-Koordinate des ersten Pixels und Thread 1 die X-Koordinate des zweiten Pixels laden möchte, liegt im Speicher das `Y0` des ersten Threads im Weg. Die Zugriffe sind somit mit einer Schrittweite von 2 gestreckt, was zu einer höheren Anzahl von Speicher-Transaktionen führt.
+Allerdings hat dieses Layout in CUDA häufig einen Nachteil bezüglich des Speicherzugriffs: Threads innerhalb eines gemeinsamen Warps (32 Threads) können keine vollständig _coalesced_ Speicherzugriff durchführen. Wenn Thread 0 die X-Koordinate des ersten Pixels und Thread 1 die X-Koordinate des zweiten Pixels laden möchte, liegt im Speicher das `Y0` des ersten Threads im Weg. Die Zugriffe sind somit mit einer Schrittweite von 2 gestreckt, was zu einer höheren Anzahl von Speicher-Transaktionen führt.
 
 Um globale Speicherzugriffe zu bündeln, wird in diesem Optimierungsschritt das gegensätzliche Layout **Structure of Arrays (SoA)** verwendet. Dabei werden die Daten nach Komponenten getrennt im Speicher abgelegt:
 
@@ -1004,7 +1004,7 @@ grid_in[pixel_y, pixel_x]
 grid_in[pixel_y + size, pixel_x]
 ```
 
-Durch diese Anpassung liegen alle Daten für den Warp sequenziell im Speicher.
+Für das _Structure of Arrays (SoA)_ Layout ergeben sich folgende Performancemessungen:
 
 ```bash
 uv run .\src\task7.py SoA_square_euclidean_jfa
@@ -1015,6 +1015,16 @@ uv run .\src\task7.py compare-naive_square_euclidean_jfa-SoA_square_euclidean_jf
 | -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_SoA_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_SoA_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_SoA_square_euclidean_jfa_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_SoA_square_euclidean_jfa_resolution=128_points=64,128,256,512.png) |
+
+Ein Vergleich der Messdaten mit der naiven quadratischen euklidischen Implementierung zeigt, dass das umgestellte _Structure of Arrays (SoA)_ Layout keinen messbaren Laufzeitvorteil gegenüber dem _Array of Structures (AoS)_ Layout liefert. Es lassen sich folgende mögliche Ursachen feststellen:
+
+- Beim laden der Pixel-Koordinaten liegen die Daten im AoS-Layout (`X0 Y0 X1 Y1 ...`) sequenziell hintereinander. Fordert der Warp die X-Koordinate an, lädt die Hardware implizit die dazugehörige Y-Koordinate innerhalb derselben Speicheranfrage in den Cache. Der unmittelbar folgende Lesezugriff auf die Y-Komponente kann direkt aus dem Cache erfolgen.
+  - Beim Laden der eigenen Pixel-Koordinaten (`best_seed_x` und `best_seed_y`) ist beim AoS dadurch nur eine Speicheranfrage nötig, wohingegen beim SoA durch die planare Trennung für den Y-Wert eine zweite, separate Speicheranfrage an das VRAM gestellt werden muss.
+  - Beim Laden der Koordinaten der 8 Nachbarpixel wirkt sich SoA ebenfalls nachteilig aus. Da sich das SoA-Grid in eine obere (X) und untere (Y) Hälfte mit dem Offset `size` aufteilt, erfordert jede Nachbarabfrage das Laden von zwei weit auseinanderliegenden Speicheradressen. Müssen die Threads eines Warps aufgrund großer Schrittweiten (`step_size`) ohnehin **nicht** zusammenhängende Speicherbereiche anfordern, kann das SoA-Layout die Anzahl der Speicheranforderungen im Vergleich zu AoS - bei dem X- und Y-Wert in derselben Speicheranfrage liegen - erhöhen.
+
+- Das theoretische _Memory Coalescing_ von SoA setzt voraus, dass die Threads **lückenlos** auf benachbarte Adressen zugreifen. Beim JFA ist dies durch die variierenden Sprungweiten (`step_size`) in der horizontalen und insbesondere in der vertikalen Dimension (Zeilensprünge) über die meisten Iterationen hinweg nicht gegeben. Da die Threads dadurch ohnehin nicht zusammenhängende Speichersegmente anfordern müssen, kann der Strukturvorteil von SoA nicht greifen.
+
+NCU-Analyse: [ncu-Datei](../data/ncu_NVIDIA-GeForce-RTX-5070_square_euclidean_jfa_SoA_resolution=2048_points=512.log)
 
 **Shuffle**
 
