@@ -873,14 +873,15 @@ _Können Optimierungen durchgeführt werden? Wenn ja, warum? Wenn nein, warum ni
 
 **Shared Memory**
 
-Als erster Optimierungsansatz wird **Shared Memory** evaluiert. Der Einsatz von Shared Memory ist primär dann sinnvoll, wenn benachbarte Threads innerhalb eines Blocks redundant auf dieselben Speicheradressen im globalen VRAM der GPU zugreifen müssen. Durch das einmalige, kollektive Laden der Daten aus dem VRAM in das Shared Memory können nachfolgende, mehrfache Lesezugriffe beschleunigt werden.
+Wie zuvor erläutert, ist der JFA primär memory bound (vgl. ncu-Analyse). Um diesem Aspekt nachzugehen, wird als erster Optimierungsansatz **Shared Memory** evaluiert. Der Einsatz von Shared Memory ist primär dann sinnvoll, wenn benachbarte Threads innerhalb eines Blocks redundant auf dieselben Speicheradressen im globalen VRAM der GPU zugreifen müssen. Durch das einmalige, kollektive Laden der Daten aus dem VRAM in das Shared Memory können nachfolgende, mehrfache Lesezugriffe beschleunigt werden.
 
 _Problemstellung bei JFA_
 
-Pro Iteration benötigt jeder Thread die Daten von sich selbst sowie von 8 Nachbarpixeln. Da sich die Suchfenster benachbarter Threads stark überschneiden, kommt es zu redundanten VRAM-Lesezugriffen. Allerdings variiert die Distanz zu den Nachbarn (`step_size`) je nach Iterationsschritt:
+Im bezug auf den Einsatz von shared memory beim JFA ergibt sich folgende Problematik: Pro Iteration benötigt jeder Thread die Daten von sich selbst sowie von 8 Nachbarpixeln. Die Problematik hierbei ist, dass sich das Zugriffsfenszter stark mit der aktuellen Schrittweite (`step_size`) je nach Iterationsschritt variiert:
 
-- **Große Schrittweiten:** Die benötigten Nachbardaten liegen weit auseinander. Ein Shared-Memory-Buffer müsste sehr groß sein, um diese Distanzen abzudecken, was das Hardware-Limit des GPU-Shared-Memorys sprengen könnte.
-- **Kleine Schrittweiten:** Erst wenn die Schrittweite unter einen bestimmten Schwellenwert fällt, liegen alle von einem Thread-Block benötigten Pixeldaten räumlich so nah beieinander, dass sie gemeinsam in den Shared Memory geladen werden können.
+- **Große Schrittweiten:** Die benötigten Nachbardaten liegen weit auseinander und außerhalb des Thread-Blocks. Um diese Distanzen abzudecken, müsste der Shared-Memory-Buffer unrealistisch groß dimensioniert werden. Dies würde nicht nur das Hardware-Limit des Shared Memory pro Block sprengen, sondern auch zu einem Overhead beim Laden der Daten führen. Der Einsatz von Shared Memory ist in diesen Phasen daher **nicht sinnvoll**.
+
+- **Kleine Schrittweiten:** Erst wenn die Schrittweite klein genug ist und unter einen bestimmten Schwellenwert fällt, liegen alle von einem Thread-Block benötigten Pixeldaten räumlich so nah beieinander, dass sie gemeinsam in den Shared Memory geladen werden können und der Einsatz von Shared Memory könnte von Nutzen sein.
 
 _Die hybride Strategie_
 
@@ -943,9 +944,7 @@ $$2304 \times 2 \times 4\mathrm{ Byte} = 18432\mathrm{ Byte} \approx 18,4\mathrm
 uses too much shared data (0xc800 bytes, 0xc000 max)
 ```
 
-_TODO: Beim Rumprobieren mit JFA_SHARED_THRESHOLD ist aufgefallen, dass die Performance mit kleinerer Größe steigt, sodass bei 1 die beste Laufzeit erreicht wird. Dies entspricht jedoch einer vollständigen Deaktivierung der Shared-Memory-Pipeline, wodurch der gesamte Ansatz mit Shared Memory keinen Gewinn bringt. Wieso ist das so? Hilft nuc/nsys/asm? Sind die Operationen wie % und // ggf. ein Problem?_
-
-Hier wird der Schwellenwert auf `JFA_SHARED_THRESHOLD = ???` festgelegt.
+Da ein zu großer Schwellenwert den Shared-Memory-Bedarf ansteigen lässt und den Ladeaufwand für den Halo-Bereich vergrößert, wird der Schwellenwert `JFA_SHARED_THRESHOLD = 8` festgelegt. Daraus ergeben sich die folgenden Performancemessungen:
 
 ```bash
 uv run .\src\task7.py shared_memory_square_euclidean_jfa
@@ -956,6 +955,20 @@ uv run .\src\task7.py compare-naive_square_euclidean_jfa-shared_memory_square_eu
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_shared_memory_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_shared_memory_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_shared_memory_square_euclidean_jfa_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_shared_memory_square_euclidean_jfa_resolution=128_points=64,128,256,512.png) |
+
+Auch hier zeigt sich wieder die typische JFA-Charakteristik bezüglich der Laufzeitkomplexität in Abhängigkeit von Auflösung. Vergleicht man die Laufzeiten mit denen der naiven quadratischen euklidischen Implementierung, stellt man fest, dass der Einsatz von Shared Memory **keinen Laufzeitvorteil** erbracht hat. Dafür lassen sich folgende mögliche Ursachen identifizieren:
+
+- Für das kooperative Laden mittels Grid-Stride-Loop sind innerhalb des Kernels Ganzzahl-Divisionen (`//`) und Modulo-Operationen (`%`) notwendig, um die linearen Thread-Indizes wieder in 2D-Koordinaten für das Shared-Memory-Array zu übersetzen. Diese Operationen sind mathematisch aufwändig und können die Laufzeit verschlechtern.
+
+- Der Befehl `cuda.syncthreads()` ist ein Synchronisations-Barriere, bei der alle 256 Threads des Blocks aufeinander warten müssen, bis das Laden des Buffers abgeschlossen ist. Bei der naiven Implementierung entfällt diese Barriere, wodurch die Threads unabhängiger voneinander agieren können.
+
+- Die hardwareseitigen L1- und L2-Caches leisten bereits bei der naiven Implementierung einen enormen Beitrag bei den kleinen Schrittweiten, wodurch der softwareseitig verwaltete Shared-Memory-Buffer keinen signifikanten Zusatznutzen mehr generieren kann.
+
+<!-- Außerdem hat sich beim Rumprobieren mit JFA_SHARED_THRESHOLD gezeigt, dass die Performance mit kleinerer Größe steigt, sodass bei 1 die beste Laufzeit erreicht wird. Dies entspricht jedoch einer vollständigen Deaktivierung der Shared-Memory-Pipeline, wodurch der gesamte Ansatz mit Shared Memory keinen Gewinn bringt. ... -->
+
+NCU analyse: [ncu-Datei](../data/ncu_NVIDIA-GeForce-RTX-5070_square_euclidean_jfa_shared_resolution=2048_points=512.log)
+
+<!-- Abschließend lässt sich festhalten, dass durch die Optimierung mittels Shared Memory beim JFA **kein Performancegewinn** erzielt werden konnte. Dies hängt mit der Struktur des JFA zusammen: Zwar benötigt jeder Thread 9 Pixeldaten aus dem VRAM, die effektive Redundanz der Zugriffe innerhalb eines Blocks sind jedoch nicht hoch genug, um den zusätzlichen Aufwand durch den Einsatz von shared memory -->
 
 **Datenlayout optimieren**
 
