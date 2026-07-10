@@ -1028,6 +1028,36 @@ NCU-Analyse: [ncu-Datei](../data/ncu_NVIDIA-GeForce-RTX-5070_square_euclidean_jf
 
 **Shuffle**
 
+Beim Shuffle können Daten von Threads innerhalb desselben Warps direkt ausgetauscht werden, ohne den Umweg über Shared oder Global Memory. Numba stellt dafür unter anderem `shfl_sync`, `shfl_up_sync`, `shfl_down_sync` und `shfl_xor_sync` bereit, die alle auf die `laneid` eines Threads referenzieren - also seine Position (0-31) innerhalb des Warps (vgl. [Numba-Dokumentation](https://numba.pydata.org/numba-doc/0.41.0/cuda-reference/kernel.html#numba.cuda.shfl_sync)).
+
+_Die Grundidee für den Einsatz in JFA_
+
+Zu Beginn jedes Passes lädt jeder Thread den aktuell gespeicherten Punkt seines eigenen Pixels aus dem Grid (als Ausgangsbasis für den Distanzvergleich). Braucht Thread A nun die Punkt-Daten von Pixel $P+k$, so hat Thread B, der zu $P+k$ gehört, diesen Wert im selben Kernel-Aufruf ebenfalls bereits geladen. Sitzen A und B im selben Warp, könnte A die Daten von B per Shuffle direkt lesen, statt diese zusätzlich selbst aus dem Global Memory zu laden. Auf diese Weise ließe sich theoretisch eine der VRAM-Anfragen pro Nachbarschaftsprüfung einsparen.
+
+Dieser Ansatz stößt bei JFA jedoch auf zwei grundlegende Einschränkungen:
+
+1. Die Threads eines Blocks werden nach der X-Dimension zu Warps zusammengefasst, wodurch ein Warp einer horizontalen Gridzeile entspricht. Shuffle kann dann grundsätzlich nur auf die Pixel $P+k$ und $P-k$ **nach rechts bzw. links** zugreifen. Die Nachbarn oben, unten und auf den vier Diagonalen liegen per Definition in anderen Zeilen und damit außerhalb des Warps. Dafür bleibt zwingend ein Fallback auf Global Memory nötig, wodurch Shuffle im besten Fall also nur 2 der 8 Nachbarschaftsprüfungen betreffen würde (`dy == 0 and dx == +/-1`).
+   <!-- (Anmerkung: Bei einer Blockkonfiguration, bei der `blockDim.x` **kein** Vielfaches von 32 ist - z. B. unsere BLOCK_DIM = (16, 16) - verschiebt sich dieses Bild leicht: Ein Warp fasst dann automatisch zwei volle Zeilen zusammen (32 = 2 × 16), sodass für einen Teil der Threads sogar der direkt vertikale Nachbar im selben Warp läge. Das ändert am grundsätzlichen Befund aber nichts, da erstens weiterhin nur benachbarte Zeilenpaare betroffen sind (nicht beliebige y-Distanzen) und zweitens die Einschränkung aus Punkt 1 (Schrittweite < 32) unverändert gilt.) -->
+
+2. Ein Warp umfasst **32 Threads**. Damit deckt ein Warp bei der typischen 1D-Lane-Anordnung exakt 32 konsekutive horizontale (x-)Pixel ab. Ein Thread an Lane-Position $L$ kann seinen **rechten** Nachbarn bei Schrittweite $k$ nur dann per Shuffle "erreichen", wenn dieser Nachbar (Lane $L+k$) noch innerhalb desselben Warps liegt, also $L + k \le 31$ gilt. Je größer $k$, desto weniger Threads erfüllen diese Bedingung (Für die **linken** Nachbarn funktioniert dieselbe Logik spiegelverkehrt: Bedingung $L - k \ge 0$):
+   - $k=1$: 31 von 32 Threads können shuffeln. Nur der Thread ganz rechts (Lane 31) hat keinen rechten Nachbarn mehr im Warp.
+   - $k=2$: 30 von 32 Threads
+   - $k=4$: 28 von 32 Threads
+   - $k=8$: 24 von 32 Threads
+   - $k=16$: 16 von 32 Threads
+   - $k=32$: 0 von 32 Threads. Ab hier ist Shuffle vollständig ausgeschlossen.
+   - $k>32$: ebenfalls 0 von 32 Threads
+
+   Für alle Schrittweiten ab $k=32$ ist Shuffle also von vornherein nicht einsetzbar. Erst für die letzten, kleinen Passes ($k < 32$) wird überhaupt ein Teil der Threads _shuffle-fähig_, wobei auch dort der nutzbare Anteil mit wachsendem $k$ abnimmt.
+
+_Implementierungsaufwand und Warp-Divergenz_
+
+Eine Umsetzung würde für jeden Thread diverse `if`-Abfragen erfordern. Es muss geprüft werden ob der Nachbar bei gegebener `step_size` tatsächlich innerhalb desselben Warps liegt. Ist das nicht der Fall, muss es einen Fallback-Pfad geben, der auf Global Memory basiert. Da innerhalb eines Warps dann ein Teil der Threads den Shuffle-Pfad und ein anderer Teil den Global-Memory-Pfad nimmt, divergiert der Warp an dieser Stelle (_Warp Divergenz_). Dieser Effekt kann dann einen Großteil des theoretischen Shuffle-Vorteils wieder aufheben und im ungünstigsten Fall verschlechtert sich die Performance sogar gegenüber der naiven, rein VRAM-basierten Variante.
+
+_Fazit_
+
+Sowohl die Analyse zu Shared Memory zuvor als auch die hier dargelegten Überlegungen zu Shuffle deuten für die Schrittweiten-Charakteristik von JFA auf **keinen** Performancegewinn hin: Shuffle wäre lediglich auf **kleine** Schrittweiten ($k < 32$) und auf 2 der 8 Nachbarn anwendbar, wodurch zusätzliche Index-Berechnungen, Index-Prüfungen und Warp-Divergenz resultieren würden. Aus diesem Grund wird eine _JFA-Shuffle-Variante_ nicht implementiert. Der Ansatz wird an dieser Stelle dennoch dokumentiert, da er im Rahmen der Optimierungsüberlegungen diskutiert und geprüft wurde.
+
 **Read-Only Cache**
 
 **Ausblick: JFA+ und JFA\***
