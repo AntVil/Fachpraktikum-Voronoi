@@ -50,8 +50,6 @@ Für dieses Projekt werden die folgenden Einschränkungen und Annahmen getroffen
 
 - Statische Eingabe Punkte: Die Positionen der Punkte sind nach der Initialisierung fix und verändern sich während der Kernel-Laufzeit nicht.
 
-==> TODO (Hier erwähnen?): $N$ muss für JFA eine Zweierpotenz sein (wichtig für die Schrittweitenhalbierung)
-
 _Was ist die Eingabe und Ausgabe und welcher Daten-Typ wird genutzt?_
 
 Für die Berechnung des Voronoi-Diagramms sind folgende Parameter definiert:
@@ -70,8 +68,6 @@ Das Laufzeitverhalten und die Skalierbarkeit des Problems hängen von zwei Param
 
 2. Die Anzahl der im Raum zufällig verteilten Punkte/Seeds, die bei der Distanzberechnung berücksichtigt werden müssen.
 
-==> TODO: Auf JFA-Besonderheit hier schon eingehen?
-
 # Aufgabe 2 - Performance Analyse Konzept
 
 ```
@@ -87,9 +83,7 @@ _Wie werden im folgenden Performance Analysen durchgeführt?_
 
 Für die Performance-Analyse werden die Aufnahme der Messergebnisse und die daraus resultierende Generierung der Diagramme getrennt.
 
-Aufgrund der unterschiedlichen Algorithmenstrukturen und Kernelsignaturen wurde die Messlogik in zwei nahezu identische Funktionen aufgeteilt (`compute_performance_metrics` und `compute_performance_metrics_jfa`). Dies hält den Code übersichtlich und verhindert übermäßig komplexe Funktionsparameter. Sie unterscheiden sich vor allem in der Allokation der benötigten Daten auf der GPU und dem tatsächlichen Kernelaufruf auf der Host-Seite.
-
-==> TODO: Auf Messproblem beim JFA Kernel eingehen? Python Overhead beim Context-Switch; Hier? Oder in Task6?
+Aufgrund der unterschiedlichen Algorithmenstrukturen und Kernelsignaturen wurde die Messlogik in zwei nahezu identische Funktionen aufgeteilt (`compute_performance_metrics` und `compute_performance_metrics_jfa`). Dies hält den Code übersichtlich und verhindert übermäßig komplexe Funktionsparameter. Sie unterscheiden sich vor allem in der Allokation der benötigten Daten auf der GPU und dem tatsächlichen Kernelaufruf auf der Host-Seite (siehe auch die Hinweise zur [Performance-Messung beim JFA](#aufgabe-6---alternativer-ansatz-jump-flooding-algorithmus-jfa)).
 
 Bei der Messung werden für jede Konfiguration mehrere Durchläufe (`run_count`) durchgeführt und einzeln gespeichert. Dabei werden sowohl die Bildauflösung (`resolution_sizes`) als auch die Punkteanzahl (`point_counts`) variiert. Für die folgenden Analysen werden dabei `RUNS = 20` durchgeführt. Die Messfunktionen liefern für die weitere Verarbeitung und Visualisierung ein dreidimensionales Array der Form `(Auflösungen, Punkteanzahlen, Durchläufe)`. Für die anschließende Analyse wird der Median der Durchläufe gebildet, da dieser robuster gegenüber vereinzelten Ausreißern ist.
 
@@ -111,8 +105,7 @@ Für die **Eingabe** werden folgende Größen variiert:
 | 256 ($2^8$)     | 128 ($2^7$)  |
 | 512 ($2^9$)     | 256 ($2^8$)  |
 | 1024 ($2^{10}$) | 512 ($2^9$)  |
-| 2048 ($2^{11}$) | TBD          |
-| TBD             | TBD          |
+| 2048 ($2^{11}$) |              |
 
 Zur visuellen Auswertung der Ergebnisse (**Ausgabe**) stehen zwei Diagrammtypen zur Verfügung:
 
@@ -629,11 +622,7 @@ Die folgenden Visualisierungen zeigen den Zustand des Diagramms nach jedem Schri
 
 Sowohl bei der quadratischen euklidischen Distanz als auch bei der Manhattan-Distanz ist gut zu erkennen, wie das zu Beginn leere, schwarze Bild mit jedem Schritt "voller" wird. Das typische _"Flooding-Verhalten"_ (Fluten) des Algorithmus wird hierbei in jeder Iteration sichtbar.
 
-_Wieso arbeitet der Algorithmus korrekt?_
-
-_Wo liegen die Unterschiede zum Ansatz der vorherigen Implementierung? (Komplexität)_
-
-**Integer statt Float**
+_Wo liegen die Unterschiede zum Ansatz der vorherigen Implementierung?_
 
 Ursprünglich wurde zur Initialisierung der kürzesten Distanz wie beim Pixel-Algorithmus Folgendes verwendet: `best_dist = np.float32(np.inf)`. Ein `.inspect_types()`-Aufruf nach dem Kernel-Lauf zeigt jedoch, dass trotz des expliziten `float32`-Casts eine `float64`-Variable initialisiert wird.
 
@@ -662,36 +651,6 @@ $$N^2 \le 1073741823,5$$
 $$N \le \sqrt{1073741823,5} = 32768$$
 
 Demnach würde diese Obergrenze bei Bildgrößen ab $32768 \times 32768$ Pixeln überschritten werden, was für die meisten Auflösungen allerdings ausreichend sein sollte. Da beim JFA zudem nie zwei diagonal gegenüberliegende Bildeckpunkte verwendet werden - aufgrund der höchsten Schritte von $\frac{N}{2}$ zu Beginn - ist die tatsächliche maximale Grenze für den JFA nochmal höher.
-
-**Loop Unrolling der 8 "Nachbarschafts-Pixeln"**
-
-Da für die acht Nachbarschaftspixel eine verschachtelte For-Loop mit If-Statement zum Überspringen des zentralen Pixels `(0, 0)` verwendet wird, liegt die Vermutung nahe, dass der Compiler ohne explizite Anweisungen kein Loop Unrolling durchführt:
-
-```python
-for dy in (-1, 0, 1):
-    for dx in (-1, 0, 1):
-        # NOTE: We can skip the pixel that this thread computes
-        if dx == 0 and dy == 0:
-            continue
-		...
-```
-
-Um ein explizites Loop Unrolling zu forcieren, könnte ein flacher Ansatz mit vorberechneten Tupeln gewählt werden:
-
-```python
-OFFSETS = ((-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1))
-for dy, dx in OFFSETS:
-    ...
-```
-
-Diesen Ausdruck würde Numba mit hoher Wahrscheinlichkeit unrollen.
-
-Um zu überprüfen, wie der Compiler den naiven Ansatz tatsächlich übersetzt, wurde die erzeugte [Assembly-Datei]() analysiert. Es zeigt sich ... ????
-==> TODO: Assembly analysieren `uv run .\src\task7.py naive_square_euclidean_jfa`
-
-```diff
-
-```
 
 _Gibt es Qualitätsunterschiede (Pixelfehler) im Diagramm?_
 
@@ -899,7 +858,11 @@ Für die Implementierung wird das Grid in Blöcke aufgeteilt und pro Block soll 
 
 Um einen Zugriff auf das globale VRAM zu verhindern, wird der Shared-Memory-Buffer um eine Sicherheitszone - dem **Halo** (Heiligenschein) - in alle vier Richtungen erweitert. Das folgende Bild soll die Aufteilung schematisch darstellen.
 
+<center>
+
 ![](../data/task6b_sharedMemory_Concept.svg)
+
+</center>
 
 Die maximale Breite dieses Halos (`MAX_HALO_RADIUS`) leitet sich direkt aus der maximal erlaubten Schrittweite innerhalb des Shared Memorys ab ($\mathrm{JFA\_SHARED\_THRESHOLD} / 2$).
 
@@ -1057,8 +1020,6 @@ Eine Umsetzung würde für jeden Thread diverse `if`-Abfragen erfordern. Es muss
 _Fazit_
 
 Sowohl die Analyse zu Shared Memory zuvor als auch die hier dargelegten Überlegungen zu Shuffle deuten für die Schrittweiten-Charakteristik von JFA auf **keinen** Performancegewinn hin: Shuffle wäre lediglich auf **kleine** Schrittweiten ($k < 32$) und auf 2 der 8 Nachbarn anwendbar, wodurch zusätzliche Index-Berechnungen, Index-Prüfungen und Warp-Divergenz resultieren würden. Aus diesem Grund wird eine _JFA-Shuffle-Variante_ nicht implementiert. Der Ansatz wird an dieser Stelle dennoch dokumentiert, da er im Rahmen der Optimierungsüberlegungen diskutiert und geprüft wurde.
-
-**Read-Only Cache**
 
 **Ausblick: JFA+ und JFA\***
 
