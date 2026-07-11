@@ -1062,7 +1062,12 @@ Sowohl die Analyse zu Shared Memory zuvor als auch die hier dargelegten Überleg
 
 **Ausblick: JFA+ und JFA\***
 
-[PDF](https://maciejczyzewski.github.io/fast_gpu_voronoi/slides_small.pdf)
+Eine interessante Weiterentwicklung stellen die von **Maciej A. Czyzewski (2019)** vorgeschlagenen Varianten _JFA+_ und _JFA\*_ dar. Beide adressieren das Problem der "leeren" Grid-Bereiche im klassischen JFA, in denen keine Daten vorhanden sind und damit Zeit verloren geht. Als Lösung wird vorgeschlagen, leere Grid-Bereiche mit zufälligem Rauschen zu befüllen, sodass auch initial undefinierte Zellen früh Informationen zu Punkten erhalten. Ziel ist es, den Algorithmus dadurch in einer geringeren Anzahl von Schritten durchzuführen, wodurch die Gesamtlaufzeit reduziert werden soll:
+
+- Foliensatz: [PDF](https://maciejczyzewski.github.io/fast_gpu_voronoi/slides_small.pdf)
+- Implementierung: [Git-Hub Repository](https://github.com/maciejczyzewski/fast_gpu_voronoi)
+
+Wichtig zu erwähnen ist, dass eine formale Analyse bzw. ein Beweis dieser Schrittzahl bislang aussteht. Trotzdem soll im Rahmen dieser Arbeit diese mögliche Idee aufgeführt und genannt werden, da die zuvor eigenentwickelten Optimierungsversuche keinen Laufzeitvorteil gegenüber dem klassischen JFA erzielen konnten.
 
 # Aufgabe 7 - Ergebnisse
 
