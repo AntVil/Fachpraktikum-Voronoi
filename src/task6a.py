@@ -22,10 +22,10 @@ from utils import (
 )
 
 # Resolution of the image containing the voronoi diagram
-RESOLUTION: int = 1024
+RESOLUTION: int = 2048
 
 # The number of seeds (points) in the diagram
-SEED_COUNT: int = 2000
+SEED_COUNT: int = 512
 SEED_COUNT_VISU: int = 256
 
 
@@ -39,7 +39,7 @@ def main() -> None:
     Test the implementations and generate example diagrams for the Jump Flooding Algorithm (JFA).
     """
 
-    command: str = get_argument()
+    command = get_argument()
 
     ###
     # Naive Euclidean JFA
@@ -53,13 +53,13 @@ def main() -> None:
             grid_layout="AoS",
             mode="standard",
         )
-        plt.imshow(voronoi_jfa)
-        plt.show()
+        # plt.imshow(voronoi_jfa)
+        # plt.show()
 
     ###
     # Naive Manhattan JFA
     ###
-    elif command is None or command == "jfa-manhattan":
+    elif command == "jfa-manhattan":
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         naive_manhattan = jfa_voronoi_host(
             kernel=_jfa_pass_naive_manhattan_kernel,
@@ -68,13 +68,13 @@ def main() -> None:
             grid_layout="AoS",
             mode="standard",
         )
-        plt.imshow(naive_manhattan)
-        plt.show()
+        # plt.imshow(naive_manhattan)
+        # plt.show()
 
     ###
     # Generate GIFs for visualisation
     ###
-    elif command is None or command == "jfa-euclidean-visualization":
+    elif command == "jfa-euclidean-visualization":
         seeds = generate_random_seeds_jfa(
             seed_count=SEED_COUNT_VISU, resolution=RESOLUTION
         )
@@ -83,9 +83,9 @@ def main() -> None:
             seeds=seeds,
             resolution=RESOLUTION,
             grid_layout="AoS",
-            gif_path=os.path.join(DATA_FOLDER, "task6_euclidean_jfa_visualization.gif"),
+            gif_path=os.path.join(DATA_FOLDER, "task6a_euclidean_jfa_visualization.gif"),
         )
-    elif command is None or command == "jfa-manhattan-visualization":
+    elif command == "jfa-manhattan-visualization":
         seeds = generate_random_seeds_jfa(
             seed_count=SEED_COUNT_VISU, resolution=RESOLUTION
         )
@@ -94,13 +94,13 @@ def main() -> None:
             seeds=seeds,
             resolution=RESOLUTION,
             grid_layout="AoS",
-            gif_path=os.path.join(DATA_FOLDER, "task6_manhattan_jfa_visualization.gif"),
+            gif_path=os.path.join(DATA_FOLDER, "task6a_manhattan_jfa_visualization.gif"),
         )
 
     ###
     # Naive Euclidean JFA+1 and JFA+2
     ###
-    elif command is None or command == "jfa+1-euclidean":
+    elif command == "jfa+1-euclidean":
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         voronoi_jfa_plus1 = jfa_voronoi_host(
             kernel=_jfa_pass_naive_square_euclidean_kernel,
@@ -111,7 +111,7 @@ def main() -> None:
         )
         plt.imshow(voronoi_jfa_plus1)
         plt.show()
-    elif command is None or command == "jfa+2-euclidean":
+    elif command == "jfa+2-euclidean":
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         voronoi_jfa_plus2 = jfa_voronoi_host(
             kernel=_jfa_pass_naive_square_euclidean_kernel,
@@ -126,7 +126,7 @@ def main() -> None:
     ###
     # Compare JFA variants
     ###
-    elif command is None or command == "jfa-accuracy":
+    elif command == "jfa-accuracy":
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         voronoi_jfa = jfa_voronoi_host(
             kernel=_jfa_pass_naive_square_euclidean_kernel,
@@ -159,16 +159,19 @@ def main() -> None:
             resolution=RESOLUTION,
         )
         create_error_map_plot(evaluation_data=evaluation_data)
+    else:
+        print(f"Error: unknown command '{command}'")
+        exit(1)
 
 
 def jfa_voronoi_host(
-    kernel: Callable[[cuda.devicearray.DeviceNDArray, cuda.devicearray.DeviceNDArray, int, int], None],
+    kernel: Callable[[cuda.devicearray.DeviceNDArray, cuda.devicearray.DeviceNDArray, np.int32, np.int32], None],
     seeds: np.ndarray,
     resolution: int,
     grid_layout: Literal["AoS", "SoA"],
     mode: Literal["standard", "jfa+1", "jfa+2"] = "standard",
     gif_path: str | None = None,
-) -> np.ndarray:
+) -> np.ndarray[tuple[int, int, int], np.dtype[np.int32]]:
     """
     Host function that sets everything up for the naive JFA.
 
@@ -193,7 +196,7 @@ def jfa_voronoi_host(
         # Divide further
         step_size //= 2
 
-    # Determine additional setps at the end (JFA+1/JFA+2)
+    # Determine additional steps at the end (JFA+1/JFA+2)
     if mode == "standard":
         pass
     elif mode == "jfa+1":
@@ -206,14 +209,14 @@ def jfa_voronoi_host(
         )
 
     # GPU grid allocation for the ping pong
-    grid_init: np.ndarray = None
+    grid_init: np.ndarray
     if grid_layout == "AoS":
         grid_init = generate_AoS_grid_jfa(seeds=seeds, resolution=resolution)
     elif grid_layout == "SoA":
         grid_init = generate_SoA_grid_jfa(seeds=seeds, resolution=resolution)
     else:
         raise ValueError(f"Unknown grid layout: {grid_layout}")
-    grid_in = cuda.to_device(grid_init)
+    grid_in: cuda.devicearray.DeviceNDArray = cuda.to_device(grid_init)
     grid_out = cuda.device_array_like(grid_in)
 
     # Grid configuration
@@ -251,14 +254,16 @@ def jfa_voronoi_host(
 
     # Retrieve the final result
     # Since the values are swapped at the end of the loop, grid_in contains the data from the last iteration
-    out_image = grid_in.copy_to_host()
+    out_image: np.ndarray[tuple[int, int, int], np.dtype[np.int32]] = grid_in.copy_to_host()
 
-    id_map = None
+    id_map: np.ndarray[tuple[int, int, int], np.dtype[np.int32]]
     if grid_layout == "AoS":
         # Each seed is assigned a unique ID (ID = x + y*resolution)
         id_map = out_image[:, :, 0] + out_image[:, :, 1] * resolution
-    if grid_layout == "SoA":
+    elif grid_layout == "SoA":
         id_map = out_image[:resolution, :] + out_image[resolution:, :] * resolution
+    else:
+        raise ValueError(f"Unknown grid layout: {grid_layout}")
 
     # Save as a GIF
     if gif_path:
@@ -383,7 +388,7 @@ def create_error_map_plot(evaluation_data: list[dict]) -> None:
 
         safe_kernel_name = name.lower().replace(" ", "_").replace("+", "plus")
         filename = (
-            f"task6_error_map_{safe_kernel_name}_res{resolution}_seeds{seed_count}.png"
+            f"task6a_error_map_{safe_kernel_name}_res{resolution}_seeds{seed_count}.png"
         )
         filepath = os.path.join(DATA_FOLDER, filename)
         plt.savefig(
@@ -397,7 +402,7 @@ def create_error_map_plot(evaluation_data: list[dict]) -> None:
         plt.close()
 
 
-@cuda.jit("void(int32[:,:,:], int32[:,:,:], int32, int32)")
+@cuda.jit("void(int32[:, :, :], int32[:, :, :], int32, int32)")
 def _jfa_pass_naive_square_euclidean_kernel(
     grid_in: cuda.devicearray.DeviceNDArray,
     grid_out: cuda.devicearray.DeviceNDArray,
@@ -471,7 +476,7 @@ def _jfa_pass_naive_square_euclidean_kernel(
     grid_out[pixel_y, pixel_x, 1] = best_seed_y
 
 
-@cuda.jit("void(int32[:,:,:], int32[:,:,:], int32, int32)")
+@cuda.jit("void(int32[:, :, :], int32[:, :, :], int32, int32)")
 def _jfa_pass_naive_manhattan_kernel(
     grid_in: cuda.devicearray.DeviceNDArray,
     grid_out: cuda.devicearray.DeviceNDArray,

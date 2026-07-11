@@ -84,6 +84,12 @@ def main() -> None:
             kernel=pixel_based[command],
             make_output_grid=make_empty_voronoi_output
         )
+    elif command in jfa_based:
+        kernel_performance_analysis_jfa(
+            kernel_name=command,
+            kernel=jfa_based[command][0],
+            make_output_grid=jfa_based[command][1],
+        )
     elif command == "all":
         for kernel_name, kernel in pixel_based.items():
             kernel_performance_analysis(
@@ -96,8 +102,8 @@ def main() -> None:
         if match is None:
             print(f"Error: unknown command '{command}'")
             exit(1)
-        kernel1 = match[1]
-        kernel2 = match[2]
+        kernel1 = str(match[1])
+        kernel2 = str(match[2])
         if kernel1 in pixel_based and kernel2 in pixel_based:
             kernel_performance_analysis_compare(
                 kernels=[
@@ -115,12 +121,6 @@ def main() -> None:
             )
         else:
             print(f"Error: unknown kernel combination '{kernel1} x {kernel2}'")
-    elif command in jfa_based:
-        kernel_performance_analysis_jfa(
-            kernel_name=command,
-            kernel=jfa_based[command][0],
-            make_output_grid=jfa_based[command][1],
-        )
     elif command == "all_jfa":
         for kernel_name, jfa_data in jfa_based.items():
             kernel_performance_analysis_jfa(

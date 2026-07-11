@@ -23,10 +23,10 @@ from utils import (
 )
 
 # Resolution of the image containing the voronoi diagram
-RESOLUTION: int = 1024
+RESOLUTION: int = 2048
 
 # The number of seeds (points) in the diagram
-SEED_COUNT: int = 2000
+SEED_COUNT: int = 512
 
 
 # Block layout (16x16 = 256 threads)
@@ -70,8 +70,8 @@ def main() -> None:
             grid_layout="AoS",
             mode="standard",
         )
-        plt.imshow(shared_mem_euclidean)
-        plt.show()
+        # plt.imshow(shared_mem_euclidean)
+        # plt.show()
 
     ###
     # Euclidean JFA using 'Structure of Arrays (SoA)' approach
@@ -85,8 +85,8 @@ def main() -> None:
             grid_layout="SoA",
             mode="standard",
         )
-        plt.imshow(soA_euclidean)
-        plt.show()
+        # plt.imshow(soA_euclidean)
+        # plt.show()
 
     ###
     # JFA runtime per step size analysis
@@ -314,7 +314,7 @@ def create_jfa_runtime_per_step_size_plot(
     plt.close()
 
 
-@cuda.jit("void(int32[:,:,:], int32[:,:,:], int32, int32)")
+@cuda.jit("void(int32[:, :, :], int32[:, :, :], int32, int32)")
 def _jfa_pass_shared_memory_square_euclidean_kernel(
     grid_in: cuda.devicearray.DeviceNDArray,
     grid_out: cuda.devicearray.DeviceNDArray,
@@ -502,12 +502,12 @@ def _jfa_pass_shared_memory_square_euclidean_kernel(
     grid_out[pixel_y, pixel_x, 1] = best_seed_y
 
 
-@cuda.jit("void(int32[:,:], int32[:,:], int32, int32)")
+@cuda.jit("void(int32[:, :], int32[:, :], int32, int32)")
 def _jfa_pass_SoA_square_euclidean_kernel(
     grid_in: cuda.devicearray.DeviceNDArray,
     grid_out: cuda.devicearray.DeviceNDArray,
-    step_size: int,
-    size: int,
+    step_size: np.int32,
+    size: np.int32,
 ) -> None:
     """
     Executes a single pass of the Jump Flooding Algorithm (JFA) using a planar Structure of Arrays (SoA) 2D layout.

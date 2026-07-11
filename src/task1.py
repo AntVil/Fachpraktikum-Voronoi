@@ -9,15 +9,12 @@ from utils import (
     get_argument,
     generate_uniform_points,
     make_empty_voronoi_output,
-    make_empty_distance_field_output,
     make_grid_configuration,
     get_thread_position,
     is_outside_image,
     calculate_euclidean_distance_with_hypot,
     calculate_manhattan_distance,
-    calculate_max_absolute_distance,
-    euclidean_distance_field_to_gif_frame,
-    manhattan_distance_field_to_gif_frame
+    calculate_max_absolute_distance
 )
 
 

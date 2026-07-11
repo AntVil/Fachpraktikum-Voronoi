@@ -47,7 +47,7 @@ def generate_uniform_points(point_count: int | np.int64) -> cuda.devicearray.Dev
     return cuda.to_device(points)
 
 
-def generate_random_seeds_jfa(seed_count: int | np.int64, resolution: int | np.int64) -> np.ndarray:
+def generate_random_seeds_jfa(seed_count: int | np.int64, resolution: int | np.int64) -> np.ndarray[tuple[int, int], np.dtype[np.int32]]:
     """
     Generate a random array of seed positions within the resolution range.
     The array contains seed_count entries, with each entry representing the x and y position of a seed within the grid (integer).
@@ -56,7 +56,7 @@ def generate_random_seeds_jfa(seed_count: int | np.int64, resolution: int | np.i
     return np.random.randint(low=0, high=int(resolution), size=(int(seed_count), 2)).astype(np.int32)
 
 
-def generate_AoS_grid_jfa(seeds: np.ndarray, resolution: int | np.int64) -> np.ndarray:
+def generate_AoS_grid_jfa(seeds: np.ndarray[tuple[int, int], np.dtype[np.int32]], resolution: int | np.int64) -> np.ndarray[tuple[int, int, int], np.dtype[np.int32]]:
     """
     Generate an of Array of Structure (AoS) grid for the JFA.
 
@@ -69,7 +69,7 @@ def generate_AoS_grid_jfa(seeds: np.ndarray, resolution: int | np.int64) -> np.n
 
     # Construct and initialize a grid: Each pixel stores the position of the closest seed (seed_x, seed_y)
     # Initialization of '-1' means: "No seed known yet"
-    grid: np.ndarray = np.full(
+    grid = np.full(
         shape=(resolution, resolution, 2), fill_value=-1, dtype=np.int32
     )
 
@@ -82,7 +82,7 @@ def generate_AoS_grid_jfa(seeds: np.ndarray, resolution: int | np.int64) -> np.n
     return grid
 
 
-def generate_SoA_grid_jfa(seeds: np.ndarray, resolution: int | np.int64) -> np.ndarray:
+def generate_SoA_grid_jfa(seeds: np.ndarray[tuple[int, int], np.dtype[np.int32]], resolution: int | np.int64) -> np.ndarray[tuple[int, int], np.dtype[np.int32]]:
     """
     Generate an Structure of Arrays (SoA) grid for the JFA.
 
@@ -94,7 +94,7 @@ def generate_SoA_grid_jfa(seeds: np.ndarray, resolution: int | np.int64) -> np.n
     # NOTE:
     # Form: (Height, Width) -> Double the height, but normal width
     # Initialization of '-1' means: "No seed known yet"
-    grid: np.ndarray = np.full(
+    grid = np.full(
         shape=(resolution * 2, resolution), fill_value=-1, dtype=np.int32
     )
 
