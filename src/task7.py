@@ -30,7 +30,7 @@ from task5 import (
     _voroni_square_euclidean_fast_grid_stride_kernel,
     _voroni_square_euclidean_fast_warp_shfl_kernel,
 )
-from task6 import (
+from task6a import (
     _jfa_pass_naive_square_euclidean_kernel,
     _jfa_pass_naive_manhattan_kernel,
 )

@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 
 
 from constants import DATA_FOLDER, INT32_MAX
-from task6 import (
+from task6a import (
     jfa_voronoi_host,
     _jfa_pass_naive_square_euclidean_kernel,
     _jfa_pass_naive_manhattan_kernel,
@@ -56,7 +56,7 @@ def main() -> None:
     Test the implementations and generate performance diagrams for the Jump Flooding Algorithm (JFA).
     """
 
-    command: str = get_argument()
+    command = get_argument()
 
     ###
     # Euclidean JFA using shared memory
@@ -76,7 +76,7 @@ def main() -> None:
     ###
     # Euclidean JFA using 'Structure of Arrays (SoA)' approach
     ###
-    elif command is None or command == "jfa-SoA":
+    elif command == "jfa-SoA":
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         soA_euclidean = jfa_voronoi_host(
             kernel=_jfa_pass_SoA_square_euclidean_kernel,
@@ -91,7 +91,7 @@ def main() -> None:
     ###
     # JFA runtime per step size analysis
     ###
-    elif command is None or command == "naive-jfa-step-analysis":
+    elif command == "naive-jfa-step-analysis":
         # NOTE: The same resolution and seed count as used for ncu
         SEED_COUNT = 512
         RESOLUTION = 2048
@@ -114,7 +114,7 @@ def main() -> None:
             ("Naive manhattan", naive_manhattan_data),
         ]
         create_jfa_runtime_per_step_size_plot(RESOLUTION, SEED_COUNT, plot_data)
-    elif command is None or command == "all-jfa-step-analysis":
+    elif command == "all-jfa-step-analysis":
         SEED_COUNT = 512
         RESOLUTION = 2048
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
@@ -152,10 +152,13 @@ def main() -> None:
             ("SoA square euclidean", soA_euclidean_data),
         ]
         create_jfa_runtime_per_step_size_plot(RESOLUTION, SEED_COUNT, plot_data)
+    else:
+        print(f"Error: unknown command '{command}'")
+        exit(1)
 
 
 def analyze_runtime_per_step_size(
-    kernel: Callable[[cuda.devicearray.DeviceNDArray, cuda.devicearray.DeviceNDArray, int, int], None],
+    kernel: Callable[[cuda.devicearray.DeviceNDArray, cuda.devicearray.DeviceNDArray, np.int32, np.int32], None],
     make_output_grid: Callable[[np.ndarray, int], np.ndarray],
     seeds: np.ndarray,
     resolution: int,
@@ -182,7 +185,7 @@ def analyze_runtime_per_step_size(
     ###
     # Real JFA
     ###
-    grid_in = cuda.to_device(make_output_grid(seeds=seeds, resolution=resolution))
+    grid_in: cuda.devicearray.DeviceNDArray = cuda.to_device(make_output_grid(seeds=seeds, resolution=resolution))
     grid_out = cuda.device_array_like(grid_in)
     blocks_per_grid, threads_per_block = make_grid_configuration(
         resolution=resolution, threads_per_dimension=BLOCK_DIM
@@ -305,7 +308,7 @@ def create_jfa_runtime_per_step_size_plot(
     plt.savefig(
         os.path.join(
             DATA_FOLDER,
-            f"task6_jfa_runtime_over_stepSize_{device_name.replace(" ", "-")}{kernel_names}_res{resolution}_seeds{seed_count}.png",
+            f"task6b_jfa_runtime_over_stepSize_{device_name.replace(" ", "-")}{kernel_names}_res{resolution}_seeds{seed_count}.png",
         ),
         dpi=300,
     )
