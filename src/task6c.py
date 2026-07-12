@@ -15,11 +15,6 @@ from utils import (
 
 
 def main() -> None:
-    """
-    Main entry point.
-    Test the implementations and generate example diagrams for the Jump Flooding Algorithm (JFA).
-    """
-
     command = get_argument()
 
     point_count = 512
@@ -100,6 +95,7 @@ def _jfa_inout_pass_square_euclidean_kernel(
 
             neighbor_point_index = grid_in_out[neighbor_y_index, neighbor_x_index]
 
+            # NOTE: actual coordinates are stored elsewhere, get them
             (point_x_coordinate, point_y_coordinate) = points[neighbor_point_index]
 
             distance = calculate_square_euclidean_distance(
