@@ -110,7 +110,7 @@ def generate_SoA_grid_jfa(seeds: np.ndarray[tuple[int, int], np.dtype[np.int32]]
     return grid
 
 
-def make_empty_voronoi_output(resolution: int | np.int64, fill_value: int  | np.int64 | None = None) -> cuda.devicearray.DeviceNDArray:
+def make_empty_voronoi_output(resolution: int | np.int64, fill_value: int  | np.int32 | None = None) -> cuda.devicearray.DeviceNDArray:
     """
     An empty voronoi diagram on the device
     """
@@ -154,6 +154,32 @@ def make_empty_distance_field_output(resolution: int | np.int64, fill_value: flo
                 dtype=np.float64
             )
         )
+
+
+def make_point_raster_voronoi_output(points: np.ndarray[tuple[int, int], np.dtype[np.float32]], resolution: int | np.int64, fill_value: int  | np.int32) -> cuda.devicearray.DeviceNDArray:
+    """
+    Much like `make_empty_voronoi_output`, except that points are put into their respective cell in the grid.
+    """
+
+    resolution = int(resolution)
+    fill_value = int(fill_value)
+
+    # Construct and initialize a grid: Each pixel stores the position of the closest seed (seed_x, seed_y)
+    # Initialization of '-1' means: "No seed known yet"
+    grid = np.full(
+        shape=(resolution, resolution), fill_value=fill_value, dtype=np.int32
+    )
+
+    # Set the positions of the seeds in the grid
+    # Each seed knows its own position at the start
+    for (index, (point_x, point_y)) in enumerate(points):
+        index_y = int(resolution * point_y)
+        index_x = int(resolution * point_x)
+        grid[index_y, index_x] = index
+
+    return cuda.to_device(
+        grid
+    )
 
 
 def euclidean_distance_field_to_gif_frame(
