@@ -1,19 +1,16 @@
 import re
-from constants import DATA_FOLDER
 from utils import (
     get_argument,
-    make_empty_voronoi_output,
-    generate_AoS_grid_jfa,
-    generate_SoA_grid_jfa,
-    make_point_raster_voronoi_output,
 )
 
 from task2 import (
+    MeasurableKernel,
+    PixelAlgorithm,
+    JFAPingPongAoSAlgorithm,
+    JFAPingPongSoAAlgorithm,
+    JFAInOutAlgorithm,
     kernel_performance_analysis,
-    kernel_performance_analysis_jfa,
-    kernel_performance_analysis_jfa_inout,
     kernel_performance_analysis_compare,
-    kernel_performance_analysis_compare_jfa,
 )
 from task3 import (
     _voroni_euclidean_hypot_kernel,
@@ -48,97 +45,58 @@ from task6c import (
 def main() -> None:
     command = get_argument()
 
-    pixel_based = {
-        # Naive kernels with different approaches to calculating the seed distance
-        "euclidean_hypot": _voroni_euclidean_hypot_kernel,
-        "manhattan": _voroni_manhattan_kernel,
-        "euclidean_hypot_fast": _voroni_euclidean_hypot_fast_kernel,
-        "euclidean_sqrt": _voroni_euclidean_sqrt_kernel,
-        "euclidean_sqrt_fast": _voroni_euclidean_sqrt_fast_kernel,
-        "square_euclidean": _voroni_square_euclidean_kernel,
-        "square_euclidean_fast": _voroni_square_euclidean_fast_kernel,
-        # Optimised kernel using shared memory
-        "euclidean_hypot_grid_stride": _voroni_euclidean_hypot_grid_stride_kernel,
-        "euclidean_hypot_warp_shfl": _voroni_euclidean_hypot_warp_shfl_kernel,
-        "square_euclidean_fast_grid_stride": _voroni_square_euclidean_fast_grid_stride_kernel,
-        "square_euclidean_fast_warp_shfl": _voroni_square_euclidean_fast_warp_shfl_kernel,
-    }
+    kernels: list[MeasurableKernel] = [
+        PixelAlgorithm(name="euclidean_hypot", kernel=_voroni_euclidean_hypot_kernel),
+        PixelAlgorithm(name="manhattan", kernel=_voroni_manhattan_kernel),
+        PixelAlgorithm(name="euclidean_hypot_fast", kernel=_voroni_euclidean_hypot_fast_kernel),
+        PixelAlgorithm(name="euclidean_sqrt", kernel=_voroni_euclidean_sqrt_kernel),
+        PixelAlgorithm(name="euclidean_sqrt_fast", kernel=_voroni_euclidean_sqrt_fast_kernel),
+        PixelAlgorithm(name="square_euclidean", kernel=_voroni_square_euclidean_kernel),
+        PixelAlgorithm(name="square_euclidean_fast", kernel=_voroni_square_euclidean_fast_kernel),
+        PixelAlgorithm(name="euclidean_hypot_grid_stride", kernel=_voroni_euclidean_hypot_grid_stride_kernel),
+        PixelAlgorithm(name="euclidean_hypot_warp_shfl", kernel=_voroni_euclidean_hypot_warp_shfl_kernel),
+        PixelAlgorithm(name="square_euclidean_fast_grid_stride", kernel=_voroni_square_euclidean_fast_grid_stride_kernel),
+        PixelAlgorithm(name="square_euclidean_fast_warp_shfl", kernel=_voroni_square_euclidean_fast_warp_shfl_kernel),
 
-    jfa_based = {
-        "naive_square_euclidean_jfa": (
-            _jfa_pass_naive_square_euclidean_kernel,
-            generate_AoS_grid_jfa,
-        ),
-        "naive_manhattan_jfa": (
-            _jfa_pass_naive_manhattan_kernel,
-            generate_AoS_grid_jfa,
-        ),
-        "shared_memory_square_euclidean_jfa": (
-            _jfa_pass_shared_memory_square_euclidean_kernel,
-            generate_AoS_grid_jfa,
-        ),
-        "SoA_square_euclidean_jfa": (
-            _jfa_pass_SoA_square_euclidean_kernel,
-            generate_SoA_grid_jfa,
-        ),
-    }
+        JFAPingPongAoSAlgorithm(name="naive_square_euclidean_jfa", kernel=_jfa_pass_naive_square_euclidean_kernel),
+        JFAPingPongAoSAlgorithm(name="naive_manhattan_jfa", kernel=_jfa_pass_naive_manhattan_kernel),
+        JFAPingPongAoSAlgorithm(name="shared_memory_square_euclidean_jfa", kernel=_jfa_pass_shared_memory_square_euclidean_kernel),
+        JFAPingPongSoAAlgorithm(name="SoA_square_euclidean_jfa", kernel=_jfa_pass_SoA_square_euclidean_kernel),
 
-    if command == "jfa_inout_square_euclidean":
-        kernel_performance_analysis_jfa_inout(
-            kernel_name="jfa_inout_square_euclidean",
-            kernel=_jfa_inout_pass_square_euclidean_kernel,
-            make_output_grid=make_point_raster_voronoi_output
-        )
-    elif command in pixel_based:
+        JFAInOutAlgorithm(name="jfa_inout_square_euclidean", kernel=_jfa_inout_pass_square_euclidean_kernel)
+    ]
+
+    # NOTE: small helper lookup
+    kernels_dictionary = dict(map(lambda kernel: (kernel.get_name(), kernel), kernels))
+
+    if command in kernels_dictionary:
         kernel_performance_analysis(
-            kernel_name=command,
-            kernel=pixel_based[command],
-            make_output_grid=make_empty_voronoi_output
-        )
-    elif command in jfa_based:
-        kernel_performance_analysis_jfa(
-            kernel_name=command,
-            kernel=jfa_based[command][0],
-            make_output_grid=jfa_based[command][1],
+            kernel=kernels_dictionary[command]
         )
     elif command == "all":
-        for kernel_name, kernel in pixel_based.items():
+        for kernel in kernels:
             kernel_performance_analysis(
-                kernel_name=kernel_name,
-                kernel=kernel,
-                make_output_grid=make_empty_voronoi_output
+                kernel=kernel
             )
     elif command is not None and "compare" in command:
         match = re.match(pattern="^compare-([^-]+)-([^-]+)$", string=command)
         if match is None:
             print(f"Error: unknown command '{command}'")
             exit(1)
+
         kernel1 = str(match[1])
         kernel2 = str(match[2])
-        if kernel1 in pixel_based and kernel2 in pixel_based:
+
+        if kernel1 in kernels and kernel2 in kernels:
             kernel_performance_analysis_compare(
                 kernels=[
-                    (kernel1, pixel_based[kernel1]),
-                    (kernel2, pixel_based[kernel2])
-                ],
-                make_output_grid=make_empty_voronoi_output
-            )
-        elif kernel1 in jfa_based and kernel2 in jfa_based:
-            kernel_performance_analysis_compare_jfa(
-                data=[
-                    (kernel1, (jfa_based[kernel1][0], jfa_based[kernel1][1])),
-                    (kernel2, (jfa_based[kernel2][0], jfa_based[kernel2][1])),
+                    kernels[kernel1],
+                    kernels[kernel2]
                 ]
             )
         else:
             print(f"Error: unknown kernel combination '{kernel1} x {kernel2}'")
-    elif command == "all_jfa":
-        for kernel_name, jfa_data in jfa_based.items():
-            kernel_performance_analysis_jfa(
-                kernel_name=kernel_name,
-                kernel=jfa_data[0],
-                make_output_grid=jfa_data[1]
-            )
+            exit(1)
     else:
         print(f"Error: unknown command '{command}'")
         exit(1)
