@@ -84,6 +84,45 @@ def kernel_performance_analysis(
     )
 
 
+def kernel_performance_analysis_jfa_inout(
+    kernel_name: str,
+    kernel: Callable[[cuda.devicearray.DeviceNDArray, cuda.devicearray.DeviceNDArray, np.int32], None],
+    make_output_grid: Callable[[np.ndarray, int | np.int64, int | np.int32], cuda.devicearray.DeviceNDArray],
+) -> None:
+    """
+    Do a performance analysis on a single Kernel and generate a number of plots
+    """
+
+    device_name = get_device_name().replace(" ", "_")
+
+    # NOTE: reading llvm is quite hard, for our purposes the asm is totally fine
+    # with open(os.path.join(DATA_FOLDER, f"compiled_llvm_{device_name}_{kernel_name.replace(" ", "_")}.ll"), "w") as f:
+    #     f.write(kernel.inspect_llvm(kernel.signatures[0])) # type: ignore
+
+    with open(os.path.join(DATA_FOLDER, f"compiled_asm_{device_name}_{kernel_name.replace(" ", "_")}.asm"), "w") as f:
+        f.write(kernel.inspect_asm(kernel.signatures[0])) # type: ignore
+
+    metrics = compute_performance_metrics_jfa_inout(
+        kernel=kernel,
+        make_output_grid=make_output_grid,
+        resolution_sizes=RESOLUTION_SIZES,
+        point_counts=POINT_COUNTS,
+        run_count=RUNS,
+    )
+
+    create_kernel_performance_plot(
+        resolution=RESOLUTION_SIZES[0],
+        input_sizes=POINT_COUNTS,
+        performances=[(kernel_name, np.median(metrics[0], axis=1))],
+    )
+    create_kernel_performance_matrix(
+        kernel_name=kernel_name,
+        resolution_sizes=RESOLUTION_SIZES,
+        point_counts=POINT_COUNTS,
+        performances=np.median(metrics, axis=2),
+    )
+
+
 def kernel_performance_analysis_jfa(
     kernel_name: str,
     kernel: Callable[[cuda.devicearray.DeviceNDArray, cuda.devicearray.DeviceNDArray, int, int], None],
@@ -306,6 +345,76 @@ def compute_performance_metrics_jfa(
                 while k >= 1:
                     kernel[blocks_per_grid, threads_per_block](grid_in, grid_out, k, resolution)
                     grid_in, grid_out = grid_out, grid_in
+                    k //= 2
+                kernel_end.record()
+
+                # Synchronize and add the measured time to the list
+                cuda.synchronize()
+                kernel_times.append(kernel_start.elapsed_time(kernel_end))
+
+            result_entry.append(kernel_times)
+
+        result.append(result_entry)
+
+    return np.array(result)
+
+
+def compute_performance_metrics_jfa_inout(
+    kernel: Callable[[cuda.devicearray.DeviceNDArray, cuda.devicearray.DeviceNDArray, int], None],
+    make_output_grid: Callable[[np.ndarray, int | np.int64, int | np.int32], cuda.devicearray.DeviceNDArray],
+    resolution_sizes: np.ndarray[tuple[int], np.dtype[np.int64]],
+    point_counts: np.ndarray[tuple[int], np.dtype[np.int64]],
+    run_count: int,
+) -> np.ndarray[tuple[int, int, int], np.dtype[np.float64]]:
+    """
+    Compute execution time of JFA-kernel (without any data transfer) as a multi-dimensional array
+    with dimensions (resolution, point_count, executions).
+    Each entry is measured in milliseconds.
+    """
+
+    # MARK: Dry run definitions
+    _blocks, _threads = make_grid_configuration(resolution=resolution_sizes[0])
+
+    _points = generate_uniform_points(point_count=100)
+    _inout = make_output_grid(_points, resolution_sizes[0], 0)
+
+    # MARK: Dry run over multiple runs
+    for _ in range(5):
+        kernel[_blocks, _threads](_points, _inout, resolution_sizes[0] // 2)
+        cuda.synchronize()
+
+    result: list[list[list[float]]] = []
+
+    # CUDA Events
+    kernel_start = cuda.event(timing=True)
+    kernel_end = cuda.event(timing=True)
+
+    for resolution in resolution_sizes:
+        # Grid configuration
+        blocks_per_grid, threads_per_block = make_grid_configuration(
+            resolution=resolution, threads_per_dimension=16
+        )
+
+        result_entry: list[list[float]] = []
+
+        for point_count in point_counts:
+            points = generate_uniform_points(point_count=point_count)
+
+            kernel_times: list[float] = []
+            for _ in range(run_count):
+                # Reset out_data
+                grid_inout = make_output_grid(points, resolution, 0)
+                # NOTE: Consider moving this outside the 'RUNS'-loop, and either ignore resetting
+                # or use something like 'out_image_gpu.copy_to_device(blank_host_array)'
+
+                # JFA loop
+                k = np.int32(resolution) // 2
+
+                # Measure kernel
+                kernel_start.record()
+                while k >= 1:
+                    kernel[blocks_per_grid, threads_per_block](points, grid_inout, k)
+
                     k //= 2
                 kernel_end.record()
 

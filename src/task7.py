@@ -5,11 +5,13 @@ from utils import (
     make_empty_voronoi_output,
     generate_AoS_grid_jfa,
     generate_SoA_grid_jfa,
+    make_point_raster_voronoi_output,
 )
 
 from task2 import (
     kernel_performance_analysis,
     kernel_performance_analysis_jfa,
+    kernel_performance_analysis_jfa_inout,
     kernel_performance_analysis_compare,
     kernel_performance_analysis_compare_jfa,
 )
@@ -37,6 +39,9 @@ from task6a import (
 from task6b import (
     _jfa_pass_shared_memory_square_euclidean_kernel,
     _jfa_pass_SoA_square_euclidean_kernel,
+)
+from task6c import (
+    _jfa_inout_pass_square_euclidean_kernel,
 )
 
 
@@ -78,7 +83,13 @@ def main() -> None:
         ),
     }
 
-    if command in pixel_based:
+    if command == "jfa_inout_square_euclidean":
+        kernel_performance_analysis_jfa_inout(
+            kernel_name="jfa_inout_square_euclidean",
+            kernel=_jfa_inout_pass_square_euclidean_kernel,
+            make_output_grid=make_point_raster_voronoi_output
+        )
+    elif command in pixel_based:
         kernel_performance_analysis(
             kernel_name=command,
             kernel=pixel_based[command],
