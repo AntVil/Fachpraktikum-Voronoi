@@ -1030,6 +1030,35 @@ Eine interessante Weiterentwicklung stellen die von **Maciej A. Czyzewski (2019)
 
 Wichtig zu erwähnen ist, dass eine formale Analyse bzw. ein Beweis dieser Schrittzahl bislang aussteht. Trotzdem soll im Rahmen dieser Arbeit diese mögliche Idee aufgeführt und genannt werden, da die zuvor eigenentwickelten Optimierungsversuche keinen Laufzeitvorteil gegenüber dem klassischen JFA erzielen konnten.
 
+# Aufgabe 6c - Jump Flooding In-Out-Ansatz
+
+_Welche Limitation hat der bisher implementierte JFA Algorithmus?_
+
+Der bisherige JFA Algorithmus verwendet zwei Pixelraster welche abwechselnd gelesen und geschrieben werden. Es sind zwei Raster nötig, da sonst unvollständige Werte in das Raster geschrieben werden könnten, wodurch es zu Race-Conditions kommt. Eine Folge davon könnte sein, dass beim Lesen eines Punkt die `x`-Komponente und die `y`-Komponente von verschiedenen Punkten sind.
+
+_Welche Nachteile bringen zwei Raster?_
+
+Zwei Raster haben einige Nachteile. Zum einen muss ist mehr Speicher auf der GPU nötig. Zum anderen muss der Algorithmus ständig die Zeiger auf die Raster nach jedem Kernel-Aufruf wechseln. Zudem kann es auch sein, dass die GPU caches schlechter ausnutzen kann, da es doppeltsoviele Daten zu verarbeiten gibt.
+
+_Sind zwei Raster tatsächlich nötig?_
+
+Beim Algorithmus wird bei jedem Kernel-Aufruf pro Thread nur ein Pixel beschrieben. Ob ein anderer Thread den Pixel aus dieser Iteration oder aus der nächsten Iteration liest, ist dabei tatsächlich nicht wichtig, da nur der nächste Nachbar relevant ist. Es muss also nur verhindert werden, dass ein ungültiger Punkt gelesen wird. Da der lesende Zugriff auf Pixel weit reicht, vorallem in den ersten Iterationen, können die im Kurstext beschriebenen Synchronisations-Methoden nur schwer angewendet werden. Desweiteren würden Synchronisations-Methoden vermutlich den Algorithmus langsamer machen. Um diese Problematik zu umgehen werden Punkte und das Raster separat gespeichert. Statt die coordinaten der Punkte im Raster zu verwalten, werden Verweise auf die Punkte im Raster gespeichert. Diese Indirektion führt dazu, dass mehr Daten aus dem Global-Memory gelanden werden, aber dafür kann auf das zweite Raster verzichtet werden.
+
+Ein weiterer Vorteil der sich hierraus ergibt, ist, dass für die Punkt-Koordinaten wieder `float32` statt `int32` verwendet werden kann.
+
+Um die Warp-Divergence niedrig zu halten werden zudem alle Verweise im Raster, welche initial keinen Punkt zugewiesen bekommen haben, auf den ersten Punkt der Eingabe gesetzt. Auf diese Weise kann zur Kernel-Laufzeit auf Prüfungen der Punkte verzichtet werden.
+
+_Wie ändert sich die Laufzeit beim verwenden nur eines Rasters?_
+
+Folgene Abbildungen geben die Laufzeiten des beschriebenen Ansatz an.
+
+| RTX 5070                                                                                                                                           | GTX 1660 Ti                                                                                                                                           |
+| -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_inout_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_jfa_inout_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_jfa_inout_square_euclidean_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_jfa_inout_square_euclidean_resolution=128_points=64,128,256,512.png) |
+
+Es ist zu sehen, dass für die Eingabe-Größen `512` und `2048` des Raster eine Verbesserung der Laufzeit zu erkennen ist. Die anderen Größen sind in einem ähnlichen Wertebereich wie zuvor. Erstaunlicherweise ist der Algorithmus schneller, wenn die Eingabe-Größe des Raster `512` statt `128` ist. Der Grund hierfür konnte aus zeitlichen Gründen leider nicht bestimmt werden.
+
 # Aufgabe 7 - Ergebnisse
 
 _Welche der Optimierungen hat den größten Laufzeit-gewinn erbracht?_
