@@ -87,11 +87,11 @@ def main() -> None:
         kernel1 = str(match[1])
         kernel2 = str(match[2])
 
-        if kernel1 in kernels and kernel2 in kernels:
+        if kernel1 in kernels_dictionary and kernel2 in kernels_dictionary:
             kernel_performance_analysis_compare(
                 kernels=[
-                    kernels[kernel1],
-                    kernels[kernel2]
+                    kernels_dictionary[kernel1],
+                    kernels_dictionary[kernel2]
                 ]
             )
         else:
