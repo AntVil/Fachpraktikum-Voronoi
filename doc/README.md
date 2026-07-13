@@ -614,11 +614,16 @@ $$\text{UID} = X + (Y \cdot \text{resolution})$$
 
 Dadurch entstehen eindeutige IDs für identische Seed-Koordinaten.
 
-Die folgenden Visualisierungen zeigen den Zustand des Diagramms nach jedem Schritt $k$:
+Die folgenden Visualisierungen zeigen den Zustand des Diagramms nach jedem Schritt $k$ (Auflösung: $2048 \times 2048$, Punkte: $256$):
 
-| `JFA - square euclidean distance`                  | `JFA - manhattan distance`                         |
-| -------------------------------------------------- | -------------------------------------------------- |
-| ![](../data/task6_euclidean_jfa_visualization.gif) | ![](../data/task6_manhattan_jfa_visualization.gif) |
+```bash
+uv run .\src\task6a.py jfa-euclidean-visualization
+uv run .\src\task6a.py jfa-manhattan-visualization
+```
+
+| `JFA - square euclidean distance`                   | `JFA - manhattan distance`                          |
+| --------------------------------------------------- | --------------------------------------------------- |
+| ![](../data/task6a_euclidean_jfa_visualization.gif) | ![](../data/task6a_manhattan_jfa_visualization.gif) |
 
 Sowohl bei der quadratischen euklidischen Distanz als auch bei der Manhattan-Distanz ist gut zu erkennen, wie das zu Beginn leere, schwarze Bild mit jedem Schritt "voller" wird. Das typische _"Flooding-Verhalten"_ (Fluten) des Algorithmus wird hierbei in jeder Iteration sichtbar.
 
@@ -662,20 +667,24 @@ Als Ursache für diese Fehler wird der Informationstransport des JFA über abneh
 
 Zur Verbesserung der Ergebnisse schlägt die Studie mehrere Varianten vor, um diese Fehler gezielt an den Voronoi-Eckpunkten und entlang der Kanten zu eliminieren - darunter `JFA+1` und `JFA+2`. Dabei wird zunächst der Standard-JFA durchgeführt. Am Ende werden jedoch zusätzliche Durchläufe mit einer Schrittweite von **1** (für `JFA+1`) beziehungsweise **2** und anschließend **1** (für `JFA+2`) angehängt. Diese lokalen Suchen erlauben es den betroffenen Pixeln, korrekte Daten aus ihrer unmittelbaren Nachbarschaft zu übernehmen, selbst wenn der primäre Ausbreitungspfad zuvor blockiert wurde.
 
-Um diesem Aspekt im Projekt quantitativ nachzugehen, wurde der naive JFA-Ansatz mit der quadrierten euklidischen Distanz (`_jfa_pass_naive_square_euclidean_kernel`) mit der Referenzimplementierung aus der vorherigen Aufgabe (`_voroni_square_euclidean_kernel`) verglichen. Der pixelbasierte Algorithmus dient dabei als exakte `100%`-Referenz. Der Vergleich wurde mit einer Auflösung von **$1024 \times 1024$ Pixeln** und **2000** Punkten durchgeführt.
+Um diesem Aspekt im Projekt quantitativ nachzugehen, wurde der naive JFA-Ansatz mit der quadrierten euklidischen Distanz (`_jfa_pass_naive_square_euclidean_kernel`) mit der Referenzimplementierung aus der vorherigen Aufgabe (`_voroni_square_euclidean_kernel`) verglichen. Der pixelbasierte Algorithmus dient dabei als exakte `100%`-Referenz. Der Vergleich wurde mit einer Auflösung von **$2048 \times 2048$ Pixeln** und **512** Punkten durchgeführt.
 
 Die folgenden _Error Maps_ visualisieren die Abweichungen der verschiedenen JFA-Varianten, wobei identische Zuordnungen schwarz und fehlerhafte Pixel rot dargestellt werden:
 
+```bash
+uv run .\src\task6a.py jfa-accuracy
+```
+
 | `Standard JFA`                                                  | `JFA+1`                                                       | `JFA+2`                                                       |
 | --------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------- |
-| ![](../data/task6_error_map_standard_jfa_res1024_seeds2000.png) | ![](../data/task6_error_map_jfa_plus_1_res1024_seeds2000.png) | ![](../data/task6_error_map_jfa_plus_2_res1024_seeds2000.png) |
+| ![](../data/task6a_error_map_standard_jfa_res2048_seeds512.png) | ![](../data/task6a_error_map_jfa_plus_1_res2048_seeds512.png) | ![](../data/task6a_error_map_jfa_plus_2_res2048_seeds512.png) |
 
 Die Auswertung der Genauigkeiten lieferte folgende Ergebnisse:
 
 ```bash
-Standard JFA: 99.5950%
-JFA + 1: 99.5990%
-JFA + 2: 99.5993%
+Standard JFA: 99.9635%
+JFA + 1: 99.9637%
+JFA + 2: 99.9637%
 ```
 
 Es ist zu erkennen, dass bereits beim Standard-JFA ohne zusätzliche Durchläufe der Anteil fehlerhafter Pixel im Vergleich zur Gesamtpixelanzahl deutlich unter 1 % liegt. Mit den zusätzlichen Durchläufen von `JFA+1` und `JFA+2` lassen sich im Experiment zwar messbare Verbesserungen der Genauigkeit erzielen, diese fallen bei der gewählten Konstellation jedoch nicht mehr allzu signifikant aus, da die Basisgenauigkeit bereits recht hoch ist.
@@ -786,9 +795,9 @@ Um dem Ergebnis der ncu-Analyse weiter nachzugehen, wurde die Kernellaufzeit üb
 uv run .\src\task6b.py naive-jfa-step-analysis
 ```
 
-| RTX 5070                                                                                                                         | GTX 1660 Ti                                                                                                                         |
-| -------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/task6_jfa_runtime_over_stepSize_NVIDIA-GeForce-RTX-5070_Naive-square-euclidean_Naive-manhattan_res2048_seeds512.png) | ![](../data/task6_jfa_runtime_over_stepSize_NVIDIA-GeForce-GTX-1660-Ti_Naive-square-euclidean_Naive-manhattan_res2048_seeds512.png) |
+| RTX 5070                                                                                                                          | GTX 1660 Ti                                                                                                                          |
+| --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| ![](../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-RTX-5070_Naive-square-euclidean_Naive-manhattan_res2048_seeds512.png) | ![](../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-GTX-1660-Ti_Naive-square-euclidean_Naive-manhattan_res2048_seeds512.png) |
 
 <table>
 <tr>
@@ -1052,8 +1061,8 @@ _Wie ändert sich die Laufzeit beim verwenden nur eines Rasters?_
 
 Folgene Abbildungen geben die Laufzeiten des beschriebenen Ansatz an.
 
-| RTX 5070                                                                                                                                           | GTX 1660 Ti                                                                                                                                           |
-| -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| RTX 5070                                                                                                                                             | GTX 1660 Ti                                                                                                                                             |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_inout_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_jfa_inout_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_jfa_inout_square_euclidean_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_jfa_inout_square_euclidean_resolution=128_points=64,128,256,512.png) |
 
