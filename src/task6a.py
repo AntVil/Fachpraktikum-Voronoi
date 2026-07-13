@@ -231,7 +231,7 @@ def jfa_voronoi_host(
     step_frames: list[np.ndarray] = []
     for step_size in steps:
         # Kernel launch
-        kernel[blocks_per_grid, threads_per_block](
+        kernel[blocks_per_grid, threads_per_block]( # type: ignore
             grid_in, grid_out, step_size, resolution
         )
 
@@ -254,7 +254,7 @@ def jfa_voronoi_host(
 
     # Retrieve the final result
     # Since the values are swapped at the end of the loop, grid_in contains the data from the last iteration
-    out_image: np.ndarray[tuple[int, int, int], np.dtype[np.int32]] = grid_in.copy_to_host()
+    out_image: np.ndarray[tuple[int, int, int], np.dtype[np.int32]] = grid_in.copy_to_host() # type: ignore
 
     id_map: np.ndarray[tuple[int, int, int], np.dtype[np.int32]]
     if grid_layout == "AoS":
@@ -420,8 +420,8 @@ def _jfa_pass_naive_square_euclidean_kernel(
 
     # Determine the thread's position within the 2D grid
     col, row = cuda.grid(2)
-    pixel_x = np.int32(col)
-    pixel_y = np.int32(row)
+    pixel_x = np.int32(col) # type: ignore
+    pixel_y = np.int32(row) # type: ignore
 
     # Out of bounds check: Terminate threads outside the valid image boundaries
     if is_outside_image(pixel_x, pixel_y, grid_in):
@@ -490,8 +490,8 @@ def _jfa_pass_naive_manhattan_kernel(
     """
 
     col, row = cuda.grid(2)
-    pixel_x = np.int32(col)
-    pixel_y = np.int32(row)
+    pixel_x = np.int32(col) # type: ignore
+    pixel_y = np.int32(row) # type: ignore
     if is_outside_image(pixel_x, pixel_y, grid_in):
         return
 

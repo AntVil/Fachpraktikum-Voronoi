@@ -93,8 +93,8 @@ def main() -> None:
     ###
     elif command == "naive-jfa-step-analysis":
         # NOTE: The same resolution and seed count as used for ncu
-        SEED_COUNT = 512
-        RESOLUTION = 2048
+        #SEED_COUNT = 512
+        #RESOLUTION = 2048
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         naive_euclidean_data = analyze_runtime_per_step_size(
             kernel=_jfa_pass_naive_square_euclidean_kernel,
@@ -115,8 +115,8 @@ def main() -> None:
         ]
         create_jfa_runtime_per_step_size_plot(RESOLUTION, SEED_COUNT, plot_data)
     elif command == "all-jfa-step-analysis":
-        SEED_COUNT = 512
-        RESOLUTION = 2048
+        #SEED_COUNT = 512
+        #RESOLUTION = 2048
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         naive_euclidean_data = analyze_runtime_per_step_size(
             kernel=_jfa_pass_naive_square_euclidean_kernel,
@@ -173,19 +173,19 @@ def analyze_runtime_per_step_size(
     # Dry run
     ###
     _seeds = generate_random_seeds_jfa(seed_count=10, resolution=512)
-    _in = cuda.to_device(make_output_grid(seeds=_seeds, resolution=512))
+    _in = cuda.to_device(make_output_grid(_seeds, 512))
     _out = cuda.device_array_like(_in)
     _blocks, _threads = make_grid_configuration(
         resolution=512, threads_per_dimension=BLOCK_DIM
     )
     for _ in range(5):
-        kernel[_blocks, _threads](_in, _out, 512 // 2, 512)
+        kernel[_blocks, _threads](_in, _out, 512 // 2, 512) # type: ignore
         cuda.synchronize()
 
     ###
     # Real JFA
     ###
-    grid_in: cuda.devicearray.DeviceNDArray = cuda.to_device(make_output_grid(seeds=seeds, resolution=resolution))
+    grid_in: cuda.devicearray.DeviceNDArray = cuda.to_device(make_output_grid(seeds, resolution))
     grid_out = cuda.device_array_like(grid_in)
     blocks_per_grid, threads_per_block = make_grid_configuration(
         resolution=resolution, threads_per_dimension=BLOCK_DIM
@@ -203,7 +203,7 @@ def analyze_runtime_per_step_size(
     while k >= 1:
         # Measure kernel
         kernel_start.record()
-        kernel[blocks_per_grid, threads_per_block](grid_in, grid_out, k, resolution)
+        kernel[blocks_per_grid, threads_per_block](grid_in, grid_out, k, resolution) # type: ignore
         kernel_end.record()
 
         # Synchronize and add the measured time to the list
@@ -359,7 +359,7 @@ def _jfa_pass_shared_memory_square_euclidean_kernel(
     # - Smaller step sizes dynamically utilize only a sub-region of this buffer, leaving the
     #   remaining rows/columns unused.
     shared_buffer: cuda.devicearray.DeviceNDArray = cuda.shared.array(
-        shape=(SHARED_MEMORY_SIZE, SHARED_MEMORY_SIZE, 2),
+        shape=(SHARED_MEMORY_SIZE, SHARED_MEMORY_SIZE, 2), # type: ignore
         dtype=np.int32,
     )
 
@@ -369,8 +369,8 @@ def _jfa_pass_shared_memory_square_euclidean_kernel(
 
     # Global pixel coordinates within the entire 2D grid
     col, row = cuda.grid(2)
-    pixel_x = np.int32(col)
-    pixel_y = np.int32(row)
+    pixel_x = np.int32(col) # type: ignore
+    pixel_y = np.int32(row) # type: ignore
 
     # Registers tracking the best seed coordinates found by this thread
     best_seed_x = np.int32(-1)
@@ -381,8 +381,8 @@ def _jfa_pass_shared_memory_square_euclidean_kernel(
     ###
     if step_size < JFA_SHARED_THRESHOLD:
         # Shift the block's global origin top-left by 'step_size' to capture the halo
-        block_start_x = cuda.blockIdx.x * BLOCK_DIM - step_size
-        block_start_y = cuda.blockIdx.y * BLOCK_DIM - step_size
+        block_start_x = cuda.blockIdx.x * BLOCK_DIM - step_size # type: ignore
+        block_start_y = cuda.blockIdx.y * BLOCK_DIM - step_size # type: ignore
 
         # Calculate layout metrics for the current step's padded tile size
         current_tile_dim = BLOCK_DIM + 2 * step_size
@@ -391,7 +391,7 @@ def _jfa_pass_shared_memory_square_euclidean_kernel(
         # The size of the shared memory is larger than the number of available threads
         # (e.g. 20 * 20 = 400 elements vs. 256 threads)
         # Therefore, load the data into the shared memory using a grid stride loop
-        linear_thread_id = thread_y * BLOCK_DIM + thread_x
+        linear_thread_id = thread_y * BLOCK_DIM + thread_x # type: ignore
         total_available_threads = BLOCK_DIM * BLOCK_DIM
         for i in range(linear_thread_id, total_tile_elements, total_available_threads):
             # Calculate the local coordinates within the shared memory
@@ -427,8 +427,8 @@ def _jfa_pass_shared_memory_square_euclidean_kernel(
             return
 
         # Translate local thread ID to its shifted position inside the shared buffer
-        shared_pixel_x = thread_x + step_size
-        shared_pixel_y = thread_y + step_size
+        shared_pixel_x = thread_x + step_size # type: ignore
+        shared_pixel_y = thread_y + step_size # type: ignore
 
         # Fetch the tracking seed currently held by this pixel from shared memory
         best_seed_x = shared_buffer[shared_pixel_y, shared_pixel_x, 0]
@@ -525,8 +525,8 @@ def _jfa_pass_SoA_square_euclidean_kernel(
 
     # 1 Thread = 1 Pixel
     col, row = cuda.grid(2)
-    pixel_x = np.int32(col)
-    pixel_y = np.int32(row)
+    pixel_x = np.int32(col) # type: ignore
+    pixel_y = np.int32(row) # type: ignore
 
     # Out of bounds check based on the actual resolution (size)
     if pixel_x >= size or pixel_y >= size:
