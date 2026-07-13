@@ -8,73 +8,95 @@ Processing [data/_square_euclidean_jfa_SoA.sqlite] with [/opt/nvidia/nsight-syst
 
  Time (%)  Total Time (ns)  Num Calls     Avg (ns)         Med (ns)        Min (ns)       Max (ns)      StdDev (ns)            Name         
  --------  ---------------  ---------  ---------------  ---------------  -------------  -------------  -------------  ----------------------
-     63,0    8.356.168.595        807     10.354.607,0      7.501.300,0          1.160    206.182.674   19.388.685,0  poll                  
-     21,0    2.867.209.569          8    358.401.196,0    500.066.449,0         10.299    500.098.923  225.929.679,0  pthread_cond_timedwait
-     11,0    1.445.779.842          1  1.445.779.842,0  1.445.779.842,0  1.445.779.842  1.445.779.842            0,0  sem_clockwait         
-      2,0      297.200.116     15.031         19.772,0          1.250,0            999    126.152.704    1.365.623,0  read                  
-      1,0      186.261.319        775        240.337,0         14.300,0          1.090     23.811.766      981.075,0  ioctl                 
-      0,0       13.296.217      5.560          2.391,0          2.080,0          1.010        414.769        5.669,0  stat64                
-      0,0       10.190.704        724         14.075,0          2.030,0          1.590      4.667.096      183.726,0  mmap64                
-      0,0        9.128.678      2.292          3.982,0          3.180,0          1.220         40.139        2.957,0  open64                
-      0,0        6.110.236        703          8.691,0          2.510,0          2.130      2.524.313       95.945,0  munmap                
-      0,0        1.961.879      1.215          1.614,0          1.200,0          1.000         27.929        1.494,0  close                 
-      0,0        1.431.443        102         14.033,0          3.510,0          2.200        294.152       46.917,0  mmap                  
-      0,0        1.393.512         19         73.342,0         26.470,0         15.259        474.487      132.981,0  sem_timedwait         
-      0,0          911.617          3        303.872,0        210.425,0        184.885        516.307      184.416,0  pthread_join          
-      0,0          630.761        364          1.732,0          1.195,0          1.000         31.769        1.890,0  fstat64               
-      0,0          527.876          1        527.876,0        527.876,0        527.876        527.876            0,0  sem_wait              
-      0,0          454.707         62          7.334,0          7.279,0          1.080         23.590        4.983,0  write                 
-      0,0          440.243        214          2.057,0          1.840,0          1.010          7.120          614,0  lstat64               
-      0,0          428.694        216          1.984,0          1.890,0          1.050          4.800          451,0  stat                  
-      0,0          342.950         38          9.025,0          6.700,0          1.020         59.618        9.810,0  fgets                 
-      0,0          275.714          5         55.142,0         63.218,0         31.550         67.498       14.980,0  pthread_create        
-      0,0          259.702         47          5.525,0          3.580,0          1.110         22.879        5.088,0  fopen                 
-      0,0           92.009         49          1.877,0          1.530,0          1.000          5.400          909,0  fclose                
-      0,0           77.568          1         77.568,0         77.568,0         77.568         77.568            0,0  pthread_cond_wait     
-      0,0           77.226         14          5.516,0          5.584,0          1.450          9.370        2.104,0  pthread_cond_signal   
-      0,0           61.988          3         20.662,0         23.419,0          8.609         29.960       10.939,0  waitpid               
-      0,0           48.798         10          4.879,0          4.439,0          2.140          8.770        2.385,0  pipe2                 
-      0,0           35.229          6          5.871,0          4.590,0          1.950         15.029        4.917,0  fopen64               
-      0,0           34.698          7          4.956,0          4.180,0          2.080          8.169        2.342,0  open                  
-      0,0           32.760          4          8.190,0          9.195,0          2.920         11.450        3.679,0  fread                 
-      0,0           28.999          3          9.666,0         10.469,0          6.020         12.510        3.318,0  socket                
-      0,0           18.089          2          9.044,0          9.044,0          7.860         10.229        1.675,0  connect               
-      0,0           15.520          7          2.217,0          1.060,0          1.000          9.180        3.071,0  fstat                 
-      0,0            9.949          6          1.658,0          1.715,0          1.059          2.200          420,0  close_range           
-      0,0            8.100          3          2.700,0          1.820,0          1.100          5.180        2.177,0  getc                  
-      0,0            5.629          5          1.125,0          1.140,0          1.020          1.240           87,0  fcntl                 
-      0,0            5.340          4          1.335,0          1.260,0          1.070          1.750          290,0  sigaction             
-      0,0            4.930          1          4.930,0          4.930,0          4.930          4.930            0,0  pthread_kill          
-      0,0            4.300          2          2.150,0          2.150,0          1.600          2.700          777,0  fwrite                
-      0,0            3.800          1          3.800,0          3.800,0          3.800          3.800            0,0  mprotect              
-      0,0            3.340          3          1.113,0          1.110,0          1.060          1.170           55,0  dup2                  
-      0,0            2.820          1          2.820,0          2.820,0          2.820          2.820            0,0  pthread_cond_broadcast
-      0,0            2.390          2          1.195,0          1.195,0          1.040          1.350          219,0  fcntl64               
-      0,0            2.160          1          2.160,0          2.160,0          2.160          2.160            0,0  bind                  
-      0,0            1.290          1          1.290,0          1.290,0          1.290          1.290            0,0  pthread_mutex_lock    
+     63,0    8.236.842.371        540     15.253.411,0     10.072.083,0          1.290    201.262.824   23.099.874,0  poll                  
+     21,0    2.827.435.840          7    403.919.405,0    500.067.144,0         48.068    500.090.553  189.411.606,0  pthread_cond_timedwait
+     10,0    1.394.049.749          1  1.394.049.749,0  1.394.049.749,0  1.394.049.749  1.394.049.749            0,0  sem_clockwait         
+      2,0      281.807.750     14.708         19.160,0          1.240,0            999    121.196.202    1.330.118,0  read                  
+      1,0      189.100.079        785        240.891,0         14.540,0          1.030     24.313.743      997.438,0  ioctl                 
+      0,0       12.925.850      5.558          2.325,0          2.100,0          1.020         64.357        1.533,0  stat64                
+      0,0        9.949.224        727         13.685,0          1.949,0          1.560      4.426.503      174.772,0  mmap64                
+      0,0        9.039.364      2.290          3.947,0          3.170,0          1.230         93.416        3.388,0  open64                
+      0,0        5.644.771        707          7.984,0          2.760,0          2.040      2.370.158       89.753,0  munmap                
+      0,0        1.846.335      1.179          1.566,0          1.140,0            999         35.228        1.698,0  close                 
+      0,0        1.636.024         19         86.106,0         43.108,0         13.759        588.760      148.218,0  sem_timedwait         
+      0,0        1.343.190        104         12.915,0          2.740,0          2.080        265.636       44.793,0  mmap                  
+      0,0          535.432          3        178.477,0        143.952,0        143.733        247.747       59.989,0  pthread_join          
+      0,0          498.964          1        498.964,0        498.964,0        498.964        498.964            0,0  sem_wait              
+      0,0          477.688         43         11.109,0          9.340,0          1.000         59.037        9.660,0  fgets                 
+      0,0          474.468        286          1.659,0          1.260,0          1.000          6.270          895,0  fstat64               
+      0,0          396.861        214          1.854,0          1.740,0          1.010          9.110          596,0  lstat64               
+      0,0          362.116         63          5.747,0          6.290,0          1.060         20.688        3.384,0  write                 
+      0,0          322.030        210          1.533,0          1.445,0          1.190          3.550          293,0  stat                  
+      0,0          311.434          5         62.286,0         68.776,0         42.178         83.606       17.949,0  pthread_create        
+      0,0          273.932         47          5.828,0          3.650,0          1.080         35.238        6.070,0  fopen                 
+      0,0           98.357         15          6.557,0          4.310,0          1.040         31.928        7.568,0  pthread_cond_signal   
+      0,0           95.775         48          1.995,0          1.640,0          1.010          6.229        1.076,0  fclose                
+      0,0           78.346          1         78.346,0         78.346,0         78.346         78.346            0,0  backtrace             
+      0,0           68.356          3         22.785,0         20.249,0         18.859         29.248        5.639,0  waitpid               
+      0,0           66.536          1         66.536,0         66.536,0         66.536         66.536            0,0  pthread_cond_wait     
+      0,0           50.228         10          5.022,0          4.730,0          2.170          9.379        2.464,0  pipe2                 
+      0,0           47.648          7          6.806,0          5.750,0          1.740         19.889        6.035,0  open                  
+      0,0           31.448          6          5.241,0          3.074,0          1.490         16.529        5.742,0  fopen64               
+      0,0           29.479          4          7.369,0          7.949,0          3.090         10.490        3.132,0  fread                 
+      0,0           25.528          3          8.509,0          8.899,0          5.930         10.699        2.408,0  socket                
+      0,0           20.799          2         10.399,0         10.399,0          7.590         13.209        3.973,0  connect               
+      0,0           11.349          6          1.891,0          1.889,0          1.580          2.280          256,0  close_range           
+      0,0            6.780          5          1.356,0          1.240,0          1.210          1.850          276,0  sigaction             
+      0,0            6.470          2          3.235,0          3.235,0          2.440          4.030        1.124,0  fwrite                
+      0,0            5.519          1          5.519,0          5.519,0          5.519          5.519            0,0  pthread_kill          
+      0,0            4.839          4          1.209,0          1.120,0          1.050          1.549          228,0  fcntl                 
+      0,0            3.580          3          1.193,0          1.210,0          1.120          1.250           66,0  dup2                  
+      0,0            2.970          1          2.970,0          2.970,0          2.970          2.970            0,0  mprotect              
+      0,0            2.680          1          2.680,0          2.680,0          2.680          2.680            0,0  pthread_cond_broadcast
+      0,0            2.470          2          1.235,0          1.235,0          1.140          1.330          134,0  fcntl64               
+      0,0            1.929          1          1.929,0          1.929,0          1.929          1.929            0,0  bind                  
+      0,0            1.710          1          1.710,0          1.710,0          1.710          1.710            0,0  fputc                 
+      0,0            1.180          1          1.180,0          1.180,0          1.180          1.180            0,0  getc                  
+      0,0            1.170          1          1.170,0          1.170,0          1.170          1.170            0,0  fstat                 
 
 Processing [data/_square_euclidean_jfa_SoA.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/cuda_api_sum.py]... 
 
  ** CUDA API Summary (cuda_api_sum):
 
- Time (%)  Total Time (ns)  Num Calls  Avg (ns)  Med (ns)  Min (ns)  Max (ns)  StdDev (ns)          Name        
- --------  ---------------  ---------  --------  --------  --------  --------  -----------  --------------------
-     73,0          655.623         13  50.432,0  48.009,0    44.479    65.178      6.815,0  cuLibraryLoadData   
-      9,0           85.020         14   6.072,0   6.190,0     2.990     7.670      1.114,0  cuInit              
-      7,0           70.039         11   6.367,0   6.280,0     5.580     8.430        836,0  cuLibraryUnload     
-      5,0           45.768          1  45.768,0  45.768,0    45.768    45.768          0,0  cuMemGetInfo_v2     
-      2,0           20.050         65     308,0     190,0       100       930        214,0  cuKernelGetAttribute
-      0,0            6.829         13     525,0     510,0       430       770         80,0  cuLibraryGetKernel  
-      0,0            3.390          1   3.390,0   3.390,0     3.390     3.390          0,0  cuCtxSetCurrent     
+ Time (%)  Total Time (ns)  Num Calls   Avg (ns)     Med (ns)    Min (ns)   Max (ns)   StdDev (ns)          Name        
+ --------  ---------------  ---------  -----------  -----------  ---------  ---------  -----------  --------------------
+     52,0        4.530.908          1  4.530.908,0  4.530.908,0  4.530.908  4.530.908          0,0  cuMemcpyDtoH_v2     
+     29,0        2.528.870          1  2.528.870,0  2.528.870,0  2.528.870  2.528.870          0,0  cuMemcpyHtoD_v2     
+      8,0          724.542         13     55.734,0     51.377,0     43.948     91.726     13.128,0  cuLibraryLoadData   
+      4,0          418.639          2    209.319,0    209.319,0    159.902    258.737     69.886,0  cuMemAlloc_v2       
+      2,0          213.800         11     19.436,0      3.170,0      2.820    179.981     53.252,0  cuLaunchKernelEx    
+      1,0          124.725         11     11.338,0      6.929,0      6.020     51.787     13.469,0  cuLibraryUnload     
+      1,0           92.248         14      6.589,0      6.105,0      3.580     12.260      2.009,0  cuInit              
+      0,0           40.748          1     40.748,0     40.748,0     40.748     40.748          0,0  cuMemGetInfo_v2     
+      0,0           25.248         65        388,0        270,0        100      1.510        313,0  cuKernelGetAttribute
+      0,0            7.868         13        605,0        510,0        400      1.889        389,0  cuLibraryGetKernel  
+      0,0            4.180          1      4.180,0      4.180,0      4.180      4.180          0,0  cuCtxSetCurrent     
 
 Processing [data/_square_euclidean_jfa_SoA.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/cuda_gpu_kern_sum.py]... 
-SKIPPED: data/_square_euclidean_jfa_SoA.sqlite does not contain CUDA kernel data.
+
+ ** CUDA GPU Kernel Summary (cuda_gpu_kern_sum):
+
+ Time (%)  Total Time (ns)  Instances  Avg (ns)   Med (ns)   Min (ns)  Max (ns)  StdDev (ns)                                                  Name                                                
+ --------  ---------------  ---------  ---------  ---------  --------  --------  -----------  ----------------------------------------------------------------------------------------------------
+    100,0        1.428.947         11  129.904,0  129.916,0   120.828   141.852      6.772,0  __main__::_jfa_pass_SoA_square_euclidean_kernel[abi:v67,cw51cXTLSUwv1sDUaKthaKSjYKCpo4BIW7AwQwoOW3B…
 
 Processing [data/_square_euclidean_jfa_SoA.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/cuda_gpu_mem_time_sum.py]... 
-SKIPPED: data/_square_euclidean_jfa_SoA.sqlite does not contain GPU memory data.
+
+ ** CUDA GPU MemOps Summary (by Time) (cuda_gpu_mem_time_sum):
+
+ Time (%)  Total Time (ns)  Count   Avg (ns)     Med (ns)    Min (ns)   Max (ns)   StdDev (ns)           Operation          
+ --------  ---------------  -----  -----------  -----------  ---------  ---------  -----------  ----------------------------
+     57,0        3.307.640      1  3.307.640,0  3.307.640,0  3.307.640  3.307.640          0,0  [CUDA memcpy Device-to-Host]
+     43,0        2.492.306      1  2.492.306,0  2.492.306,0  2.492.306  2.492.306          0,0  [CUDA memcpy Host-to-Device]
 
 Processing [data/_square_euclidean_jfa_SoA.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/cuda_gpu_mem_size_sum.py]... 
-SKIPPED: data/_square_euclidean_jfa_SoA.sqlite does not contain GPU memory data.
+
+ ** CUDA GPU MemOps Summary (by Size) (cuda_gpu_mem_size_sum):
+
+ Total (MB)  Count  Avg (MB)  Med (MB)  Min (MB)  Max (MB)  StdDev (MB)           Operation          
+ ----------  -----  --------  --------  --------  --------  -----------  ----------------------------
+ 33,554          1  33,554    33,554    33,554    33,554    0,000        [CUDA memcpy Device-to-Host]
+ 33,554          1  33,554    33,554    33,554    33,554    0,000        [CUDA memcpy Host-to-Device]
 
 Processing [data/_square_euclidean_jfa_SoA.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/openmp_sum.py]... 
 SKIPPED: data/_square_euclidean_jfa_SoA.sqlite does not contain OpenMP event data.
@@ -104,10 +126,10 @@ Processing [data/_square_euclidean_jfa_SoA.sqlite] with [/opt/nvidia/nsight-syst
 SKIPPED: data/_square_euclidean_jfa_SoA.sqlite does not contain WDDM context data.
 
 Processing [data/_square_euclidean_jfa_SoA.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/um_sum.py]... 
-SKIPPED: data/_square_euclidean_jfa_SoA.sqlite does not contain CUDA memory transfers data.
+SKIPPED: data/_square_euclidean_jfa_SoA.sqlite does not contain CUDA Unified Memory CPU page faults data.
 
 Processing [data/_square_euclidean_jfa_SoA.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/um_total_sum.py]... 
-SKIPPED: data/_square_euclidean_jfa_SoA.sqlite does not contain CUDA memory transfers data.
+SKIPPED: data/_square_euclidean_jfa_SoA.sqlite does not contain CUDA Unified Memory CPU page faults data.
 
 Processing [data/_square_euclidean_jfa_SoA.sqlite] with [/opt/nvidia/nsight-systems/2026.3.1/target-linux-x64/reports/um_cpu_page_faults_sum.py]... 
 SKIPPED: data/_square_euclidean_jfa_SoA.sqlite does not contain CUDA Unified Memory CPU page faults data.

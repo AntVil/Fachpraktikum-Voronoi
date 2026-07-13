@@ -1074,11 +1074,7 @@ _Welche der Optimierungen hat den größten Laufzeit-gewinn erbracht?_
 
 _Wie viel schneller ist die Finale Implementation im Vergleich zur Naiven Implementation?_
 
-_Welchen Durchsatz haben die verschiedenen Implementationen?_
-
-_Ab welcher Eingabe-Größe erreicht die GPU ihre Sättigung?_
-
-_Was liefern die Profiling-Tools?_
+_Ausblick_
 
 # Anhang
 
