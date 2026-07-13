@@ -78,25 +78,10 @@ def main() -> None:
             kernel_performance_analysis(
                 kernel=kernel
             )
-    elif command is not None and "compare" in command:
-        match = re.match(pattern="^compare-([^-]+)-([^-]+)$", string=command)
-        if match is None:
-            print(f"Error: unknown command '{command}'")
-            exit(1)
-
-        kernel1 = str(match[1])
-        kernel2 = str(match[2])
-
-        if kernel1 in kernels_dictionary and kernel2 in kernels_dictionary:
-            kernel_performance_analysis_compare(
-                kernels=[
-                    kernels_dictionary[kernel1],
-                    kernels_dictionary[kernel2]
-                ]
-            )
-        else:
-            print(f"Error: unknown kernel combination '{kernel1} x {kernel2}'")
-            exit(1)
+    elif command is not None and command.startswith("compare"):
+        kernel_performance_analysis_compare(
+            kernels=list(map(lambda k: kernels_dictionary[k], command.split("-")[1:]))
+        )
     else:
         print(f"Error: unknown command '{command}'")
         exit(1)
