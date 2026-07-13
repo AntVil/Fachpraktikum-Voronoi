@@ -28,8 +28,6 @@ Als Beispiel wurden folgende Visualisierungen erstellt für die gleiche Punkte-M
 
 Die Regionen im Voronoi-Diagramm werden Voronoi-Regionen genannt.
 
-_2-3 wissenschaftliche Quellen_
-
 _Was sind verwandte Probleme die nicht berücksichtigt werden?_
 
 Um den Rahmen des Projekts abzugrenzen, werden verwandte Problemstellungen wie die Delaunay Triangulation oder Voronoi-Diagramme im mehr-dimensionalen Raum nicht betrachtet. In diesem Projekt werden lediglich diskrete Voronoi-Diagramme berechnet. Es ist somit nicht von Bedeutung die tatsächlichen Voronoi-Regionen tatsächlich zu bestimmen, sondern nur das tatsächliche Diagramm. Bei den Distanz-Funktionen steht die Euklidische-Distanz im Vordergrund. Die Manhattan-Distanz wird an einigen Stellen als Exkurs betrachtet.
