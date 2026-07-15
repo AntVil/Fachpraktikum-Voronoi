@@ -923,14 +923,16 @@ Da ein zu großer Schwellenwert den Shared-Memory-Bedarf ansteigen lässt und de
 ```bash
 uv run .\src\task7.py shared_memory_square_euclidean_jfa
 uv run .\src\task7.py compare-naive_square_euclidean_jfa-shared_memory_square_euclidean_jfa
+uv run .\src\task6b.py shared-jfa-step-analysis
 ```
 
 | RTX 5070                                                                                                                                                     | GTX 1660 Ti                                                                                                                                                     |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_shared_memory_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_shared_memory_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_shared_memory_square_euclidean_jfa_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_shared_memory_square_euclidean_jfa_resolution=128_points=64,128,256,512.png) |
+| ![](../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-RTX-5070_Naive-square-euclidean_Shared-memory-square-euclidean_res2048_seeds512.png)             | ![](../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-GTX-1660-Ti_Naive-square-euclidean_Shared-memory-square-euclidean_res2048_seeds512.png)             |
 
-Auch hier zeigt sich wieder die typische JFA-Charakteristik bezüglich der Laufzeitkomplexität in Abhängigkeit von Auflösung. Vergleicht man die Laufzeiten mit denen der naiven quadratischen euklidischen Implementierung, stellt man fest, dass der Einsatz von Shared Memory **keinen Laufzeitvorteil** erbracht hat. Dafür lassen sich folgende mögliche Ursachen identifizieren:
+Auch hier zeigt sich wieder die typische JFA-Charakteristik bezüglich der Laufzeitkomplexität in Abhängigkeit von Auflösung. In dem Diagramm, das die Laufzeit in Abhängigkeit zur Schrittweite darstellt, ist bei der `GTX 1660 Ti` zu erkennen, dass beide Implementierungen für die großen Schrittweiten übereinander liegen. Dies ist darauf zurückzuführen, dass die Shared Memory Pipeline hier nicht aktiviert ist. Ab Schrittweite 4 greift der Shared-Memory-Ansatz, der eine höhere Laufzeit als der naive Ansatz aufweist. Vergleicht man die Gesamtlaufzeiten mit denen der naiven quadratischen euklidischen Implementierung, stellt man fest, dass der Einsatz von Shared Memory **keinen Laufzeitvorteil** erbracht hat. Dafür lassen sich folgende mögliche Ursachen identifizieren:
 
 - Für das kooperative Laden mittels Grid-Stride-Loop sind innerhalb des Kernels Ganzzahl-Divisionen (`//`) und Modulo-Operationen (`%`) notwendig, um die linearen Thread-Indizes wieder in 2D-Koordinaten für das Shared-Memory-Array zu übersetzen. Diese Operationen sind mathematisch aufwändig und können die Laufzeit verschlechtern.
 
@@ -991,12 +993,14 @@ Für das _Structure of Arrays (SoA)_ Layout ergeben sich folgende Performancemes
 ```bash
 uv run .\src\task7.py SoA_square_euclidean_jfa
 uv run .\src\task7.py compare-naive_square_euclidean_jfa-SoA_square_euclidean_jfa
+uv run .\src\task6b.py SoA-jfa-step-analysis
 ```
 
 | RTX 5070                                                                                                                                           | GTX 1660 Ti                                                                                                                                           |
 | -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_SoA_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_SoA_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_SoA_square_euclidean_jfa_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_SoA_square_euclidean_jfa_resolution=128_points=64,128,256,512.png) |
+| ![](../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-RTX-5070_Naive-square-euclidean_SoA-square-euclidean_res2048_seeds512.png)             | ![](../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-GTX-1660-Ti_Naive-square-euclidean_SoA-square-euclidean_res2048_seeds512.png)             |
 
 Ein Vergleich der Messdaten mit der naiven quadratischen euklidischen Implementierung zeigt, dass das umgestellte _Structure of Arrays (SoA)_ Layout keinen messbaren Laufzeitvorteil gegenüber dem _Array of Structures (AoS)_ Layout liefert. Es lassen sich folgende mögliche Ursachen feststellen:
 

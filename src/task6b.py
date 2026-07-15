@@ -22,6 +22,7 @@ from utils import (
     get_device_name,
 )
 
+# NOTE: The same resolution and seed count as used for ncu
 # Resolution of the image containing the voronoi diagram
 RESOLUTION: int = 2048
 
@@ -92,9 +93,6 @@ def main() -> None:
     # JFA runtime per step size analysis
     ###
     elif command == "naive-jfa-step-analysis":
-        # NOTE: The same resolution and seed count as used for ncu
-        #SEED_COUNT = 512
-        #RESOLUTION = 2048
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         naive_euclidean_data = analyze_runtime_per_step_size(
             kernel=_jfa_pass_naive_square_euclidean_kernel,
@@ -114,9 +112,47 @@ def main() -> None:
             ("Naive manhattan", naive_manhattan_data),
         ]
         create_jfa_runtime_per_step_size_plot(RESOLUTION, SEED_COUNT, plot_data)
+    elif command == "shared-jfa-step-analysis":       
+        seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
+        naive_euclidean_data = analyze_runtime_per_step_size(
+            kernel=_jfa_pass_naive_square_euclidean_kernel,
+            make_output_grid=generate_AoS_grid_jfa,
+            seeds=seeds,
+            resolution=RESOLUTION,
+        )
+        print()
+        shared_euclidean_data = analyze_runtime_per_step_size(
+            kernel=_jfa_pass_shared_memory_square_euclidean_kernel,
+            make_output_grid=generate_AoS_grid_jfa,
+            seeds=seeds,
+            resolution=RESOLUTION,
+        )
+        plot_data = [
+            ("Naive square euclidean", naive_euclidean_data),
+            ("Shared memory square euclidean", shared_euclidean_data),
+        ]
+        create_jfa_runtime_per_step_size_plot(RESOLUTION, SEED_COUNT, plot_data)
+    elif command == "SoA-jfa-step-analysis":        
+        seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
+        naive_euclidean_data = analyze_runtime_per_step_size(
+            kernel=_jfa_pass_naive_square_euclidean_kernel,
+            make_output_grid=generate_AoS_grid_jfa,
+            seeds=seeds,
+            resolution=RESOLUTION,
+        )
+        print()
+        soA_euclidean_data = analyze_runtime_per_step_size(
+            kernel=_jfa_pass_SoA_square_euclidean_kernel,
+            make_output_grid=generate_SoA_grid_jfa,
+            seeds=seeds,
+            resolution=RESOLUTION,
+        )
+        plot_data = [
+            ("Naive square euclidean", naive_euclidean_data),
+            ("SoA square euclidean", soA_euclidean_data),
+        ]
+        create_jfa_runtime_per_step_size_plot(RESOLUTION, SEED_COUNT, plot_data)
     elif command == "all-jfa-step-analysis":
-        #SEED_COUNT = 512
-        #RESOLUTION = 2048
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         naive_euclidean_data = analyze_runtime_per_step_size(
             kernel=_jfa_pass_naive_square_euclidean_kernel,
