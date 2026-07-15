@@ -847,7 +847,7 @@ Wie zuvor erläutert, ist der JFA primär memory bound (vgl. ncu-Analyse). Um di
 
 _Problemstellung bei JFA_
 
-Im bezug auf den Einsatz von shared memory beim JFA ergibt sich folgende Problematik: Pro Iteration benötigt jeder Thread die Daten von sich selbst sowie von 8 Nachbarpixeln. Die Problematik hierbei ist, dass sich das Zugriffsfenszter stark mit der aktuellen Schrittweite (`step_size`) je nach Iterationsschritt variiert:
+Im Hinblick auf den Einsatz von Shared Memory beim JFA ergibt sich folgende Herausforderung: Pro Iteration benötigt jeder Thread die Daten von sich selbst sowie von 8 Nachbarpixeln. Die Problematik hierbei ist, dass das Zugriffsfenster stark mit der aktuellen Schrittweite (`step_size`) je nach Iterationsschritt variiert:
 
 - **Große Schrittweiten:** Die benötigten Nachbardaten liegen weit auseinander und außerhalb des Thread-Blocks. Um diese Distanzen abzudecken, müsste der Shared-Memory-Buffer unrealistisch groß dimensioniert werden. Dies würde nicht nur das Hardware-Limit des Shared Memory pro Block sprengen, sondern auch zu einem Overhead beim Laden der Daten führen. Der Einsatz von Shared Memory ist in diesen Phasen daher **nicht sinnvoll**.
 
@@ -1008,7 +1008,9 @@ Ein Vergleich der Messdaten mit der naiven quadratischen euklidischen Implementi
 
 - Das theoretische _Memory Coalescing_ von SoA setzt voraus, dass die Threads **lückenlos** auf benachbarte Adressen zugreifen. Beim JFA ist dies durch die variierenden Sprungweiten (`step_size`) in der horizontalen und insbesondere in der vertikalen Dimension (Zeilensprünge) über die meisten Iterationen hinweg nicht gegeben. Da die Threads dadurch ohnehin nicht zusammenhängende Speichersegmente anfordern müssen, kann der Strukturvorteil von SoA nicht greifen.
 
-NCU-Analyse: [ncu-Datei](../data/ncu_NVIDIA-GeForce-RTX-5070_square_euclidean_jfa_SoA_resolution=2048_points=512.log)
+Die [ncu-Datei](../data/ncu_NVIDIA-GeForce-RTX-5070_square_euclidean_jfa_SoA_resolution=2048_points=512.log) zeigt, dass in der Iteration 1 bis 3 der Speicher mehr ausgelastet ist als der Compute. Ab Iteration 4 bis zum Ende meldet ncu dann, dass beide Aspekte gut ausgeglichen sind (_Compute and Memory are well-balanced_).
+
+<!-- TODO: Erklärung wieso? -->
 
 **Shuffle**
 
