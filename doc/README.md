@@ -657,6 +657,12 @@ $$N \le \sqrt{1073741823,5} = 32768$$
 
 Demnach würde diese Obergrenze bei Bildgrößen ab $32768 \times 32768$ Pixeln überschritten werden, was für die meisten Auflösungen allerdings ausreichend sein sollte. Da beim JFA zudem nie zwei diagonal gegenüberliegende Bildeckpunkte verwendet werden - aufgrund der höchsten Schritte von $\frac{N}{2}$ zu Beginn - ist die tatsächliche maximale Grenze für den JFA nochmal höher.
 
+_Gibt es Warp-Divergenz?_
+
+Ja, in dieser Implementierung gibt es Warp-Divergenz: Die Threads innerhalb eines Warps können sich in unterschiedliche Ausführungspfade aufteilen. Der Grund liegt darin, dass jeder Thread genau einen Pixel bearbeitet und die dabei geprüften Bedingungen datenabhängig sind - insbesondere, ob ein Pixel oder dessen Nachbar bereits eine gültige Punkt-Koordinate kennt (`!= -1`) oder noch den initialen Default-Wert (`-1`) trägt.
+
+Diese Divergenz lässt sich aufgrund der JFA-Charakteristik nur schwer vermeiden: Zu Beginn (großer `step_size`) kennen viele Pixel noch keinen Punkt, wodurch die `-1`-Prüfungen und Distanzvergleiche stark zwischen den Threads eines Warps variieren können. Mit kleiner werdender Schrittweite besitzen zunehmend mehr Pixel bereits einen gültigen Punkt, sodass sich die Pfade der Threads innerhalb eines Warps angleichen können und die Divergenz tendenziell abnimmt.
+
 _Gibt es Qualitätsunterschiede (Pixelfehler) im Diagramm?_
 
 In der Literatur wird der JFA als Approximations-Algorithmus bezeichnet. Das bedeutet, dass der Algorithmus mathematisch nicht immer ein zu `100%` korrektes Ergebnis liefert. Auch im originalen Paper von Guodong Rong und Tiow-Seng Tan wird dieses Thema explizit behandelt (vgl. [5. Errors in Jump Flooding](https://www.comp.nus.edu.sg/~tants/jfa/i3d06.pdf)). Die Autoren zeigen dort aber auch auf, dass die Fehlerrate in der Praxis minimal ist.
@@ -831,12 +837,6 @@ Bei der `GTX 1660 Ti` verhält es sich anders: Die Laufzeit ist zu Beginn ($k = 
 
 Zu beachten ist, dass die ncu-Analyse hier mit der `RTX 5070` durchgeführt wurde (vgl. [Anhang](#anhang)) und es starke Hardwareunterschiede zu der `GTX 1660 Ti` gibt. Das aus der ncu-Analyse resultierende Verhalten muss nicht direkt für die `GTX 1660 Ti` gelten. Der L1- und L2-Cache der `RTX 5070` ist beispielsweise deutlich größer als der der `GTX 1660 Ti`, weshalb der Effekt deutlich früher eintritt (vgl. [Vergleich](https://technical.city/de/video/GeForce-GTX-1660-Ti-vs-GeForce-RTX-5070)).
 
-_Gibt es Warp-Divergenz?_
-
-Ja, in dieser Implementierung gibt es Warp-Divergenz: Die Threads innerhalb eines Warps können sich in unterschiedliche Ausführungspfade aufteilen. Der Grund liegt darin, dass jeder Thread genau einen Pixel bearbeitet und die dabei geprüften Bedingungen datenabhängig sind - insbesondere, ob ein Pixel oder dessen Nachbar bereits eine gültige Punkt-Koordinate kennt (`!= -1`) oder noch den initialen Default-Wert (`-1`) trägt.
-
-Diese Divergenz lässt sich aufgrund der JFA-Charakteristik nur schwer vermeiden: Zu Beginn (großer `step_size`) kennen viele Pixel noch keinen Punkt, wodurch die `-1`-Prüfungen und Distanzvergleiche stark zwischen den Threads eines Warps variieren können. Mit kleiner werdender Schrittweite besitzen zunehmend mehr Pixel bereits einen gültigen Punkt, sodass sich die Pfade der Threads innerhalb eines Warps angleichen können und die Divergenz tendenziell abnimmt.
-
 ## Aufgabe 6b - Optimierungen
 
 _Können Optimierungen durchgeführt werden? Wenn ja, warum? Wenn nein, warum nicht?_
@@ -886,6 +886,14 @@ Da der Shared-Memory-Buffer inklusive Halo größer ist als die Anzahl der verf�
 3. Falls ein Block am echten Bildrand liegt und der Halo über die Bildauflösung hinausragt, fangen die Threads dies ab und beschreiben das Shared Memory mit einem _Uninitialized-Flag_ (`-1`).
 
 Nach dem Ladevorgang stellt `cuda.syncthreads()` sicher, dass erst alle Elemente im Shared Memory liegen, bevor die Threads mit der eigentlichen JFA-Distanzberechnung starten. Threads, die außerhalb der echten Bildgrenzen liegen, terminieren erst **nach** diesem Sync, da sie beim kooperativen Laden des Halos mithelfen mussten. Die JFA-Distanzberechnung wird dann auf den Pixeldaten im Shared-Memory-Buffer durchgeführt.
+
+_Gibt es Bank Conflicts?_
+
+Shared Memory ist in 32 Banks aufgeteilt, wobei jede Bank 4 Byte (32 Bit) breit ist. Wenn mehrere Threads desselben Warps im selben Taktzyklus auf unterschiedliche Adressen **innerhalb** derselben Bank zugreifen wollen, entsteht ein Bank Conflict. Der Zugriff auf diese Bank wird dann serialisiert, bis alle anfragenden Threads bedient wurden, was zu einem Leistungsverlust führen kann (vgl. [NVIDIA-Dokumentation](https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/writing-cuda-kernels.html#shared-memory-access-patterns)).
+
+In diesem Kernel liegt das `shared_buffer`-Array als 3D-Layout `(SHARED_MEMORY_SIZE, SHARED_MEMORY_SIZE, 2)` vor, wobei die letzte Dimension die X- und Y-Koordinate eines Punkts _interleaved_ speichert. Dadurch beträgt der Adressabstand zwischen zwei in `x`-Richtung benachbarten Threads nicht 1 Wort (4 Byte; 32 Bit), sondern 2 Worte (2 Banks). Dadurch, landen bei einem Zugriff wie `shared_buffer[shared_pixel_y, shared_pixel_x, 0]` jeweils zwei Threads in derselben Bank: Thread 0 und Thread 16 greifen auf Bank 0 zu, Thread 1 und Thread 17 auf Bank 2, Thread 2 und Thread 18 auf Bank 4 usw. Es entsteht somit ein **2-way Bank Conflict**, der sowohl beim kooperativen Laden der Shared Memory als auch beim Lesen des eigenen Seeds und bei der Nachbarschaftsauswertung auftritt.
+
+Um diesem Problem der interleaved 3D-Struktur nachzugehen, wird im folgenden Abschnitt ein alternatives Datenlayout betrachtet. Da der Shared-Memory-Ansatz gegenüber der naiven Implementierung keine relevante Laufzeitverbesserung brachte, wird wieder die naive, ursprüngliche Implementierung verwendet, wobei das zugrunde liegende Problem gleich bleibt.
 
 _Dimensionierung von `SHARED_MEMORY_SIZE`_
 
@@ -940,19 +948,9 @@ Auch hier zeigt sich wieder die typische JFA-Charakteristik bezüglich der Laufz
 
 - Die hardwareseitigen L1- und L2-Caches leisten bereits bei der naiven Implementierung einen enormen Beitrag bei den kleinen Schrittweiten, wodurch der softwareseitig verwaltete Shared-Memory-Buffer keinen signifikanten Zusatznutzen mehr generieren kann.
 
-<!-- Außerdem hat sich beim Rumprobieren mit JFA_SHARED_THRESHOLD gezeigt, dass die Performance mit kleinerer Größe steigt, sodass bei 1 die beste Laufzeit erreicht wird. Dies entspricht jedoch einer vollständigen Deaktivierung der Shared-Memory-Pipeline, wodurch der gesamte Ansatz mit Shared Memory keinen Gewinn bringt. ... -->
+Die von ncu erzeugte [Datei](../data/ncu_NVIDIA-GeForce-RTX-5070_square_euclidean_jfa_shared_resolution=2048_points=512.log) unterstreicht das. In den Iterationen 1 bis 8 meldet ncu ein Memory-Bound-Problem, da hier noch der naive Ansatz über VRAM als Fallback verwendet wird (vgl. ncu Analse der naiven Implementation). Ab Iteration 9 (Schrittweite 4) greift die Shared-Memory-Pipeline, und ncu meldet nun eine höhere Compute- als Memory-Auslastung. Das zeigt, dass der Shared-Memory-Ansatz den ursprünglichen Speicher-Engpass zwar erfolgreich auf die Recheneinheiten verlagert, dieser Effekt jedoch durch den zusätzlichen Rechenaufwand (Indexberechnung via Ganzzahl-Division/Modulo, Synchronisationsbarriere) wieder kompensiert wird, wodurch unterm Strich keine Laufzeitverbesserung gegenüber der naiven Implementierung entsteht.
 
-NCU analyse: [ncu-Datei](../data/ncu_NVIDIA-GeForce-RTX-5070_square_euclidean_jfa_shared_resolution=2048_points=512.log)
-
-<!-- Abschließend lässt sich festhalten, dass durch die Optimierung mittels Shared Memory beim JFA **kein Performancegewinn** erzielt werden konnte. Dies hängt mit der Struktur des JFA zusammen: Zwar benötigt jeder Thread 9 Pixeldaten aus dem VRAM, die effektive Redundanz der Zugriffe innerhalb eines Blocks sind jedoch nicht hoch genug, um den zusätzlichen Aufwand durch den Einsatz von shared memory -->
-
-_Gibt es Bank Conflicts?_
-
-Shared Memory ist in 32 Banks aufgeteilt, wobei jede Bank 4 Byte (32 Bit) breit ist. Wenn mehrere Threads desselben Warps im selben Taktzyklus auf unterschiedliche Adressen **innerhalb** derselben Bank zugreifen wollen, entsteht ein Bank Conflict. Der Zugriff auf diese Bank wird dann serialisiert, bis alle anfragenden Threads bedient wurden, was zu einem Leistungsverlust führen kann (vgl. [NVIDIA-Dokumentation](https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/writing-cuda-kernels.html#shared-memory-access-patterns)).
-
-In diesem Kernel liegt das `shared_buffer`-Array als 3D-Layout `(SHARED_MEMORY_SIZE, SHARED_MEMORY_SIZE, 2)` vor, wobei die letzte Dimension die X- und Y-Koordinate eines Punkts _interleaved_ speichert. Dadurch beträgt der Adressabstand zwischen zwei in `x`-Richtung benachbarten Threads nicht 1 Wort (4 Byte; 32 Bit), sondern 2 Worte (2 Banks). Dadurch, landen bei einem Zugriff wie `shared_buffer[shared_pixel_y, shared_pixel_x, 0]` jeweils zwei Threads in derselben Bank: Thread 0 und Thread 16 greifen auf Bank 0 zu, Thread 1 und Thread 17 auf Bank 2, Thread 2 und Thread 18 auf Bank 4 usw. Es entsteht somit ein **2-way Bank Conflict**, der sowohl beim kooperativen Laden der Shared Memory als auch beim Lesen des eigenen Seeds und bei der Nachbarschaftsauswertung auftritt.
-
-Um diesem Problem der interleaved 3D-Struktur nachzugehen, wird im folgenden Abschnitt ein alternatives Datenlayout betrachtet. Da der Shared-Memory-Ansatz gegenüber der naiven Implementierung keine relevante Laufzeitverbesserung brachte, wird wieder die naive, ursprüngliche Implementierung verwendet, wobei das zugrunde liegende Problem gleich bleibt.
+<!-- Abschließend lässt sich festhalten, dass die Optimierung mittels Shared Memory beim JFA **keinen Performancegewinn** erzielt hat. Dies liegt vor allem an der Natur des Algorithmus selbst: Ein softwareseitiges Caching im Shared Memory ist konzeptionell überhaupt erst bei kleinen Schrittweiten möglich. Doch selbst bei diesen konnte kein Gewinn erzielt werden. Hier ist die Redundanz der Speicherzugriffe innerhalb eines Thread-Blocks nicht hoch genug, um den zusätzlichen Overhead für das kollaborative Laden, die Thread-Synchronisation und die Indexberechnung mittels Division und Modulo zu kompensieren. -->
 
 **Datenlayout optimieren**
 
