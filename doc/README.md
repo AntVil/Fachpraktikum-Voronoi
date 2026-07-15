@@ -579,6 +579,8 @@ Dieser Algorithmus ist nun möglichst effizient implementiert. Im folgenden woll
 
 Der Jump Flooding Algorithmus (JFA) wurde im Jahr 2006 von **Guodong Rong** und **Tiow-Seng Tan** auf der Computergrafik-Konferenz _ACM Symposium on Interactive 3D Graphics and Games (I3D)_ in Redwood City vorgestellt (vgl. [Jump Flooding in GPU](https://www.comp.nus.edu.sg/~tants/jfa/i3d06.pdf)). Die Autoren konzipierten den Algorithmus gezielt für die parallele Architektur von GPUs, um geometrische Probleme wie die Berechnung von Voronoi-Diagrammen oder Distanzfeldern zu lösen.
 
+## Aufgabe 6a - Beschreibung und naive Implementation
+
 _Wie funktioniert der Algorithmus?_
 
 Für den Algorithmus wird ein quadratisches Grid der Größe $N \times N$ definiert. Bevor der Algorithmus startet, wird das leere Grid initialisiert, indem die zuvor zufällig generierten Seed-Koordinaten gesetzt werden: Jeder Seed weiß zu Beginn, zu welchem Pixel er gehört. Alle anderen Pixel werden mit einem **undefinierten** Startzustand initialisiert. Das bedeutet, ein normaler Pixel weiß anfangs nicht, zu welchem Punkt er am nächsten liegt.
@@ -604,7 +606,7 @@ Eine Besonderheit liegt in der Steuerung auf der Host-Seite: Das Voronoi-Diagram
 - Die aktuelle Schrittweite $k$ für den Pass (`step_size`)
 - Die Auflösung des Diagramms (`size`)
 
-Die Verwendung von zwei getrennten Grids ist notwendig, da das Eingabe-Grid während des Schrittes gelesen wird, um das Ausgabe-Grid parallel zu aktualisieren. Auf der Host-Seite wird der Kernel in einer Schleife so oft aufgerufen, bis die Schrittweite den Wert **1** abgearbeitet hat. Nach jedem Kernel-Aufruf werden das Eingabe- und Ausgabe-Grid getauscht (**Swapping**), sodass ein Ping-Pong-artiges Konstrukt entsteht.
+Die Verwendung von zwei getrennten Grids ist notwendig, da das Eingabe-Grid während des Schrittes gelesen wird, um das Ausgabe-Grid parallel zu aktualisieren. Bei der Verwendung eines gemeinsamen Grids kann es zu **Race Conditions** kommen: Ein Thread liest dann möglicherweise den von einem anderen Thread neu geschriebenen Wert anstelle des ursprünglichen Werts vor diesem Pass. Da die X- und Y-Koordinate eines Punktes als zwei separate Schreiboperationen erfolgen, könnte ein Thread die X-Koordinate eines Punktes sogar mit der noch nicht aktualisierten Y-Koordinate eines anderen Punktes kombinieren, wodurch ein Punkt entsteht, der in der Form gar nicht existiert. Auf der Host-Seite wird der Kernel in einer Schleife so oft aufgerufen, bis die Schrittweite den Wert **1** abgearbeitet hat. Nach jedem Kernel-Aufruf werden das Eingabe- und Ausgabe-Grid getauscht (**Swapping**), sodass ein Ping-Pong-artiges Konstrukt entsteht.
 
 Um am Ende aus dem 3D-Array (das die Seed-Koordinaten als X/Y-Tupel speichert) ein finales 2D-Array mit eindeutigen UIDs der Seeds zu erzeugen, wird für jeden Pixel der berechnete X-Wert mit dem Wert $Y \cdot \mathrm{resolution}$ addiert:
 
@@ -686,10 +688,6 @@ JFA + 2: 99.9637%
 ```
 
 Es ist zu erkennen, dass bereits beim Standard-JFA ohne zusätzliche Durchläufe der Anteil fehlerhafter Pixel im Vergleich zur Gesamtpixelanzahl deutlich unter 1 % liegt. Mit den zusätzlichen Durchläufen von `JFA+1` und `JFA+2` lassen sich im Experiment zwar messbare Verbesserungen der Genauigkeit erzielen, diese fallen bei der gewählten Konstellation jedoch nicht mehr allzu signifikant aus, da die Basisgenauigkeit bereits recht hoch ist.
-
-_Warp Divergenz_
-
-_Bank Conflicts_
 
 _Was muss bei der Performancemessung beachtet werden?_
 
@@ -833,6 +831,12 @@ Bei der `GTX 1660 Ti` verhält es sich anders: Die Laufzeit ist zu Beginn ($k = 
 
 Zu beachten ist, dass die ncu-Analyse hier mit der `RTX 5070` durchgeführt wurde (vgl. [Anhang](#anhang)) und es starke Hardwareunterschiede zu der `GTX 1660 Ti` gibt. Das aus der ncu-Analyse resultierende Verhalten muss nicht direkt für die `GTX 1660 Ti` gelten. Der L1- und L2-Cache der `RTX 5070` ist beispielsweise deutlich größer als der der `GTX 1660 Ti`, weshalb der Effekt deutlich früher eintritt (vgl. [Vergleich](https://technical.city/de/video/GeForce-GTX-1660-Ti-vs-GeForce-RTX-5070)).
 
+_Gibt es Warp-Divergenz?_
+
+Ja, in dieser Implementierung gibt es Warp-Divergenz: Die Threads innerhalb eines Warps können sich in unterschiedliche Ausführungspfade aufteilen. Der Grund liegt darin, dass jeder Thread genau einen Pixel bearbeitet und die dabei geprüften Bedingungen datenabhängig sind - insbesondere, ob ein Pixel oder dessen Nachbar bereits eine gültige Punkt-Koordinate kennt (`!= -1`) oder noch den initialen Default-Wert (`-1`) trägt.
+
+Diese Divergenz lässt sich aufgrund der JFA-Charakteristik nur schwer vermeiden: Zu Beginn (großer `step_size`) kennen viele Pixel noch keinen Punkt, wodurch die `-1`-Prüfungen und Distanzvergleiche stark zwischen den Threads eines Warps variieren können. Mit kleiner werdender Schrittweite besitzen zunehmend mehr Pixel bereits einen gültigen Punkt, sodass sich die Pfade der Threads innerhalb eines Warps angleichen können und die Divergenz tendenziell abnimmt.
+
 ## Aufgabe 6b - Optimierungen
 
 _Können Optimierungen durchgeführt werden? Wenn ja, warum? Wenn nein, warum nicht?_
@@ -939,6 +943,14 @@ Auch hier zeigt sich wieder die typische JFA-Charakteristik bezüglich der Laufz
 NCU analyse: [ncu-Datei](../data/ncu_NVIDIA-GeForce-RTX-5070_square_euclidean_jfa_shared_resolution=2048_points=512.log)
 
 <!-- Abschließend lässt sich festhalten, dass durch die Optimierung mittels Shared Memory beim JFA **kein Performancegewinn** erzielt werden konnte. Dies hängt mit der Struktur des JFA zusammen: Zwar benötigt jeder Thread 9 Pixeldaten aus dem VRAM, die effektive Redundanz der Zugriffe innerhalb eines Blocks sind jedoch nicht hoch genug, um den zusätzlichen Aufwand durch den Einsatz von shared memory -->
+
+_Gibt es Bank Conflicts?_
+
+Shared Memory ist in 32 Banks aufgeteilt, wobei jede Bank 4 Byte (32 Bit) breit ist. Wenn mehrere Threads desselben Warps im selben Taktzyklus auf unterschiedliche Adressen **innerhalb** derselben Bank zugreifen wollen, entsteht ein Bank Conflict. Der Zugriff auf diese Bank wird dann serialisiert, bis alle anfragenden Threads bedient wurden, was zu einem Leistungsverlust führen kann (vgl. [NVIDIA-Dokumentation](https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/writing-cuda-kernels.html#shared-memory-access-patterns)).
+
+In diesem Kernel liegt das `shared_buffer`-Array als 3D-Layout `(SHARED_MEMORY_SIZE, SHARED_MEMORY_SIZE, 2)` vor, wobei die letzte Dimension die X- und Y-Koordinate eines Punkts _interleaved_ speichert. Dadurch beträgt der Adressabstand zwischen zwei in `x`-Richtung benachbarten Threads nicht 1 Wort (4 Byte; 32 Bit), sondern 2 Worte (2 Banks). Dadurch, landen bei einem Zugriff wie `shared_buffer[shared_pixel_y, shared_pixel_x, 0]` jeweils zwei Threads in derselben Bank: Thread 0 und Thread 16 greifen auf Bank 0 zu, Thread 1 und Thread 17 auf Bank 2, Thread 2 und Thread 18 auf Bank 4 usw. Es entsteht somit ein **2-way Bank Conflict**, der sowohl beim kooperativen Laden der Shared Memory als auch beim Lesen des eigenen Seeds und bei der Nachbarschaftsauswertung auftritt.
+
+Um diesem Problem der interleaved 3D-Struktur nachzugehen, wird im folgenden Abschnitt ein alternatives Datenlayout betrachtet. Da der Shared-Memory-Ansatz gegenüber der naiven Implementierung keine relevante Laufzeitverbesserung brachte, wird wieder die naive, ursprüngliche Implementierung verwendet, wobei das zugrunde liegende Problem gleich bleibt.
 
 **Datenlayout optimieren**
 
