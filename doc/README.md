@@ -1086,6 +1086,14 @@ Es ist zu sehen, dass für die Eingabe-Größen `512` und `2048` des Raster eine
 
 # Aufgabe 7 - Ergebnisse
 
+Abschließend werden beide Algorithmen gemeinsam betrachtet und gegenübergestellt. Die folgenden Diagramme zeigen die Laufzeiten der jeweiligen Kernel für eine feste Bildgröße von $128 \times 128$ und eine variierende Anzahl an Punkten:
+
+| RTX 5070      | GTX 1660 Ti                                                                                                                                                                                                                          |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ![](../data/) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_square_euclidean_fast_square_euclidean_fast_grid_stride_square_euclidean_fast_warp_shfl_naive_square_euclidean_jfa_resolution=128_points=64,128,256,512.png) |
+
+Der Pixel-Algorithmus ist vor allem bei einer geringen Punktemenge sehr schnell und weist eine deutlich bessere Laufzeit als der JFA auf. Mit zunehmender Anzahl von Punkten im Diagramm nimmt die Laufzeit jedoch quadratisch zu. Ab einer bestimmten Anzahl greift die JFA-Charakteristik und der JFA ist schneller. Dieser Übergang erfolgt je nach Implementierung des Pixel-Algorithmus zu einem späteren Zeitpunkt, aber irgendwann wird der Schnittpunkt zwingend erreicht.
+
 _Welche der Optimierungen hat den größten Laufzeit-gewinn erbracht?_
 
 _Wie viel schneller ist die Finale Implementation im Vergleich zur Naiven Implementation?_
