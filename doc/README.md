@@ -1086,10 +1086,15 @@ Es ist zu sehen, dass für die Eingabe-Größen `512` und `2048` des Raster eine
 
 # Aufgabe 7 - Ergebnisse
 
+> [!NOTE]
+> **Maximale Pfadlänge unter Windows**
+>
+> Windows begrenzt Pfade auf [260 Zeichen](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=registry). Da die Dateinamenerstellung der Performanceplots in Aufgabe 7 diese Grenze überschreiten können, wurde die Option eines Identifiers eingeführt - in diesem Fall `final`. Ohne diesen schlägt das Speichern mit `FileNotFoundError: [Errno 2] No such file or directory: ...` fehl, weil der gesamte Pfad zu lang ist.
+
 Abschließend werden beide Algorithmen gemeinsam betrachtet und gegenübergestellt. Die folgenden Diagramme zeigen die Laufzeiten der jeweiligen Kernel für eine feste Bildgröße von $128 \times 128$ und eine variierende Anzahl an Punkten:
 
-| RTX 5070      | GTX 1660 Ti                                                                                                                                                                                                                          |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| RTX 5070                                                                                             | GTX 1660 Ti                                                                                             |
+| ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_final_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_final_resolution=128_points=64,128,256,512.png) |
 
 Der Pixel-Algorithmus ist vor allem bei einer geringen Punktemenge sehr schnell und weist eine deutlich bessere Laufzeit als der JFA auf. Mit zunehmender Anzahl von Punkten im Diagramm nimmt die Laufzeit jedoch quadratisch zu. Ab einer bestimmten Anzahl greift die JFA-Charakteristik und der JFA ist schneller. Dieser Übergang erfolgt je nach Implementierung des Pixel-Algorithmus zu einem späteren Zeitpunkt, aber irgendwann wird der Schnittpunkt zwingend erreicht.
