@@ -479,8 +479,8 @@ Ein Blick auf das Assembly zeigt, dass der Compiler wegen der Konstante `GRID_ST
 
 | RTX 5070                                                                                                                                       | GTX 1660 Ti                                                                                                                                       |
 | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_hypot_grid_stride_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_grid_stride_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_euclidean_hypot_grid_stride_resolution=128_points=64,128,256,512.png)     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_euclidean_hypot_grid_stride_resolution=128_points=64,128,256,512.png)     |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_grid_stride_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_grid_stride_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_grid_stride_euclidean_hypot_resolution=128_points=64,128,256,512.png)     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_grid_stride_euclidean_hypot_resolution=128_points=64,128,256,512.png)     |
 
 Es ist zusehen, dass im Vergleich zur Naiven Variante bei höherer Auflösung und Punkt-Anzahl deutlich Laufzeit eingespart wurde. Interessanterweise ist zu sehen, dass der Algorithmus für kleine Eingaben langsamer geworden ist. Der Grund hierfür ist vermutlich darauf zurückzuführen, dass mehr Overhead durch das Shared-Memory beziehungsweise das Loop-Unrolling entstanden ist. Erst bei größeren Eingaben fällt dieser Overhead weg.
 
@@ -524,8 +524,8 @@ Wie zu erwarten ist im Assembly die intrisic Operation `shfl.sync.idx` zu sehen.
 
 | RTX 5070                                                                                                                                     | GTX 1660 Ti                                                                                                                                     |
 | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_hypot_warp_shfl_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_warp_shfl_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_euclidean_hypot_warp_shfl_resolution=128_points=64,128,256,512.png)     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_euclidean_hypot_warp_shfl_resolution=128_points=64,128,256,512.png)     |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_warp_shfl_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_warp_shfl_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_warp_shfl_euclidean_hypot_resolution=128_points=64,128,256,512.png)     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_warp_shfl_euclidean_hypot_resolution=128_points=64,128,256,512.png)     |
 
 Es ist zu sehen, dass diese Variante ebenfalls schneller arbeitet, als die initiale Variante. Interessanterweise ist nun kein Unterschied bei kleinen Eingaben zu sehen, der Grund ist an dieser Stelle leider nicht ganz eindeutig, aber es könnte daran liegen, dass kein `cuda.syncthreads` nötig ist. Für größere Eingaben erscheint der Grid-Stride-Loop mit Shared-Memory effektiver.
 
@@ -537,8 +537,8 @@ Folgende Diagramme geben die Laufzeiten wieder.
 
 | RTX 5070                                                                                                                                             | GTX 1660 Ti                                                                                                                                             |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_square_euclidean_fast_grid_stride_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_square_euclidean_fast_grid_stride_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_square_euclidean_fast_warp_shfl_resolution=128,256,512,1024,2048_points=64,128,256,512.png)   | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_square_euclidean_fast_warp_shfl_resolution=128,256,512,1024,2048_points=64,128,256,512.png)   |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_grid_stride_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_grid_stride_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_warp_shfl_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png)   | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_warp_shfl_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png)   |
 
 Es hat sich ergeben, dass die Warp mit `shfl_sync` Variante für jede Eingabe eine bessere Laufzeit aufweis.
 
