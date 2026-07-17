@@ -156,8 +156,8 @@ Folgendes Diagramm gibt die Laufzeit für verschiedene eine feste Ausgabe-Größ
 
 | RTX 5070                                                                                                                           | GTX 1660 Ti                                                                                                                           |
 | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_resolution=128_points=64,128,256,512.png)                     |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_hypot_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_hypot_resolution=128_points=64,128,256,512.png)                     |
 
 Es ist leicht zu erkennen, dass größenordnungsmäßig ein verdoppeln der Anzahl an Punkten ein verdoppeln der Laufzeit mit sich bringt. Ein verdoppeln der Auflösung führt größenordnungsmäßig zu einem vervierfachen der Laufzeit. Das liegt daran, dass ein verdoppeln der Auflösung dazu führt, dass viermal so viele Pixel berechnet werden müssen.
 
@@ -206,7 +206,7 @@ Der gleiche Algorithmus mit Manhattan-Distanz ist deutlich schneller als mit Euk
 
 | RTX 5070                                                                                                                 | GTX 1660 Ti                                                                                                                 |
 | ------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_manhattan_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_manhattan_resolution=128_points=64,128,256,512.png) |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_hypot_naive_manhattan_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_hypot_naive_manhattan_resolution=128_points=64,128,256,512.png) |
 
 Dies ist natürlich nicht verwunderlich, da für die Berechnung der Manhattan-Distanz nur Addition und die Absolut-Funktion nötig sind, welche sehr leicht zu berechnen sind.
 Hingegen für die Euklidische-Distanz wird die `cuda.libdevice.hypotf` Funktion aufgerufen, welche schwerer beziehungsweise langsamer zu berechnen ist.
@@ -320,8 +320,8 @@ Durch die verringerte Anzahl an Anweisungen ist eine klare Verbesserung in der L
 
 | RTX 5070                                                                                                                          | GTX 1660 Ti                                                                                                                          |
 | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_euclidean_sqrt_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_euclidean_sqrt_resolution=128_points=64,128,256,512.png)     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_euclidean_sqrt_resolution=128_points=64,128,256,512.png)     |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_euclidean_sqrt_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_sqrt_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_hypot_naive_euclidean_sqrt_resolution=128_points=64,128,256,512.png)     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_hypot_naive_euclidean_sqrt_resolution=128_points=64,128,256,512.png)     |
 
 Die verringerte Anzahl an Anweisungen ist auch in der Ausgabe von `ncu` zu sehen.
 
@@ -378,8 +378,8 @@ Für die Laufzeit ergeben sich folgende Unterschiede.
 
 | RTX 5070                                                                                                                               | GTX 1660 Ti                                                                                                                               |
 | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_euclidean_sqrt_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_euclidean_sqrt_fast_resolution=128_points=64,128,256,512.png)      | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_sqrt_euclidean_sqrt_fast_resolution=128_points=64,128,256,512.png)      |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_euclidean_sqrt_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_sqrt_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_sqrt_naive_euclidean_sqrt_fast_resolution=128_points=64,128,256,512.png)      | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_sqrt_naive_euclidean_sqrt_fast_resolution=128_points=64,128,256,512.png)      |
 
 Die Laufzeit hat sich deutlich verbessert durch den Einsatz von der `fastmath=True` Annotation. Für den Fall `Resolution=2048` und `Point-count=512` hat sich die Laufzeit ungefähr halbiert im Vergleich zur initialen Implementation aus _Aufgabe 3_.
 
@@ -415,8 +415,8 @@ Folgende Diagramme zeigen die Laufzeit des Algorithmus mit der neuen Distanz-Fun
 
 | RTX 5070                                                                                                                            | GTX 1660 Ti                                                                                                                            |
 | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_fast_square_euclidean_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_sqrt_fast_square_euclidean_resolution=128_points=64,128,256,512.png) |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_sqrt_fast_naive_square_euclidean_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_sqrt_fast_naive_square_euclidean_resolution=128_points=64,128,256,512.png) |
 
 Es ist zu sehen, dass ein verzichten auf die `sqrt` Funktion die Performance steigert, jedoch ist auch zu erkennen, dass die Laufzeit zwischen der `sqrt` Funktion mit `fastmath=True` und keiner `sqrt` Funktion relativ nahe beieinander liegen.
 
@@ -450,8 +450,8 @@ Das Verwenden von `fastmath=True` für die neue Distanz-Funktion hat nur minimal
 
 | RTX 5070                                                                                                                                 | GTX 1660 Ti                                                                                                                                 |
 | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_sqrt_fast_square_euclidean_fast_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_sqrt_fast_square_euclidean_fast_resolution=128_points=64,128,256,512.png) |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_sqrt_fast_naive_square_euclidean_fast_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_sqrt_fast_naive_square_euclidean_fast_resolution=128_points=64,128,256,512.png) |
 
 # Aufgabe 5 - Effizienteres Laden von Daten
 
@@ -480,7 +480,7 @@ Ein Blick auf das Assembly zeigt, dass der Compiler wegen der Konstante `GRID_ST
 | RTX 5070                                                                                                                                       | GTX 1660 Ti                                                                                                                                       |
 | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_grid_stride_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_grid_stride_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_grid_stride_euclidean_hypot_resolution=128_points=64,128,256,512.png)     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_grid_stride_euclidean_hypot_resolution=128_points=64,128,256,512.png)     |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_hypot_grid_stride_euclidean_hypot_resolution=128_points=64,128,256,512.png)     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_hypot_grid_stride_euclidean_hypot_resolution=128_points=64,128,256,512.png)     |
 
 Es ist zusehen, dass im Vergleich zur Naiven Variante bei höherer Auflösung und Punkt-Anzahl deutlich Laufzeit eingespart wurde. Interessanterweise ist zu sehen, dass der Algorithmus für kleine Eingaben langsamer geworden ist. Der Grund hierfür ist vermutlich darauf zurückzuführen, dass mehr Overhead durch das Shared-Memory beziehungsweise das Loop-Unrolling entstanden ist. Erst bei größeren Eingaben fällt dieser Overhead weg.
 
@@ -625,7 +625,7 @@ uv run .\src\task6a.py jfa-manhattan-visualization
 
 | `JFA - square euclidean distance`                   | `JFA - manhattan distance`                          |
 | --------------------------------------------------- | --------------------------------------------------- |
-| ![](../data/task6a_euclidean_jfa_visualization.gif) | ![](../data/task6a_manhattan_jfa_visualization.gif) |
+| ![](../data/task6a_jfa_euclidean_visualization.gif) | ![](../data/task6a_jfa_manhattan_visualization.gif) |
 
 Sowohl bei der quadratischen euklidischen Distanz als auch bei der Manhattan-Distanz ist gut zu erkennen, wie das zu Beginn leere, schwarze Bild mit jedem Schritt "voller" wird. Das typische _"Flooding-Verhalten"_ (Fluten) des Algorithmus wird hierbei in jeder Iteration sichtbar.
 
