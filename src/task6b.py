@@ -8,8 +8,8 @@ from matplotlib import pyplot as plt
 from constants import DATA_FOLDER, INT32_MAX
 from task6a import (
     jfa_voronoi_host,
-    _jfa_pass_naive_square_euclidean_kernel,
-    _jfa_pass_naive_manhattan_kernel,
+    _jfa_pass_square_euclidean_kernel,
+    _jfa_pass_manhattan_kernel,
 )
 from utils import (
     get_up_to_one_argument,
@@ -95,14 +95,14 @@ def main() -> None:
     elif command == "naive-jfa-step-analysis":
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         naive_euclidean_data = analyze_runtime_per_step_size(
-            kernel=_jfa_pass_naive_square_euclidean_kernel,
+            kernel=_jfa_pass_square_euclidean_kernel,
             make_output_grid=generate_AoS_grid_jfa,
             seeds=seeds,
             resolution=RESOLUTION,
         )
         print()
         naive_manhattan_data = analyze_runtime_per_step_size(
-            kernel=_jfa_pass_naive_manhattan_kernel,
+            kernel=_jfa_pass_manhattan_kernel,
             make_output_grid=generate_AoS_grid_jfa,
             seeds=seeds,
             resolution=RESOLUTION,
@@ -115,7 +115,7 @@ def main() -> None:
     elif command == "shared-jfa-step-analysis":
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         naive_euclidean_data = analyze_runtime_per_step_size(
-            kernel=_jfa_pass_naive_square_euclidean_kernel,
+            kernel=_jfa_pass_square_euclidean_kernel,
             make_output_grid=generate_AoS_grid_jfa,
             seeds=seeds,
             resolution=RESOLUTION,
@@ -135,7 +135,7 @@ def main() -> None:
     elif command == "SoA-jfa-step-analysis":
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         naive_euclidean_data = analyze_runtime_per_step_size(
-            kernel=_jfa_pass_naive_square_euclidean_kernel,
+            kernel=_jfa_pass_square_euclidean_kernel,
             make_output_grid=generate_AoS_grid_jfa,
             seeds=seeds,
             resolution=RESOLUTION,
@@ -155,14 +155,14 @@ def main() -> None:
     elif command == "all-jfa-step-analysis":
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         naive_euclidean_data = analyze_runtime_per_step_size(
-            kernel=_jfa_pass_naive_square_euclidean_kernel,
+            kernel=_jfa_pass_square_euclidean_kernel,
             make_output_grid=generate_AoS_grid_jfa,
             seeds=seeds,
             resolution=RESOLUTION,
         )
         print()
         naive_manhattan_data = analyze_runtime_per_step_size(
-            kernel=_jfa_pass_naive_manhattan_kernel,
+            kernel=_jfa_pass_manhattan_kernel,
             make_output_grid=generate_AoS_grid_jfa,
             seeds=seeds,
             resolution=RESOLUTION,

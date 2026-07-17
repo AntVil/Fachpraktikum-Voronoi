@@ -47,7 +47,7 @@ def main() -> None:
     if command is None or command == "jfa-euclidean":
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         voronoi_jfa = jfa_voronoi_host(
-            kernel=_jfa_pass_naive_square_euclidean_kernel,
+            kernel=_jfa_pass_square_euclidean_kernel,
             seeds=seeds,
             resolution=RESOLUTION,
             grid_layout="AoS",
@@ -62,7 +62,7 @@ def main() -> None:
     elif command == "jfa-manhattan":
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         naive_manhattan = jfa_voronoi_host(
-            kernel=_jfa_pass_naive_manhattan_kernel,
+            kernel=_jfa_pass_manhattan_kernel,
             seeds=seeds,
             resolution=RESOLUTION,
             grid_layout="AoS",
@@ -79,22 +79,22 @@ def main() -> None:
             seed_count=SEED_COUNT_VISU, resolution=RESOLUTION
         )
         jfa_voronoi_host(
-            kernel=_jfa_pass_naive_square_euclidean_kernel,
+            kernel=_jfa_pass_square_euclidean_kernel,
             seeds=seeds,
             resolution=RESOLUTION,
             grid_layout="AoS",
-            gif_path=os.path.join(DATA_FOLDER, "task6a_euclidean_jfa_visualization.gif"),
+            gif_path=os.path.join(DATA_FOLDER, "task6a_jfa_euclidean_visualization.gif"),
         )
     elif command == "jfa-manhattan-visualization":
         seeds = generate_random_seeds_jfa(
             seed_count=SEED_COUNT_VISU, resolution=RESOLUTION
         )
         jfa_voronoi_host(
-            kernel=_jfa_pass_naive_manhattan_kernel,
+            kernel=_jfa_pass_manhattan_kernel,
             seeds=seeds,
             resolution=RESOLUTION,
             grid_layout="AoS",
-            gif_path=os.path.join(DATA_FOLDER, "task6a_manhattan_jfa_visualization.gif"),
+            gif_path=os.path.join(DATA_FOLDER, "task6a_jfa_manhattan_visualization.gif"),
         )
 
     ###
@@ -103,7 +103,7 @@ def main() -> None:
     elif command == "jfa+1-euclidean":
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         voronoi_jfa_plus1 = jfa_voronoi_host(
-            kernel=_jfa_pass_naive_square_euclidean_kernel,
+            kernel=_jfa_pass_square_euclidean_kernel,
             seeds=seeds,
             resolution=RESOLUTION,
             grid_layout="AoS",
@@ -114,7 +114,7 @@ def main() -> None:
     elif command == "jfa+2-euclidean":
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         voronoi_jfa_plus2 = jfa_voronoi_host(
-            kernel=_jfa_pass_naive_square_euclidean_kernel,
+            kernel=_jfa_pass_square_euclidean_kernel,
             seeds=seeds,
             resolution=RESOLUTION,
             grid_layout="AoS",
@@ -129,21 +129,21 @@ def main() -> None:
     elif command == "jfa-accuracy":
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         voronoi_jfa = jfa_voronoi_host(
-            kernel=_jfa_pass_naive_square_euclidean_kernel,
+            kernel=_jfa_pass_square_euclidean_kernel,
             seeds=seeds,
             resolution=RESOLUTION,
             grid_layout="AoS",
             mode="standard",
         )
         voronoi_jfa_plus1 = jfa_voronoi_host(
-            kernel=_jfa_pass_naive_square_euclidean_kernel,
+            kernel=_jfa_pass_square_euclidean_kernel,
             seeds=seeds,
             resolution=RESOLUTION,
             grid_layout="AoS",
             mode="jfa+1",
         )
         voronoi_jfa_plus2 = jfa_voronoi_host(
-            kernel=_jfa_pass_naive_square_euclidean_kernel,
+            kernel=_jfa_pass_square_euclidean_kernel,
             seeds=seeds,
             resolution=RESOLUTION,
             grid_layout="AoS",
@@ -403,7 +403,7 @@ def create_error_map_plot(evaluation_data: list[dict]) -> None:
 
 
 @cuda.jit("void(int32[:, :, :], int32[:, :, :], int32, int32)")
-def _jfa_pass_naive_square_euclidean_kernel(
+def _jfa_pass_square_euclidean_kernel(
     grid_in: cuda.devicearray.DeviceNDArray,
     grid_out: cuda.devicearray.DeviceNDArray,
     step_size: np.int32,
@@ -477,7 +477,7 @@ def _jfa_pass_naive_square_euclidean_kernel(
 
 
 @cuda.jit("void(int32[:, :, :], int32[:, :, :], int32, int32)")
-def _jfa_pass_naive_manhattan_kernel(
+def _jfa_pass_manhattan_kernel(
     grid_in: cuda.devicearray.DeviceNDArray,
     grid_out: cuda.devicearray.DeviceNDArray,
     step_size: np.int32,

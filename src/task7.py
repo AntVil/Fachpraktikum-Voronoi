@@ -29,8 +29,8 @@ from task5 import (
     _voroni_square_euclidean_fast_warp_shfl_kernel,
 )
 from task6a import (
-    _jfa_pass_naive_square_euclidean_kernel,
-    _jfa_pass_naive_manhattan_kernel,
+    _jfa_pass_square_euclidean_kernel,
+    _jfa_pass_manhattan_kernel,
 )
 from task6b import (
     _jfa_pass_shared_memory_square_euclidean_kernel,
@@ -57,10 +57,10 @@ def main() -> None:
         PixelAlgorithm(name="square_euclidean_fast_grid_stride", kernel=_voroni_square_euclidean_fast_grid_stride_kernel),
         PixelAlgorithm(name="square_euclidean_fast_warp_shfl", kernel=_voroni_square_euclidean_fast_warp_shfl_kernel),
 
-        JFAPingPongAoSAlgorithm(name="naive_square_euclidean_jfa", kernel=_jfa_pass_naive_square_euclidean_kernel),
-        JFAPingPongAoSAlgorithm(name="naive_manhattan_jfa", kernel=_jfa_pass_naive_manhattan_kernel),
-        JFAPingPongAoSAlgorithm(name="shared_memory_square_euclidean_jfa", kernel=_jfa_pass_shared_memory_square_euclidean_kernel),
-        JFAPingPongSoAAlgorithm(name="SoA_square_euclidean_jfa", kernel=_jfa_pass_SoA_square_euclidean_kernel),
+        JFAPingPongAoSAlgorithm(name="jfa_square_euclidean", kernel=_jfa_pass_square_euclidean_kernel),
+        JFAPingPongAoSAlgorithm(name="jfa_manhattan", kernel=_jfa_pass_manhattan_kernel),
+        JFAPingPongAoSAlgorithm(name="jfa_shared_square_euclidean", kernel=_jfa_pass_shared_memory_square_euclidean_kernel),
+        JFAPingPongSoAAlgorithm(name="jfa_soa_square_euclidean", kernel=_jfa_pass_SoA_square_euclidean_kernel),
 
         JFAInOutAlgorithm(name="jfa_inout_square_euclidean", kernel=_jfa_inout_pass_square_euclidean_kernel)
     ]

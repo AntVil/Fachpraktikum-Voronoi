@@ -675,7 +675,7 @@ Als Ursache für diese Fehler wird der Informationstransport des JFA über abneh
 
 Zur Verbesserung der Ergebnisse schlägt die Studie mehrere Varianten vor, um diese Fehler gezielt an den Voronoi-Eckpunkten und entlang der Kanten zu eliminieren - darunter `JFA+1` und `JFA+2`. Dabei wird zunächst der Standard-JFA durchgeführt. Am Ende werden jedoch zusätzliche Durchläufe mit einer Schrittweite von **1** (für `JFA+1`) beziehungsweise **2** und anschließend **1** (für `JFA+2`) angehängt. Diese lokalen Suchen erlauben es den betroffenen Pixeln, korrekte Daten aus ihrer unmittelbaren Nachbarschaft zu übernehmen, selbst wenn der primäre Ausbreitungspfad zuvor blockiert wurde.
 
-Um diesem Aspekt im Projekt quantitativ nachzugehen, wurde der naive JFA-Ansatz mit der quadrierten euklidischen Distanz (`_jfa_pass_naive_square_euclidean_kernel`) mit der Referenzimplementierung aus der vorherigen Aufgabe (`_voroni_square_euclidean_kernel`) verglichen. Der pixelbasierte Algorithmus dient dabei als exakte `100%`-Referenz. Der Vergleich wurde mit einer Auflösung von **$2048 \times 2048$ Pixeln** und **512** Punkten durchgeführt.
+Um diesem Aspekt im Projekt quantitativ nachzugehen, wurde der naive JFA-Ansatz mit der quadrierten euklidischen Distanz (`_jfa_pass_square_euclidean_kernel`) mit der Referenzimplementierung aus der vorherigen Aufgabe (`_voroni_square_euclidean_kernel`) verglichen. Der pixelbasierte Algorithmus dient dabei als exakte `100%`-Referenz. Der Vergleich wurde mit einer Auflösung von **$2048 \times 2048$ Pixeln** und **512** Punkten durchgeführt.
 
 Die folgenden _Error Maps_ visualisieren die Abweichungen der verschiedenen JFA-Varianten, wobei identische Zuordnungen schwarz und fehlerhafte Pixel rot dargestellt werden:
 
@@ -749,13 +749,13 @@ _Was liefert die Performance-Analyse?_
 Die folgenden Diagramme zeigen die gemessenen Kernellaufzeiten für die **quadratische euklidische Distanz**:
 
 ```bash
-uv run .\src\task7.py naive_square_euclidean_jfa
+uv run .\src\task7.py jfa_square_euclidean
 ```
 
 | RTX 5070                                                                                                                                      | GTX 1660 Ti                                                                                                                                      |
 | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_resolution=128_points=64,128,256,512.png)                     |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_jfa_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_jfa_square_euclidean_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_jfa_square_euclidean_resolution=128_points=64,128,256,512.png)                     |
 
 Aus den Messungen geht hervor, dass die Kernellaufzeit primär von der Bildauflösung abhängt und unabhängig von der Anzahl der gesetzten Punkte ist. In den _Heatmaps_ ist visuell deutlich zu erkennen, dass der Farbverlauf innerhalb einer Zeile (also bei konstanter Bildauflösung) gleich bleibt und die Laufzeit erst beim Wechsel in die nächste Zeile (steigende Bildauflösung) zunimmt.
 
@@ -768,14 +768,14 @@ Auch in den unteren Linien-Diagrammen (Performance-Plots bei einer festen Auflö
 Die folgenden Diagramme zeigen die gemessenen Kernellaufzeiten für die **Mannhatten-Distanz**:
 
 ```bash
-uv run .\src\task7.py naive_manhattan_jfa
-uv run .\src\task7.py compare-naive_square_euclidean_jfa-naive_manhattan_jfa
+uv run .\src\task7.py jfa_manhattan
+uv run .\src\task7.py compare-jfa_square_euclidean-jfa_manhattan
 ```
 
 | RTX 5070                                                                                                                                      | GTX 1660 Ti                                                                                                                                      |
 | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_manhattan_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_manhattan_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_naive_manhattan_jfa_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_naive_manhattan_jfa_resolution=128_points=64,128,256,512.png) |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_manhattan_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_jfa_manhattan_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_jfa_square_euclidean_jfa_manhattan_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_jfa_square_euclidean_jfa_manhattan_resolution=128_points=64,128,256,512.png) |
 
 Die Diagramme der Manhattan-Distanz zeigen vergleichbare Laufzeiten und Verhaltensmuster wie die der quadratischen euklidischen Distanz. Die Wahl der Metrik zur Distanzberechnung hat folglich keinen spürbaren Einfluss auf die Gesamtperformance des Kernels. Daraus lässt sich schließen, dass der JFA-Kernel primär _memory-bound_ (speicherbandbreitenbegrenzt) und nicht _compute-bound_ (rechenleistungsbegrenzt) ist. In jeder Iteration müssen die Threads auf die Informationen der 8 benachbarten Pixel zugreifen. Der Aufwand für das Laden dieser Daten aus dem globalen VRAM dominiert die Laufzeit. Ob im Rechenwerk anschließend eine Multiplikation mehr durchgeführt wird (wie bei der euklidischen Distanz: $dx \cdot dx + dy \cdot dy$) oder eine Betragsfunktion (Manhattan: $\left|dx\right| + \left|dy\right|$), fällt leistungstechnisch nicht ins Gewicht.
 
@@ -929,15 +929,15 @@ uses too much shared data (0xc800 bytes, 0xc000 max)
 Da ein zu großer Schwellenwert den Shared-Memory-Bedarf ansteigen lässt und den Ladeaufwand für den Halo-Bereich vergrößert, wird der Schwellenwert `JFA_SHARED_THRESHOLD = 8` festgelegt. Daraus ergeben sich die folgenden Performancemessungen:
 
 ```bash
-uv run .\src\task7.py shared_memory_square_euclidean_jfa
-uv run .\src\task7.py compare-naive_square_euclidean_jfa-shared_memory_square_euclidean_jfa
+uv run .\src\task7.py jfa_shared_square_euclidean
+uv run .\src\task7.py compare-jfa_square_euclidean-jfa_shared_square_euclidean
 uv run .\src\task6b.py shared-jfa-step-analysis
 ```
 
 | RTX 5070                                                                                                                                                     | GTX 1660 Ti                                                                                                                                                     |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_shared_memory_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_shared_memory_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_shared_memory_square_euclidean_jfa_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_shared_memory_square_euclidean_jfa_resolution=128_points=64,128,256,512.png) |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_shared_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_jfa_shared_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_jfa_square_euclidean_jfa_shared_square_euclidean_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_jfa_square_euclidean_jfa_shared_square_euclidean_resolution=128_points=64,128,256,512.png) |
 | ![](../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-RTX-5070_Naive-square-euclidean_Shared-memory-square-euclidean_res2048_seeds512.png)             | ![](../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-GTX-1660-Ti_Naive-square-euclidean_Shared-memory-square-euclidean_res2048_seeds512.png)             |
 
 Auch hier zeigt sich wieder die typische JFA-Charakteristik bezüglich der Laufzeitkomplexität in Abhängigkeit von Auflösung. In dem Diagramm, das die Laufzeit in Abhängigkeit zur Schrittweite darstellt, ist bei der `GTX 1660 Ti` zu erkennen, dass beide Implementierungen für die großen Schrittweiten übereinander liegen. Dies ist darauf zurückzuführen, dass die Shared Memory Pipeline hier nicht aktiviert ist. Ab Schrittweite 4 greift der Shared-Memory-Ansatz, der eine höhere Laufzeit als der naive Ansatz aufweist. Vergleicht man die Gesamtlaufzeiten mit denen der naiven quadratischen euklidischen Implementierung, stellt man fest, dass der Einsatz von Shared Memory **keinen Laufzeitvorteil** erbracht hat. Dafür lassen sich folgende mögliche Ursachen identifizieren:
@@ -958,7 +958,7 @@ Um dem Problem der interleaved 3D-Struktur (_Bank Conflicts_) nachzugehen, wird 
 
 _Structure of Arrays (SoA) vs. Array of Structures (AoS)_
 
-Bei der naiven Implementierung `_jfa_pass_naive_square_euclidean_kernel` eines JFA-Iterationsschritts wird für das Grid ein **Array of Structures (AoS)** Layout verwendet. Das bedeutet, es wird ein 3D-Array der Form `(Height, Width, 2)` genutzt, welches pro Pixel ein Tupel von (x, y) Seed-Koordinaten speichert. Dieses Layout wird häufig verwendet, weil es für den Menschen einfacher vorzustellen und im Code intuitiv zu handhaben ist. Im Speicher liegen die Daten dabei abwechselnd in folgender Form:
+Bei der naiven Implementierung `_jfa_pass_square_euclidean_kernel` eines JFA-Iterationsschritts wird für das Grid ein **Array of Structures (AoS)** Layout verwendet. Das bedeutet, es wird ein 3D-Array der Form `(Height, Width, 2)` genutzt, welches pro Pixel ein Tupel von (x, y) Seed-Koordinaten speichert. Dieses Layout wird häufig verwendet, weil es für den Menschen einfacher vorzustellen und im Code intuitiv zu handhaben ist. Im Speicher liegen die Daten dabei abwechselnd in folgender Form:
 
 ```plaintext
 X0 Y0 X1 Y1 X2 Y2 X3 Y3 ...
@@ -991,15 +991,15 @@ grid_in[pixel_y + size, pixel_x]
 Für das _Structure of Arrays (SoA)_ Layout ergeben sich folgende Performancemessungen:
 
 ```bash
-uv run .\src\task7.py SoA_square_euclidean_jfa
-uv run .\src\task7.py compare-naive_square_euclidean_jfa-SoA_square_euclidean_jfa
+uv run .\src\task7.py jfa_soa_square_euclidean
+uv run .\src\task7.py compare-jfa_square_euclidean-jfa_soa_square_euclidean
 uv run .\src\task6b.py SoA-jfa-step-analysis
 ```
 
 | RTX 5070                                                                                                                                           | GTX 1660 Ti                                                                                                                                           |
 | -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_SoA_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_SoA_square_euclidean_jfa_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_SoA_square_euclidean_jfa_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_SoA_square_euclidean_jfa_resolution=128_points=64,128,256,512.png) |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_soa_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_jfa_soa_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_jfa_square_euclidean_jfa_soa_square_euclidean_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_jfa_square_euclidean_jfa_soa_square_euclidean_resolution=128_points=64,128,256,512.png) |
 | ![](../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-RTX-5070_Naive-square-euclidean_SoA-square-euclidean_res2048_seeds512.png)             | ![](../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-GTX-1660-Ti_Naive-square-euclidean_SoA-square-euclidean_res2048_seeds512.png)             |
 
 Ein Vergleich der Messdaten mit der naiven quadratischen euklidischen Implementierung zeigt, dass das umgestellte _Structure of Arrays (SoA)_ Layout keinen messbaren Laufzeitvorteil gegenüber dem _Array of Structures (AoS)_ Layout liefert. Es lassen sich folgende mögliche Ursachen feststellen:
@@ -1080,7 +1080,7 @@ Folgene Abbildungen geben die Laufzeiten des beschriebenen Ansatz an.
 | RTX 5070                                                                                                                                             | GTX 1660 Ti                                                                                                                                             |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_inout_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_jfa_inout_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_jfa_jfa_inout_square_euclidean_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_jfa_jfa_inout_square_euclidean_resolution=128_points=64,128,256,512.png) |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_jfa_square_euclidean_jfa_inout_square_euclidean_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_jfa_square_euclidean_jfa_inout_square_euclidean_resolution=128_points=64,128,256,512.png) |
 
 Es ist zu sehen, dass für die Eingabe-Größen `512` und `2048` des Raster eine Verbesserung der Laufzeit zu erkennen ist. Die anderen Größen sind in einem ähnlichen Wertebereich wie zuvor. Erstaunlicherweise ist der Algorithmus schneller, wenn die Eingabe-Größe des Raster `512` statt `128` ist. Der Grund hierfür konnte aus zeitlichen Gründen leider nicht bestimmt werden.
 
