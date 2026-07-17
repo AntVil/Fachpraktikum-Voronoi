@@ -1,6 +1,5 @@
-import re
 from utils import (
-    get_argument,
+    get_up_to_two_arguments,
 )
 
 from task2 import (
@@ -43,7 +42,7 @@ from task6c import (
 
 
 def main() -> None:
-    command = get_argument()
+    (command, identifier) = get_up_to_two_arguments()
 
     kernels: list[MeasurableKernel] = [
         PixelAlgorithm(name="euclidean_hypot", kernel=_voroni_euclidean_hypot_kernel),
@@ -69,21 +68,25 @@ def main() -> None:
     # NOTE: small helper lookup
     kernels_dictionary = dict(map(lambda kernel: (kernel.get_name(), kernel), kernels))
 
-    if command in kernels_dictionary:
+    if command in kernels_dictionary and identifier is None:
         kernel_performance_analysis(
             kernel=kernels_dictionary[command]
         )
-    elif command == "all":
+    elif command == "all" and identifier is None:
         for kernel in kernels:
             kernel_performance_analysis(
                 kernel=kernel
             )
     elif command is not None and command.startswith("compare"):
+        if identifier is None or identifier == "":
+            print("Warning: Not specifying an identifier may result long file names")
+
         kernel_performance_analysis_compare(
-            kernels=list(map(lambda k: kernels_dictionary[k], command.split("-")[1:]))
+            kernels=list(map(lambda k: kernels_dictionary[k], command.split("-")[1:])),
+            plot_identifier=identifier
         )
     else:
-        print(f"Error: unknown command '{command}'")
+        print(f"Error: unknown command '{command} {identifier}'")
         exit(1)
 
 

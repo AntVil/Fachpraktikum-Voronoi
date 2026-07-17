@@ -10,7 +10,7 @@ np.random.seed(42)
 DISTANCE_FIELD_CONTRAST_FACTOR = 4
 
 
-def get_argument() -> str | None:
+def get_up_to_one_argument() -> str | None:
     """
     Most basic sub-command parsing
     """
@@ -25,6 +25,32 @@ def get_argument() -> str | None:
 
     if argument_count == 2:
         return sys.argv[1]
+
+    print("Something went wrong during command parsing")
+    exit(1)
+
+
+def get_up_to_two_arguments() -> tuple[str | None, str | None]:
+    """
+    Most basic sub-command parsing
+    """
+
+    argument_count = len(sys.argv)
+    if argument_count > 3:
+        print("Error: Too many arguments")
+        exit(1)
+
+    if argument_count == 1:
+        return (None, None)
+
+    if argument_count == 2:
+        return (sys.argv[1], None)
+
+    if argument_count == 3:
+        return (sys.argv[1], sys.argv[2])
+
+    print("Something went wrong during command parsing")
+    exit(1)
 
 
 def get_device_name() -> str:

@@ -12,7 +12,7 @@ from task4 import (
     voroni_square_euclidean,
 )
 from utils import (
-    get_argument,
+    get_up_to_one_argument,
     is_outside_image,
     generate_AoS_grid_jfa,
     generate_SoA_grid_jfa,
@@ -39,7 +39,7 @@ def main() -> None:
     Test the implementations and generate example diagrams for the Jump Flooding Algorithm (JFA).
     """
 
-    command = get_argument()
+    command = get_up_to_one_argument()
 
     ###
     # Naive Euclidean JFA

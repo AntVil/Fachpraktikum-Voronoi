@@ -121,7 +121,8 @@ def kernel_performance_analysis(kernel: MeasurableKernel) -> None:
 
 
 def kernel_performance_analysis_compare(
-    kernels: list[MeasurableKernel]
+    kernels: list[MeasurableKernel],
+    plot_identifier: str | None = None
 ) -> None:
     performances: list[tuple[str, np.ndarray[tuple[int], np.dtype[np.float32] | np.dtype[np.float64]]]] = []
     for kernel in kernels:
@@ -142,7 +143,8 @@ def kernel_performance_analysis_compare(
     create_kernel_performance_plot(
         resolution=RESOLUTION_SIZES[0],
         input_sizes=POINT_COUNTS,
-        performances=performances
+        performances=performances,
+        plot_identifier=plot_identifier
     )
 
 
@@ -198,7 +200,8 @@ def compute_performance_metrics(
 def create_kernel_performance_plot(
     resolution: int,
     input_sizes: np.ndarray[tuple[int], np.dtype[np.int32] | np.dtype[np.int64]],
-    performances: list[tuple[str, np.ndarray[tuple[int], np.dtype[np.float32] | np.dtype[np.float64]]]]
+    performances: list[tuple[str, np.ndarray[tuple[int], np.dtype[np.float32] | np.dtype[np.float64]]]],
+    plot_identifier: str | None = None
 ) -> None:
     """
     Create a performance plot of one or multiple kernels.
@@ -250,11 +253,15 @@ def create_kernel_performance_plot(
         fontweight="bold",
     )
 
+    # NOTE: Normally the name should be recognizable but file-path-length can be a bit limiting ..
+    if plot_identifier is None:
+        plot_identifier = "_".join(map(lambda x: x[0].replace(" ", "-"), performances))
+
     # plt.show()
     plt.savefig(
         os.path.join(
             DATA_FOLDER,
-            f"performance_plot_{device_name.replace(" ", "-")}_{"_".join(map(lambda x: x[0].replace(" ", "-"), performances))}_resolution={resolution}_points={",".join(map(str, input_sizes))}.png"
+            f"performance_plot_{device_name.replace(" ", "-")}_{plot_identifier}_resolution={resolution}_points={",".join(map(str, input_sizes))}.png"
         ),
         dpi=300
     )

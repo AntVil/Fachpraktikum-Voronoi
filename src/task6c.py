@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 from utils import (
     is_outside_image,
     calculate_square_euclidean_distance,
-    get_argument,
+    get_up_to_one_argument,
     generate_uniform_points,
     make_grid_configuration,
     get_thread_position,
@@ -15,7 +15,7 @@ from utils import (
 
 
 def main() -> None:
-    command = get_argument()
+    command = get_up_to_one_argument()
 
     point_count = 512
     resolution = 2048

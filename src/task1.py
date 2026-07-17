@@ -6,7 +6,7 @@ import os
 
 from constants import DATA_FOLDER
 from utils import (
-    get_argument,
+    get_up_to_one_argument,
     generate_uniform_points,
     make_empty_voronoi_output,
     make_grid_configuration,
@@ -19,7 +19,7 @@ from utils import (
 
 
 def main() -> None:
-    command = get_argument()
+    command = get_up_to_one_argument()
 
     if command == "visualization_euclidean":
         # NOTE: gif only supports up to 256 colors

@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from utils import (
-    get_argument,
+    get_up_to_one_argument,
     generate_uniform_points,
     make_empty_voronoi_output,
     make_grid_configuration,
@@ -25,7 +25,7 @@ WARP_POINTS = WARP_SIZE // 2
 
 
 def main() -> None:
-    command = get_argument()
+    command = get_up_to_one_argument()
 
     point_count = 512
     resolution = 2048

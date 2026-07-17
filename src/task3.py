@@ -6,7 +6,7 @@ import os
 
 from constants import DATA_FOLDER
 from utils import (
-    get_argument,
+    get_up_to_one_argument,
     generate_uniform_points,
     make_empty_voronoi_output,
     make_empty_distance_field_output,
@@ -21,7 +21,7 @@ from utils import (
 
 
 def main() -> None:
-    command = get_argument()
+    command = get_up_to_one_argument()
 
     if command is None or command == "euclidean_hypot":
         point_count = 512

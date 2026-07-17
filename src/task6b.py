@@ -12,7 +12,7 @@ from task6a import (
     _jfa_pass_naive_manhattan_kernel,
 )
 from utils import (
-    get_argument,
+    get_up_to_one_argument,
     is_outside_image,
     generate_AoS_grid_jfa,
     generate_SoA_grid_jfa,
@@ -57,7 +57,7 @@ def main() -> None:
     Test the implementations and generate performance diagrams for the Jump Flooding Algorithm (JFA).
     """
 
-    command = get_argument()
+    command = get_up_to_one_argument()
 
     ###
     # Euclidean JFA using shared memory
@@ -112,7 +112,7 @@ def main() -> None:
             ("Naive manhattan", naive_manhattan_data),
         ]
         create_jfa_runtime_per_step_size_plot(RESOLUTION, SEED_COUNT, plot_data)
-    elif command == "shared-jfa-step-analysis":       
+    elif command == "shared-jfa-step-analysis":
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         naive_euclidean_data = analyze_runtime_per_step_size(
             kernel=_jfa_pass_naive_square_euclidean_kernel,
@@ -132,7 +132,7 @@ def main() -> None:
             ("Shared memory square euclidean", shared_euclidean_data),
         ]
         create_jfa_runtime_per_step_size_plot(RESOLUTION, SEED_COUNT, plot_data)
-    elif command == "SoA-jfa-step-analysis":        
+    elif command == "SoA-jfa-step-analysis":
         seeds = generate_random_seeds_jfa(seed_count=SEED_COUNT, resolution=RESOLUTION)
         naive_euclidean_data = analyze_runtime_per_step_size(
             kernel=_jfa_pass_naive_square_euclidean_kernel,
