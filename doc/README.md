@@ -10,8 +10,8 @@
 # Vorgehen und Aufbau
 
 Um ein strukturiertes Vorgehen zu gewährleisten wurde vorab ein Konzept entwickelt. Es beginnt mit dem ersten Abschnitt bei dem das Thema dieses Projekts klar beschrieben und abgesteckt wird.
-Im darauf folgendem Abschnitt wird ein Performance Analyse Konzept entwickelt und implementiert und in allen anderen Abschnitten einheitliche Zeitmessungen und Analysen durchzuführen.
-Der dritte Abschnitt befasst sich einer Naiven Implementation, wobei geklärt wird wie und warum diese funktioniert. Danach werden in Abschnitt vier und fünf die aus dem Kurs-Text erlernten Optimierungs-Verfahren angewandt. In Abschnitt sechs wird ein Algorithmus aus der Literatur erklärt, implementiert und mit dem bisherigem Algorithmus verglichen.
+Im darauf folgendem Abschnitt wird ein Performance-Analyse-Konzept entwickelt und implementiert, um in allen anderen Abschnitten einheitliche Zeitmessungen und Analysen durchzuführen.
+Der dritte Abschnitt befasst sich mit einer Naiven Implementation, wobei geklärt wird wie und warum diese funktioniert. Danach werden in Abschnitt vier und fünf die aus dem Kurs-Text erlernten Optimierungs-Verfahren angewandt. In Abschnitt sechs wird ein Algorithmus aus der Literatur erklärt, implementiert und mit dem bisherigem Algorithmus verglichen.
 Zuletzt wird in Abschnitt sieben eine finale Analyse und Zusammenfassung der Ergebnisse dargelegt.
 
 # Aufgabe 1 - Beschreibung des Problems
@@ -30,7 +30,7 @@ Die Regionen im Voronoi-Diagramm werden Voronoi-Regionen genannt.
 
 _Was sind verwandte Probleme die nicht berücksichtigt werden?_
 
-Um den Rahmen des Projekts abzugrenzen, werden verwandte Problemstellungen wie die Delaunay Triangulation oder Voronoi-Diagramme im mehr-dimensionalen Raum nicht betrachtet. In diesem Projekt werden lediglich diskrete Voronoi-Diagramme berechnet. Es ist somit nicht von Bedeutung die tatsächlichen Voronoi-Regionen tatsächlich zu bestimmen, sondern nur das tatsächliche Diagramm. Bei den Distanz-Funktionen steht die Euklidische-Distanz im Vordergrund. Die Manhattan-Distanz wird an einigen Stellen als Exkurs betrachtet.
+Um den Rahmen des Projekts abzugrenzen, werden verwandte Problemstellungen wie die Delaunay Triangulation oder Voronoi-Diagramme im mehr-dimensionalen Raum nicht betrachtet. In diesem Projekt werden lediglich diskrete Voronoi-Diagramme berechnet. Es ist somit nicht von Bedeutung die tatsächlichen Voronoi-Regionen zu bestimmen, sondern nur das finale Diagramm. Bei den Distanz-Funktionen steht die Euklidische-Distanz im Vordergrund. Die Manhattan-Distanz wird an einigen Stellen als Exkurs betrachtet.
 
 _Was wird berechnet?_
 
@@ -55,27 +55,20 @@ Für die Berechnung des Voronoi-Diagramms sind folgende Parameter definiert:
 | Parameter          | Beschreibung                                                             | Datentyp            |
 | ------------------ | ------------------------------------------------------------------------ | ------------------- |
 | **Bildauflösung**  | Die Seitenlänge des quadratischen Gitters ($N \times N$)                 | `int32`             |
-| **Punkte / Seeds** | Ein Array, das die 2D-Koordinaten der im Raum verteilten Zentren enthält | `float32` / `int32` |
+| **Punkte** | Ein Array, das die 2D-Koordinaten der im Raum verteilten Zentren enthält | `float32` / `int32` |
 | **Ausgabe-Grid**   | Das resultierende zweidimensionale Bildraster/Voronoi-Diagramm           | `int32`             |
+
+Für Punkte wurden die Daten-Typen `float32` beziehungsweise `int32` gewählt, da es gewisse Algorithmen gibt, welche auf `int32` angewiesen sind (siehe *Aufgabe 6*). Andere Algorithmen können sowohl `int32` als auch `float32` verarbeiten. Da es an einigen Stellen vorteilhaft ist `float32` Werte zu haben, wird als alternativer Daten-Typ auch `float32` erlaubt.
 
 _Welche Parameter sind entscheidend für das Problem und welchen Einfluss haben diese?_
 
-Das Laufzeitverhalten und die Skalierbarkeit des Problems hängen von zwei Parametern ab:
+Für die Algorithmen aus diesem Projekt gibt es zwei entscheidende Parameter, welche die Laufzeit beeinflussen:
 
 1. Die Bildauflösung ($N$): Mit steigender Auflösung wächst die Anzahl der zu berechnenden Pixel quadratisch ($N^2$).
 
-2. Die Anzahl der im Raum zufällig verteilten Punkte/Seeds, die bei der Distanzberechnung berücksichtigt werden müssen.
+2. Die Anzahl der im Raum zufällig verteilten Punkte, die bei der Distanzberechnung berücksichtigt werden müssen.
 
 # Aufgabe 2 - Performance Analyse Konzept
-
-```
-TODO
-
-- 512, 1024, ... 2^16
-- log scale (x & y)
-- single or multiple lines
-- kernel only (no transfer or context switching)
-```
 
 _Wie werden im folgenden Performance Analysen durchgeführt?_
 
