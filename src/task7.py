@@ -45,16 +45,16 @@ def main() -> None:
     (command, identifier) = get_up_to_two_arguments()
 
     kernels: list[MeasurableKernel] = [
-        PixelAlgorithm(name="euclidean_hypot", kernel=_voroni_euclidean_hypot_kernel),
-        PixelAlgorithm(name="manhattan", kernel=_voroni_manhattan_kernel),
-        PixelAlgorithm(name="euclidean_hypot_fast", kernel=_voroni_euclidean_hypot_fast_kernel),
-        PixelAlgorithm(name="euclidean_sqrt", kernel=_voroni_euclidean_sqrt_kernel),
-        PixelAlgorithm(name="euclidean_sqrt_fast", kernel=_voroni_euclidean_sqrt_fast_kernel),
-        PixelAlgorithm(name="square_euclidean", kernel=_voroni_square_euclidean_kernel),
-        PixelAlgorithm(name="square_euclidean_fast", kernel=_voroni_square_euclidean_fast_kernel),
+        PixelAlgorithm(name="naive_euclidean_hypot", kernel=_voroni_euclidean_hypot_kernel),
+        PixelAlgorithm(name="naive_manhattan", kernel=_voroni_manhattan_kernel),
+        PixelAlgorithm(name="naive_euclidean_hypot_fast", kernel=_voroni_euclidean_hypot_fast_kernel),
+        PixelAlgorithm(name="naive_euclidean_sqrt", kernel=_voroni_euclidean_sqrt_kernel),
+        PixelAlgorithm(name="naive_euclidean_sqrt_fast", kernel=_voroni_euclidean_sqrt_fast_kernel),
+        PixelAlgorithm(name="naive_square_euclidean", kernel=_voroni_square_euclidean_kernel),
+        PixelAlgorithm(name="naive_square_euclidean_fast", kernel=_voroni_square_euclidean_fast_kernel),
         PixelAlgorithm(name="grid_stride_euclidean_hypot", kernel=_voroni_euclidean_hypot_grid_stride_kernel),
-        PixelAlgorithm(name="warp_shfl_euclidean_hypot", kernel=_voroni_euclidean_hypot_warp_shfl_kernel),
         PixelAlgorithm(name="grid_stride_square_euclidean_fast", kernel=_voroni_square_euclidean_fast_grid_stride_kernel),
+        PixelAlgorithm(name="warp_shfl_euclidean_hypot", kernel=_voroni_euclidean_hypot_warp_shfl_kernel),
         PixelAlgorithm(name="warp_shfl_square_euclidean_fast", kernel=_voroni_square_euclidean_fast_warp_shfl_kernel),
 
         JFAPingPongAoSAlgorithm(name="jfa_square_euclidean", kernel=_jfa_pass_square_euclidean_kernel),
