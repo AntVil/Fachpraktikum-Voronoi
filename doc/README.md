@@ -576,13 +576,13 @@ Der Jump Flooding Algorithmus (JFA) wurde im Jahr 2006 von **Guodong Rong** und 
 
 _Wie funktioniert der Algorithmus?_
 
-Für den Algorithmus wird ein quadratisches Grid der Größe $N \times N$ definiert. Bevor der Algorithmus startet, wird das leere Grid initialisiert, indem die zuvor zufällig generierten Seed-Koordinaten gesetzt werden: Jeder Seed weiß zu Beginn, zu welchem Pixel er gehört. Alle anderen Pixel werden mit einem **undefinierten** Startzustand initialisiert. Das bedeutet, ein normaler Pixel weiß anfangs nicht, zu welchem Punkt er am nächsten liegt.
+Für den Algorithmus wird ein quadratisches Grid der Größe $N \times N$ definiert. Bevor der Algorithmus startet, wird das leere Grid initialisiert, indem die zuvor zufällig generierten Punkt-Koordinaten gesetzt werden: Jeder Punkt (auch `seed` genannt) weiß zu Beginn, zu welchem Pixel er gehört. Alle anderen Pixel werden mit einem **undefinierten** Startzustand initialisiert. Das bedeutet, ein normaler Pixel weiß anfangs nicht, zu welchem Punkt er am nächsten liegt.
 
-Der Jump Flooding Algorithmus wird nun in mehreren Schritten iterativ ausgeführt. Die erste Schrittweite beträgt $k = \frac{N}{2}$, wobei $N$ die Auflösung des Grids ist. Für jede Schrittweite $k$ prüft jeder Pixel im Grid seine 8 **Nachbarpixel** (Norden, Nordost, Osten, Südost, Süden, Südwest, Westen, Nordwest), die genau $k$ Pixel entfernt sind. Dabei wird überprüft, ob diese Nachbarn bereits gültige Seed-Koordinaten besitzen (also nicht mehr das _Uninitialized-Flag_ haben):
+Der Jump Flooding Algorithmus wird nun in mehreren Schritten iterativ ausgeführt. Die erste Schrittweite beträgt $k = \frac{N}{2}$, wobei $N$ die Auflösung des Grids ist. Für jede Schrittweite $k$ prüft jeder Pixel im Grid seine 8 **Nachbarpixel** (Norden, Nordost, Osten, Südost, Süden, Südwest, Westen, Nordwest), die genau $k$ Pixel entfernt sind. Dabei wird überprüft, ob diese Nachbarn bereits gültige Punkt-Koordinaten besitzen (also nicht mehr das _Uninitialized-Flag_ haben):
 
-- Ist das der Fall, übernimmt der aktuelle Pixel die Seed-Koordinaten des Nachbarpixels und betrachtet diesen Seed vorerst als den nächstgelegenen Punkt.
-- Hat ein Nachbarpixel ebenfalls keine Seed-Koordinaten, wird er ignoriert.
-- Wird bei einer späteren Prüfung oder in einem späteren Schritt ein Seed gefunden, dessen Distanz zum aktuellen Pixel kürzer ist als die des bereits gespeicherten Seeds, werden die neuen, näheren Koordinaten übernommen und die alten überschrieben.
+- Ist das der Fall, übernimmt der aktuelle Pixel die Punkt-Koordinaten des Nachbarpixels und betrachtet diesen Punkt vorerst als den nächstgelegenen.
+- Hat ein Nachbarpixel ebenfalls keine Punkt-Koordinaten, wird er ignoriert.
+- Wird bei einer späteren Prüfung oder in einem späteren Schritt ein Punkt gefunden, dessen Distanz zum aktuellen Pixel kürzer ist als die des bereits gespeicherten Punkte, werden die neuen, näheren Koordinaten übernommen und die alten überschrieben.
 
 Nach jeder Iteration wird die Schrittweite $k$ halbiert ($k = \frac{k}{2}$), bis der Wert **1** erreicht und berechnet wurde.
 
@@ -590,7 +590,7 @@ Aufgrund dieser fortlaufenden Halbierung ist es **zwingend erforderlich**, dass 
 
 _Wie wird der JFA implementiert?_
 
-In dieser **ersten naiven** Implementation wird das Grid als 3D-Array der Form `shape=(resolution, resolution, 2)` vom Typ `int32` definiert. Dieses Layout wird auch als _Array of Structures (AoS)_ bezeichnet, weil es für jeden Pixel die X- und Y-Koordinate des nächstgelegenen Seeds speichert (vgl. `generate_AoS_grid_jfa()`). Für den undefinierten Startzustand der Pixel, die kein Seed sind, wird der Wert `-1` verwendet. Dieser signalisiert, dass der Pixel noch keine Seed-Koordinaten kennt.
+In dieser **ersten naiven** Implementation wird das Grid als 3D-Array der Form `shape=(resolution, resolution, 2)` vom Typ `int32` definiert. Dieses Layout wird auch als _Array of Structures (AoS)_ bezeichnet, weil es für jeden Pixel die X- und Y-Koordinate des nächstgelegenen Punktes speichert (vgl. `generate_AoS_grid_jfa()`). Für den undefinierten Startzustand der Pixel, die kein Punkt sind, wird der Wert `-1` verwendet. Dieser signalisiert, dass der Pixel noch keine Punkt-Koordinaten kennt.
 
 Eine Besonderheit liegt in der Steuerung auf der Host-Seite: Das Voronoi-Diagramm wird hier iterativ in einer Schleife nach dem eben beschriebenen Verfahren bestimmt. Die Kernel-Implementierung auf der GPU beinhaltet also keine vollständige Berechnung des gesamten Diagramms, sondern führt nur einen einzelnen **Pass** (einen Iterationsschritt) aus. Der Kernel nimmt folgende Parameter entgegen:
 
@@ -603,11 +603,11 @@ Die Verwendung von zwei getrennten Grids ist notwendig, da das Eingabe-Grid wäh
 
 Bei der Verwendung eines gemeinsamen Grids kann es zu **Race Conditions** kommen: Ein Thread liest dann möglicherweise den von einem anderen Thread neu geschriebenen Wert anstelle des ursprünglichen Werts vor diesem Pass. Da die X- und Y-Koordinate eines Punktes als zwei separate Schreiboperationen erfolgen, könnte ein Thread die X-Koordinate eines Punktes mit der noch nicht aktualisierten Y-Koordinate eines anderen Punktes kombinieren, wodurch ein Punkt entsteht, der in der Form gar nicht existiert.
 
-Um am Ende aus dem 3D-Array (das die Seed-Koordinaten als X/Y-Tupel speichert) ein finales 2D-Array mit eindeutigen UIDs der Seeds zu erzeugen, wird für jeden Pixel der berechnete X-Wert mit dem Wert $Y \cdot \mathrm{resolution}$ addiert:
+Um am Ende aus dem 3D-Array (das die Punkt-Koordinaten als X/Y-Tupel speichert) ein finales 2D-Array mit eindeutigen UIDs der Punkte zu erzeugen, wird für jeden Pixel der berechnete X-Wert mit dem Wert $Y \cdot \mathrm{resolution}$ addiert:
 
 $$\text{UID} = X + (Y \cdot \text{resolution})$$
 
-Dadurch entstehen eindeutige IDs für identische Seed-Koordinaten.
+Dadurch entstehen eindeutige IDs für identische Punkt-Koordinaten.
 
 Die folgenden Visualisierungen zeigen den Zustand des Diagramms nach jedem Schritt $k$ (Auflösung: $2048 \times 2048$, Punkte: $256$):
 
@@ -886,7 +886,7 @@ _Gibt es Bank Conflicts?_
 
 Shared Memory ist in 32 Banks aufgeteilt, wobei jede Bank 4 Byte (32 Bit) breit ist. Wenn mehrere Threads desselben Warps im selben Taktzyklus auf unterschiedliche Adressen **innerhalb** derselben Bank zugreifen wollen, entsteht ein Bank Conflict. Der Zugriff auf diese Bank wird dann serialisiert, bis alle anfragenden Threads bedient wurden, was zu einem Leistungsverlust führen kann (vgl. [NVIDIA-Dokumentation](https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/writing-cuda-kernels.html#shared-memory-access-patterns)).
 
-In diesem Kernel liegt das `shared_buffer`-Array als 3D-Layout `(SHARED_MEMORY_SIZE, SHARED_MEMORY_SIZE, 2)` vor, wobei die letzte Dimension die X- und Y-Koordinate eines Punkts _interleaved_ speichert. Dadurch beträgt der Adressabstand zwischen zwei in `x`-Richtung benachbarten Threads nicht 1 Wort (4 Byte; 32 Bit), sondern 2 Worte (2 Banks). Dadurch, landen bei einem Zugriff wie `shared_buffer[shared_pixel_y, shared_pixel_x, 0]` jeweils zwei Threads in derselben Bank: Thread 0 und Thread 16 greifen auf Bank 0 zu, Thread 1 und Thread 17 auf Bank 2, Thread 2 und Thread 18 auf Bank 4 usw. Es entsteht somit ein **2-way Bank Conflict**, der sowohl beim kooperativen Laden der Shared Memory als auch beim Lesen des eigenen Seeds und bei der Nachbarschaftsauswertung auftritt.
+In diesem Kernel liegt das `shared_buffer`-Array als 3D-Layout `(SHARED_MEMORY_SIZE, SHARED_MEMORY_SIZE, 2)` vor, wobei die letzte Dimension die X- und Y-Koordinate eines Punkts _interleaved_ speichert. Dadurch beträgt der Adressabstand zwischen zwei in `x`-Richtung benachbarten Threads nicht 1 Wort (4 Byte; 32 Bit), sondern 2 Worte (2 Banks). Dadurch, landen bei einem Zugriff wie `shared_buffer[shared_pixel_y, shared_pixel_x, 0]` jeweils zwei Threads in derselben Bank: Thread 0 und Thread 16 greifen auf Bank 0 zu, Thread 1 und Thread 17 auf Bank 2, Thread 2 und Thread 18 auf Bank 4 usw. Es entsteht somit ein **2-way Bank Conflict**, der sowohl beim kooperativen Laden des Shared Memory als auch beim Lesen des eigenen Punktes und bei der Nachbarschaftsauswertung auftritt.
 
 _Dimensionierung von `SHARED_MEMORY_SIZE`_
 
@@ -951,7 +951,7 @@ Um dem Problem der interleaved 3D-Struktur (_Bank Conflicts_) nachzugehen, wird 
 
 _Structure of Arrays (SoA) vs. Array of Structures (AoS)_
 
-Bei der naiven Implementierung `_jfa_pass_square_euclidean_kernel` eines JFA-Iterationsschritts wird für das Grid ein **Array of Structures (AoS)** Layout verwendet. Das bedeutet, es wird ein 3D-Array der Form `(Height, Width, 2)` genutzt, welches pro Pixel ein Tupel von (x, y) Seed-Koordinaten speichert. Dieses Layout wird häufig verwendet, weil es für den Menschen einfacher vorzustellen und im Code intuitiv zu handhaben ist. Im Speicher liegen die Daten dabei abwechselnd in folgender Form:
+Bei der naiven Implementierung `_jfa_pass_square_euclidean_kernel` eines JFA-Iterationsschritts wird für das Grid ein **Array of Structures (AoS)** Layout verwendet. Das bedeutet, es wird ein 3D-Array der Form `(Height, Width, 2)` genutzt, welches pro Pixel ein Tupel von (x, y) Punkt-Koordinaten speichert. Dieses Layout wird häufig verwendet, weil es für den Menschen einfacher vorzustellen und im Code intuitiv zu handhaben ist. Im Speicher liegen die Daten dabei abwechselnd in folgender Form:
 
 ```plaintext
 X0 Y0 X1 Y1 X2 Y2 X3 Y3 ...
@@ -969,10 +969,10 @@ Wenn nun die 32 Threads eines Warps die X-Koordinaten von 32 nebeneinanderliegen
 
 _Umsetzung für JFA_
 
-Im JFA wird das ursprüngliche Grid der Form `shape=(resolution, resolution, 2)` so angepasst, dass es eine Dimension weniger besitzt, dafür aber die doppelte logische Höhe aufweist: `shape=(resolution * 2, resolution)`. Die Daten für die Seed-X- und Y-Koordinaten werden planar untereinander angeordnet:
+Im JFA wird das ursprüngliche Grid der Form `shape=(resolution, resolution, 2)` so angepasst, dass es eine Dimension weniger besitzt, dafür aber die doppelte logische Höhe aufweist: `shape=(resolution * 2, resolution)`. Die Daten für die X- und Y-Koordinaten der Punkte werden planar untereinander angeordnet:
 
-- **Obere Hälfte (Zeile $0$ bis $\mathrm{size} - 1$):** Hält die X-Koordinaten der Seeds
-- **Untere Hälfte (Zeile $\mathrm{size}$ bis $2 \times \mathrm{size} - 1$):** Hält die Y-Koordinaten der Seeds
+- **Obere Hälfte (Zeile $0$ bis $\mathrm{size} - 1$):** Hält die X-Koordinaten der Punkte
+- **Untere Hälfte (Zeile $\mathrm{size}$ bis $2 \times \mathrm{size} - 1$):** Hält die Y-Koordinaten der Punkte
 
 Um im Kernel auf die Daten zuzugreifen, muss für die Y-Koordinate lediglich der Offset der Bildauflösung (`size`) auf den Zeilenindex hinzuaddiert werden, während der X-Wert auf der normalen Zeile geladen werden kann:
 
