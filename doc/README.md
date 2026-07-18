@@ -18,7 +18,7 @@ Zuletzt wird in Abschnitt sieben eine finale Analyse und Zusammenfassung der Erg
 
 _Was ist das Problem?_
 
-Ein Voronoi-Diagramm ist eine Aufteilung eines Raumes. Für eine gegebene Punkte-Menge wird diese Aufteilung berechnet, wobei jeder Punkt in genau einer Region liegt. Das Ziel ist es, den Raum so in Regionen zu unterteilen, dass alle Punkte innerhalb einer Region als nächst gelegenen Nachbarn den Punkt, der innerhalb der Region liegt, haben. Je nachdem welche Distanz-Metrik verwendet wird sieht das Voronoi-Diagramm unterschiedlich aus.
+Ein Voronoi-Diagramm ist eine Aufteilung eines Raumes. Für eine gegebene Punkte-Menge wird diese Aufteilung berechnet, wobei jeder Punkt genau einer Region zugeordnet wird. Das Ziel ist es, den Raum so in Regionen zu unterteilen, dass alle Punkte innerhalb einer Region als nächst gelegenen Nachbarn den Punkt, der innerhalb der Region liegt, haben. Je nachdem welche Distanz-Metrik verwendet wird sieht das Voronoi-Diagramm unterschiedlich aus.
 
 Als Beispiel wurden folgende Visualisierungen erstellt für die gleiche Punkte-Menge mit Unterschiedlichen Distanz-Funktionen.
 
@@ -52,15 +52,15 @@ _Was ist die Eingabe und Ausgabe und welcher Daten-Typ wird genutzt?_
 
 Für die Berechnung des Voronoi-Diagramms sind folgende Parameter definiert:
 
-| Parameter          | Beschreibung                                                             | Datentyp            |
-| ------------------ | ------------------------------------------------------------------------ | ------------------- |
-| **Bildauflösung**  | Die Seitenlänge des quadratischen Gitters ($N \times N$)                 | `int32`             |
-| **Punkte** | Ein Array, das die 2D-Koordinaten der im Raum verteilten Zentren enthält | `float32` / `int32` |
-| **Ausgabe-Grid**   | Das resultierende zweidimensionale Bildraster/Voronoi-Diagramm           | `int32`             |
+| Parameter         | Beschreibung                                                            | Datentyp            |
+| ----------------- | ----------------------------------------------------------------------- | ------------------- |
+| **Bildauflösung** | Die Seitenlänge des quadratischen Gitters ($N \times N$)                | `int32`             |
+| **Punkte**        | Ein Array, das die 2D-Koordinaten der im Raum verteilten Punkte enthält | `float32` / `int32` |
+| **Ausgabe-Grid**  | Das resultierende zweidimensionale Bildraster/Voronoi-Diagramm          | `int32`             |
 
-Für Punkte wurden die Daten-Typen `float32` beziehungsweise `int32` gewählt, da es gewisse Algorithmen gibt, welche auf `int32` angewiesen sind (siehe *Aufgabe 6*). Andere Algorithmen können sowohl `int32` als auch `float32` verarbeiten. Da es an einigen Stellen vorteilhaft ist `float32` Werte zu haben, wird als alternativer Daten-Typ auch `float32` erlaubt.
+Für Punkte wurden die Daten-Typen `float32` beziehungsweise `int32` gewählt, da es gewisse Algorithmen gibt, welche auf `int32` angewiesen sind (siehe _Aufgabe 6_). Andere Algorithmen können sowohl `int32` als auch `float32` verarbeiten. Da es an einigen Stellen vorteilhaft ist `float32` Werte zu haben, wird als alternativer Daten-Typ auch `float32` erlaubt.
 
-Für machen Algorithmen werden zusätzliche Eingaben erlaubt, welche für die Berechnung nötig sind, dies betrifft erneut die Algorithmen aus *Aufgabe 6*.
+Für machen Algorithmen werden zusätzliche Eingaben erlaubt, welche für die Berechnung nötig sind, dies betrifft erneut die Algorithmen aus _Aufgabe 6_.
 
 _Welche Parameter sind entscheidend für das Problem und welchen Einfluss haben diese?_
 
@@ -76,15 +76,15 @@ _Wie werden im folgenden Performance Analysen durchgeführt?_
 
 Für die Performance-Analyse werden die Aufnahme der Messergebnisse und die daraus resultierende Generierung der Diagramme getrennt.
 
-Da die Algorithmen leicht unterschiedliche Eingaben erhalten können ist ein einheitlichen Zeit-Messen leicht erschwert. Um die Zeitmessungen dennoch zu vereinheitlichen wurde das `Protocol` (auch bekannt als _abstrakte Klasse_) `MeasurableKernel` eingeführt. Für jede Klasse von Algorithmus wird eine Kind-Klasse von `MeasurableKernel` geschrieben, wie zum Beispiel `PixelAlgorithm`. Die Kind-Klasse hat die Aufgabe den Aufruf des Algorithmus zu abstrahieren, sodass die Routine `compute_performance_metrics` eine beliebige Instanz von einer Kind-Klasse von `MeasurableKernel` erhalten und verarbeiten kann.
+Aufgrund der unterschiedlichen Algorithmenstrukturen und Kernelsignaturen ist das einheitliche Messen von Zeiten etwas erschwert. Um die Zeitmessungen dennoch zu vereinheitlichen wurde das `Protocol` (auch bekannt als _abstrakte Klasse_) `MeasurableKernel` eingeführt. Für jede Klasse von Algorithmus wird eine Kind-Klasse von `MeasurableKernel` geschrieben (zum Beispiel `PixelAlgorithm`). Die Kind-Klasse hat die Aufgabe den Aufruf des Algorithmus zu abstrahieren, sodass die Routine `compute_performance_metrics` eine beliebige Instanz von einer Kind-Klasse von `MeasurableKernel` erhalten und verarbeiten kann.
 
-Die Routine `compute_performance_metrics` verwendet zwei `cuda.event(timing=True)` um die Zeitmessung durchzuführen. Um die finale Laufzeit zu erhalten muss `cuda.synchronize()` und danach kann die `elapsed_time` Methode aufgerufen werden, welche die Laufzeit in Millisekunden zurückgibt. Gemessen wird ausschließlich die reine Ausführungszeit des Kernels auf der GPU für die Berechnung des Voronoi-Diagramms. Die Messungen werden für mehrere vordefinierte Eingabe-Größen durchgeführt. Für jede dieser Größen wird 20-mal die Zeitmessung durchgeführt. Für die erstellten Diagramme wird dann der Median pro Eingabe verwendet.
+Die Routine `compute_performance_metrics` verwendet zwei CUDA-Events (`cuda.event(timing=True)`) um die Zeitmessung auf der GPU durchzuführen. Ein `cuda.synchronize()` stellt sicher, dass die GPU alle Berechnungen vollständig abgeschlossen hat, bevor die finale Laufzeit in Millisekunden via `.elapsed_time()` auf der CPU bestimmt wird. Gemessen wird ausschließlich die reine Ausführungszeit des Kernels auf der GPU für die Berechnung des Voronoi-Diagramms. Die Messungen werden für mehrere vordefinierte Eingabe-Größen durchgeführt. Für jede dieser Größen wird 20-mal die Zeitmessung durchgeführt. Für die erstellten Diagramme wird dann der Median pro Eingabe verwendet.
 
 _Wie wird die Zeit für das kompilieren und den Daten-Transfer in der Analyse berücksichtigt?_
 
 Um saubere Messergebnisse zu erhalten, werden vorab fünf _Dry Warm-up_ Durchläufe durchgeführt. Dadurch wird sichergestellt, dass die erste Just-In-Time-Kompilierung (JIT) des Kernels die eigentlichen Performance-Messungen zeitlich nicht verfälscht.
 
-Es werden **keine** Transferzeiten wie Host-to-Device (H2D) oder Device-to-Host (D2H) berücksichtigt. Um die Transfer-Zeit aus den Analysen auszuschließen werden Daten-Transfer manuell mit `to_device` durchgeführt, bevor die `record` Methode der Cuda-Events aufgerufen wird.
+Es werden **keine** Transferzeiten wie Host-to-Device (H2D) oder Device-to-Host (D2H) berücksichtigt. Um die Transfer-Zeit aus den Analysen auszuschließen wird der Daten-Transfer manuell mit `to_device` durchgeführt, bevor die `record` Methode der Cuda-Events aufgerufen wird.
 
 _Welche Eingabe- beziehungsweise Ausgabe-Größen werden verwendet?_
 
@@ -123,7 +123,7 @@ Folgende Animation gibt an, wie das Ergebnis nach jeder Iteration, also Hinzunah
 Aus dieser Animation ist ersichtlich, dass jeder Pixel immer den bisherigen nächsten Nachbar verwaltet und inkrementell weitere Punkte hinzunimmt. In der beistehenden Animation sind die Distanzen zu sehen. Hierbei ist zu erkennen, dass die Distanzen sich mit jeder Iterationen verringern (oder gleich bleiben).
 
 > [!note]
-> Das berechneten Distanzen wurden aus dem Wertebereich $0$ bis $\sqrt{2}$ in den Wertebereich $0$ bis $255$ abgebildet. Zur besseren Visualisierung wurden die Distanzen mit dem Faktor $4$ hoch-skaliert und an der Oberen-Grenze abgeschnitten. Die Begründung hierfür ist, dass auch bei den letzten Iterationen der Animation noch Änderungen mit bloßem Auge zu erkennen sind. Für andere Animationen der Distanzen wird ebenfalls mit dem gleichen Faktor hoch-skaliert um Vergleiche zu ermöglichen.
+> Die berechneten Distanzen wurden aus dem Wertebereich $0$ bis $\sqrt{2}$ in den Wertebereich $0$ bis $255$ abgebildet. Zur besseren Visualisierung wurden die Distanzen mit dem Faktor $4$ hoch-skaliert und an der Oberen-Grenze abgeschnitten. Die Begründung hierfür ist, dass auch bei den letzten Iterationen der Animation noch Änderungen mit bloßem Auge zu erkennen sind. Für andere Animationen der Distanzen wird ebenfalls mit dem gleichen Faktor hoch-skaliert um Vergleiche zu ermöglichen.
 
 _Wieso arbeitet der Algorithmus korrekt?_
 
@@ -145,10 +145,10 @@ _Welche Parameter haben den größten Einfluss auf die Performance und wieso?_
 
 Die Anzahl an Punkten und die Ausgabe-Größe haben den größten Einfluss auf die Performance, da weitere Schleifen-Iterationen durchgeführt beziehungsweise weitere Threads gestartet werden müssen.
 
-Folgendes Diagramm gibt die Laufzeit für verschiedene eine feste Ausgabe-Größe als Matrix. Das Diagram darunter ist für die feste Ausgabe-Größe von `128x128`.
+Folgendes Diagramm zeigt die Laufzeit für verschiedene Auflösungen und Punktemengen als Matrix. Das Diagram darunter ist für die feste Ausgabe-Größe von `128x128`.
 
-| RTX 5070                                                                                                                           | GTX 1660 Ti                                                                                                                           |
-| ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| RTX 5070                                                                                                                                 | GTX 1660 Ti                                                                                                                                 |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_hypot_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_hypot_resolution=128_points=64,128,256,512.png)                     |
 
@@ -197,8 +197,8 @@ Folgende Animation wurde für die Manhattan-Distanz erstellt.
 Der Algorithmus funktioniert auf die gleiche Weise, es gibt jedoch abgesehen von der Ausgabe einen deutlichen Unterschied in der Laufzeit.
 Der gleiche Algorithmus mit Manhattan-Distanz ist deutlich schneller als mit Euklidischer-Distanz, wie folgendes Diagramm zeigt.
 
-| RTX 5070                                                                                                                 | GTX 1660 Ti                                                                                                                 |
-| ------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| RTX 5070                                                                                                                             | GTX 1660 Ti                                                                                                                             |
+| ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_hypot_naive_manhattan_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_hypot_naive_manhattan_resolution=128_points=64,128,256,512.png) |
 
 Dies ist natürlich nicht verwunderlich, da für die Berechnung der Manhattan-Distanz nur Addition und die Absolut-Funktion nötig sind, welche sehr leicht zu berechnen sind.
@@ -240,21 +240,21 @@ Der bisherige Algorithmus arbeitet jeden Punkt ab und berechnet den Abstand um e
 
 Es kann versucht werden das berechnen von Distanz-Funktionen zu verbessern. Hierbei gibt es die Möglichkeit die `sqrt` Funktion aufzurufen.
 
-Ansonsten können schnellere Mathe-Operationen ermöglicht werden mit der `fastmath=True` Annotation. Laut dem [nvidia-numba-cuda-user-guide](https://nvidia.github.io/numba-cuda/user/fastmath.html) werden einige Operationen wie `sqrt` durch schnellere Approximationen ersetzt und Multiplikations- und Additions-Operationen verschmolzen. Da unser Algorithmus nicht die exakten Distanzen benötigt sondern nur Distanzen vergleichen muss ist dies ein klarer Anwendungsfall.
+Ansonsten können mit der `fastmath=True` Annotation schnellere Mathe-Operationen ermöglicht werden. Laut dem [nvidia-numba-cuda-user-guide](https://nvidia.github.io/numba-cuda/user/fastmath.html) werden einige Operationen wie `sqrt` durch schnellere Approximationen ersetzt und Multiplikations- und Additions-Operationen verschmolzen. Da unser Algorithmus nicht die exakten Distanzen benötigt sondern nur Distanzen vergleichen muss ist dies ein klarer Anwendungsfall.
 
-Zuletzt kann darauf verzichtet werden die tatsächliche Euklidische Distanz zu berechnen. Da nur Distanzen verglichen werden, können wir auch die quadratische euklidische Distanz vergleichen. Auf den ersten Blick erscheint dies aufwendiger, jedoch kann auf diese Weise auf alle kompliziertere Mathe-Operationen verzichtet werden.
+Zuletzt kann darauf verzichtet werden die tatsächliche Euklidische Distanz zu berechnen. Da nur Distanzen verglichen werden, können wir auch die quadratische euklidische Distanz vergleichen. Auf den ersten Blick erscheint dies aufwendiger, jedoch kann auf diese Weise auf alle komplizierteren Mathe-Operationen verzichtet werden.
 
 2. Distanz Berechnung überspringen
 
 Es können schnelle Approximationen der Distanz-Funktion verwendet werden um sich die exakte Berechnung einzusparen. Beispielsweise kann der Abstand unter Berücksichtigung nur einer Dimension bestimmt werden. Auf diese Weise können Punkte die definitiv zu Weit entfernt sind übersprungen werden, indem eine Verzweigung eingesetzt wird.
 
-Um den Rahmen dieses Projekt nicht zu sprengen beschränken wir uns in diesem Projekt nur mit dem ersten Ansatz. Es sei hier jedoch am Rande erwähnt, dass Abzweigungen wie sie im zweiten Ansatz beschrieben sind, vermutlich zu Warp-Divergence führen würden. Dadurch könnten ein solcher Ansatz die performance potentiell verschlechtern.
+Um den Rahmen dieses Projekt nicht zu sprengen beschränken wir uns in diesem Projekt nur mit dem ersten Ansatz. Es sei hier jedoch am Rande erwähnt, dass Abzweigungen wie sie im zweiten Ansatz beschrieben sind, vermutlich zu Warp-Divergence führen würden. Dadurch könnten ein solcher Ansatz die Performance potentiell verschlechtern.
 
 _Welchen Einfluss hat `sqrt` und wieso?_
 
-Für die bisherigen Berechnungen wurde die `cuda.libdevice.hypotf` Funktion verwendet, da diese genau die Euklidische-Distanz berechnet. Es ist auch möglich das equivalent der `cuda.libdevice.hypotf` Funktion zu berechnen, indem der Ausdruck $\sqrt{(a_x - b_x)^2 + (a_y - b_y)^2}$ ausgeschrieben wird mit Hilfe der Funktion `cuda.libdevice.sqrtf`.
+Für die bisherigen Berechnungen wurde die `cuda.libdevice.hypotf` Funktion verwendet, da diese genau die Euklidische-Distanz berechnet. Es ist auch möglich das Äquivalent der `cuda.libdevice.hypotf` Funktion zu berechnen, indem der Ausdruck $\sqrt{(a_x - b_x)^2 + (a_y - b_y)^2}$ mit Hilfe der Funktion `cuda.libdevice.sqrtf` ausgeschrieben wird.
 
-Die Annahme vorab ist, dass die beiden Funktionen die gleiche Laufzeit haben. Es wäre auch denkbar, dass die `cuda.libdevice.hypotf` Funktion bestimmte Optimierungen ermöglicht, die bei der generischen Funktion `cuda.libdevice.sqrtf` nicht möglich wären. Tatsächlich hat sich in der Praxis das gegenteil gezeigt, wie folgender Ausschnitt aus dem Assembly zeigt.
+Die Annahme vorab ist, dass die beiden Funktionen die gleiche Laufzeit haben. Es wäre auch denkbar, dass die `cuda.libdevice.hypotf` Funktion bestimmte Optimierungen ermöglicht, die bei der generischen Funktion `cuda.libdevice.sqrtf` nicht möglich wären. Tatsächlich hat sich in der Praxis das Gegenteil gezeigt, wie folgender Ausschnitt aus dem Assembly zeigt.
 
 ```diff
 $L__BB0_6:
@@ -295,7 +295,7 @@ $L__BB0_6:
 +	selp.b64 	%rd75, %rd76, %rd75, %p24;
 ```
 
-Es ist zu erkennen, dass die `cuda.libdevice.hypotf` zu einem größeren Ausdruck übersetzt wird und innerhalb dieses Ausdruck wird die intrinsic Funktion `sqrt.rn.f32` aufgerufen. Das explizite Ausschreiben des Ausdruck $\sqrt{(a_x - b_x)^2 + (a_y - b_y)^2}$ führt dazu, dass gewisse Anweisungen wegfallen.
+Es ist zu erkennen, dass die `cuda.libdevice.hypotf` zu einem größeren Ausdruck übersetzt wird und innerhalb dieses Ausdruck die intrinsic Funktion `sqrt.rn.f32` aufgerufen wird. Das explizite Ausschreiben des Ausdruck $\sqrt{(a_x - b_x)^2 + (a_y - b_y)^2}$ führt dazu, dass gewisse Anweisungen wegfallen.
 
 Ein Abgleich mit der Dokumentation von CUDA für die [hypotf Funktion](https://docs.nvidia.com/cuda/cuda-math-api/cuda_math_api/group__CUDA__MATH__SINGLE.html#group__cuda__math__single_1ga2880a4ebf5500aeb74fb01340ea91215) gibt einen Einblick weswegen diese Anweisungen existieren.
 Die `cuda.libdevice.hypotf` Funktion muss garantieren, dass:
@@ -307,14 +307,14 @@ Die `cuda.libdevice.hypotf` Funktion muss garantieren, dass:
 
 Diese Bedingungen erfordern zusätzliche Anweisungen.
 
-Für den Algorithmus sind die meisten dieser Bedingungen tatsächlich irrelevant. Das Verhalten des Algorithmus ändert sich nicht, wenn die Funktion $\mathrm{NaN}$ statt $\infty$ oder andersherum zurückgibt, da Distanzen nur verglichen werden und der Algorithmus in beiden Fällen die gleiche Verzweigung wählt.
+Für den Algorithmus sind die meisten dieser Bedingungen tatsächlich irrelevant. Das Verhalten des Algorithmus ändert sich nicht, wenn die Funktion $\mathrm{NaN}$ statt $\infty$ oder andersherum zurückgibt, da nur Distanzen verglichen werden und der Algorithmus in beiden Fällen die gleiche Verzweigung wählt.
 
 Durch die verringerte Anzahl an Anweisungen ist eine klare Verbesserung in der Laufzeit zu erkennen.
 
-| RTX 5070                                                                                                                          | GTX 1660 Ti                                                                                                                          |
-| --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_euclidean_sqrt_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_sqrt_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_hypot_naive_euclidean_sqrt_resolution=128_points=64,128,256,512.png)     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_hypot_naive_euclidean_sqrt_resolution=128_points=64,128,256,512.png)     |
+| RTX 5070                                                                                                                                  | GTX 1660 Ti                                                                                                                                  |
+| ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_euclidean_sqrt_resolution=128,256,512,1024,2048_points=64,128,256,512.png)   | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_sqrt_resolution=128,256,512,1024,2048_points=64,128,256,512.png)   |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_hypot_naive_euclidean_sqrt_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_hypot_naive_euclidean_sqrt_resolution=128_points=64,128,256,512.png) |
 
 Die verringerte Anzahl an Anweisungen ist auch in der Ausgabe von `ncu` zu sehen.
 
@@ -341,7 +341,7 @@ Die verringerte Anzahl an Anweisungen ist auch in der Ausgabe von `ncu` zu sehen
 
 Im Vergleich zur initialen Implementation hat diese implementation `4.595.081` (`~25.508 %`) weniger Rechenzyklen. Durch diese Einsparung ist der Algorithmus schneller geworden.
 
-Es ist hierbei zu beachten, dass effektiv keine günstigere Distanz-Rechnung durchgeführt wurde, sondern es wurde auf gewisse Garantien bei der bisherigen Distanz-Berechnung verzichtet, da diese für den Algorithmus keinen Unterschied machen. Im folgenden wird auf exakte Ergebnisse verzichtet um den Algorithmus noch schneller zu machen.
+Es ist hierbei zu beachten, dass effektiv keine günstigere Distanz-Rechnung durchgeführt wurde, sondern es wurde auf gewisse Garantien bei der bisherigen Distanz-Berechnung verzichtet, da diese für den Algorithmus keinen Unterschied machen. Im folgenden wird auf exakte Ergebnisse verzichtet, um den Algorithmus noch schneller zu machen.
 
 _Welchen Einfluss hat `fastmath` und wieso?_
 
@@ -369,12 +369,12 @@ In diesem Fall hat der Compiler wegen `fastmath=True` die intrinsic Funktion `sq
 
 Für die Laufzeit ergeben sich folgende Unterschiede.
 
-| RTX 5070                                                                                                                               | GTX 1660 Ti                                                                                                                               |
-| -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_euclidean_sqrt_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_sqrt_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_sqrt_naive_euclidean_sqrt_fast_resolution=128_points=64,128,256,512.png)      | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_sqrt_naive_euclidean_sqrt_fast_resolution=128_points=64,128,256,512.png)      |
+| RTX 5070                                                                                                                                      | GTX 1660 Ti                                                                                                                                      |
+| --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_euclidean_sqrt_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png)  | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_sqrt_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png)  |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_sqrt_naive_euclidean_sqrt_fast_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_sqrt_naive_euclidean_sqrt_fast_resolution=128_points=64,128,256,512.png) |
 
-Die Laufzeit hat sich deutlich verbessert durch den Einsatz von der `fastmath=True` Annotation. Für den Fall `Resolution=2048` und `Point-count=512` hat sich die Laufzeit ungefähr halbiert im Vergleich zur initialen Implementation aus _Aufgabe 3_.
+Die Laufzeit hat sich durch den Einsatz der `fastmath=True` Annotation deutlich verbessert. Für den Fall `Resolution=2048` und `Point-count=512` hat sich die Laufzeit im Vergleich zur initialen Implementation aus _Aufgabe 3_ ungefähr halbiert.
 
 _Welchen Einfluss hat schlicht $a^2 + b^2$ und wieso?_
 
@@ -400,18 +400,18 @@ $L__BB0_6:
 	selp.b64 	%rd75, %rd76, %rd75, %p24;
 ```
 
-Diese Änderung erscheint auf den ersten Blick ernüchternd, jedoch ist die `sqrt.rn.f32` eine Aufwendige Operation, diese Operation einzusparen macht einen großen Unterschied.
+Diese Änderung erscheint auf den ersten Blick ernüchternd, jedoch ist die `sqrt.rn.f32` eine aufwendige Operation und diese Operation einzusparen macht einen großen Unterschied.
 
 In dem bisherigen Assembly hat der Compiler Loop-Unrolling durchgeführt mit bis zu vier Iterationen der Schleife. Durch das verzichten auf `sqrt.rn.f32` scheint der Compiler bis zu acht Iterationen der Schleife aufzurollen.
 
 Folgende Diagramme zeigen die Laufzeit des Algorithmus mit der neuen Distanz-Funktion.
 
-| RTX 5070                                                                                                                            | GTX 1660 Ti                                                                                                                            |
-| ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| RTX 5070                                                                                                                                        | GTX 1660 Ti                                                                                                                                        |
+| ----------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)       | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)       |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_sqrt_fast_naive_square_euclidean_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_sqrt_fast_naive_square_euclidean_resolution=128_points=64,128,256,512.png) |
 
-Es ist zu sehen, dass ein verzichten auf die `sqrt` Funktion die Performance steigert, jedoch ist auch zu erkennen, dass die Laufzeit zwischen der `sqrt` Funktion mit `fastmath=True` und keiner `sqrt` Funktion relativ nahe beieinander liegen.
+Es ist zu sehen, dass ein verzichten auf die `sqrt` Funktion die Performance steigert. Jedoch ist auch zu erkennen, dass die Laufzeit zwischen der `sqrt` Funktion mit `fastmath=True` und keiner `sqrt` Funktion relativ nahe beieinander liegen.
 
 An dieser Stelle ist es erneut interessant die Ausgabe von `ncu` zu betrachten:
 
@@ -437,13 +437,13 @@ An dieser Stelle ist es erneut interessant die Ausgabe von `ncu` zu betrachten:
           could be reduced or moved to look-up tables.
 ```
 
-Hierbei weist `ncu` darauf hin, dass der Algorithmus viele Berechnungen durchführt und vergleichsweise wenig auf Speicherauslastung hat. Den Vorschlag die Anzahl an Berechnungen zu verringern oder Ergebnisse zwischenzuspeichern funktioniert für diesen Algorithmus leider jedoch nicht. Die Ausgabe von `ncu` wollen wir an dieser Stelle nicht ignorieren, jedoch wird erst im nächsten Abschnitt die Speicherauslastung optimiert. Vorab betrachten wir noch die Kombination aus Quadratischer-Euklidischer-Distanz und `fastmath=True`.
+Hierbei weist `ncu` darauf hin, dass der Algorithmus viele Berechnungen durchführt und vergleichsweise wenig Speicherauslastung hat. Den Vorschlag die Anzahl an Berechnungen zu verringern oder Ergebnisse zwischenzuspeichern funktioniert für diesen Algorithmus leider jedoch nicht. Die Ausgabe von `ncu` wollen wir an dieser Stelle nicht ignorieren, jedoch wird erst im nächsten Abschnitt die Speicherauslastung optimiert. Vorab betrachten wir noch die Kombination aus Quadratischer-Euklidischer-Distanz und `fastmath=True`.
 
-Das Verwenden von `fastmath=True` für die neue Distanz-Funktion hat nur minimale Auswirkungen, da im Algorithmus nur noch Divisionen, die nur selten durchgeführt werden beschleunigt werden, wie folgende Diagramme zeigen.
+Das Verwenden von `fastmath=True` für die neue Distanz-Funktion hat nur minimale Auswirkungen, da im Algorithmus nur noch Divisionen, die nur selten durchgeführt werden, beschleunigt werden, wie folgende Diagramme zeigen.
 
-| RTX 5070                                                                                                                                 | GTX 1660 Ti                                                                                                                                 |
-| ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
+| RTX 5070                                                                                                                                             | GTX 1660 Ti                                                                                                                                             |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png)       | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png)       |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_sqrt_fast_naive_square_euclidean_fast_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_sqrt_fast_naive_square_euclidean_fast_resolution=128_points=64,128,256,512.png) |
 
 # Aufgabe 5 - Effizienteres Laden von Daten
@@ -458,9 +458,9 @@ Da in der Naiven Implementation zu jedem Zeitpunkt bekannt ist, welcher Punkt al
 
 _Wie können die Daten ins Shared Memory geladen und mit einem Grid-Stride-Loop verarbeitet werden?_
 
-Der gewählte Ansatz besteht darin eine feste Konstante `GRID_STRIDE_SIZE` zu definieren. Auf diese weise kann ein `cuda.shared.array` definiert und im Kernel zugegriffen werden. Dieser hat wie die Punkte Eingabe auch zwei Dimensionen, nämlich `GRID_STRIDE_SIZE` und `2`. Nun werden die ersten `GRID_STRIDE_SIZE` Punkte in das Shared Memory geschrieben. Hierbei werden `2 * GRID_STRIDE_SIZE` Threads benötigt, da für jeden Punkt ein `x` und ein `y` geladen werden muss. Je zwei aufeinander folgende Threads laden also die Daten für einen Punkt. Threads die keinen Punkt berechnen sollen warten beziehungsweise falls keine Punkte mehr vorhanden sind wird `np.inf` ins Shared Memory geschrieben um Fehler bei Rechnungen zu vermeiden. Bevor lesend auf das Shared Memory zugegriffen werden kann, muss `cuda.syncthreads()` aufgerufen werden, um Race-Conditions zu vermeiden. Nun können alle Threads aus dem Block durch das Array iterieren und Distanzen berechnen. Falls ein neuer Nächster Nachbar entdeckt wurde, muss der korrekte index des Punkt berechnet werden (Der Index in das Shared Memory Array wäre nicht korrekt). Zuletzt muss erneut `cuda.syncthreads()` aufgerufen werden, bevor die Schleife sich wiederholt, erneut um Race-Conditions zu vermeiden.
+Der gewählte Ansatz besteht darin eine feste Konstante `GRID_STRIDE_SIZE` zu definieren. Auf diese weise kann ein `cuda.shared.array` definiert und im Kernel zugegriffen werden. Dieser hat wie die Punkte Eingabe auch zwei Dimensionen, nämlich `GRID_STRIDE_SIZE` und `2`. Nun werden die ersten `GRID_STRIDE_SIZE` Punkte in das Shared Memory geschrieben. Hierbei werden `2 * GRID_STRIDE_SIZE` Threads benötigt, da für jeden Punkt ein `x` und ein `y` geladen werden muss. Je zwei aufeinander folgende Threads laden also die Daten für einen Punkt. Threads die keinen Punkt berechnen sollen warten beziehungsweise falls keine Punkte mehr vorhanden sind wird `np.inf` ins Shared Memory geschrieben, um Fehler bei Rechnungen zu vermeiden. Bevor lesend auf das Shared Memory zugegriffen werden kann, muss `cuda.syncthreads()` aufgerufen werden, um Race-Conditions zu vermeiden. Nun können alle Threads aus dem Block durch das Array iterieren und Distanzen berechnen. Falls ein neuer Nächster Nachbar entdeckt wurde, muss der korrekte Index des Punktes berechnet werden (Der Index in das Shared Memory Array wäre nicht korrekt). Zuletzt muss erneut `cuda.syncthreads()` aufgerufen werden, bevor die Schleife sich wiederholt, erneut um Race-Conditions zu vermeiden.
 
-Ein weiteres Detail ist, dass ein early-exit nicht mehr möglich ist für Threads die Pixel außerhalb des Diagram berechnen. Das liegt daran, dass Threads neben dem Pixel ausrechnen auch Punkte laden müssen. Es kann also sein, dass ein Thread zwar außerhalb des Diagram liegt, aber trotzdem Punkte für andere Threads laden muss. Erst nachdem keine Punkte mehr geladen werden müssen ist ein exit für diese Threads möglich beziehungsweise nötig.
+Ein weiteres Detail ist, dass ein early-exit nicht mehr möglich ist für Threads die Pixel außerhalb des Diagram berechnen. Das liegt daran, dass Threads neben dem Pixel auch Punkte laden müssen. Es kann also sein, dass ein Thread zwar außerhalb des Diagram liegt, aber trotzdem Punkte für andere Threads laden muss. Erst nachdem keine Punkte mehr geladen werden müssen ist ein exit für diese Threads möglich beziehungsweise nötig.
 
 _Welchen Einfluss hat das Laden der Daten ins Shared Memory und Verarbeiten mit einem Grid-Stride-Loop und wieso?_
 
@@ -468,12 +468,12 @@ Um den Einfluss der Shared Memory Verarbeitung mit Grid-Stride-Loop besser darzu
 
 Die Größe `GRID_STRIDE_SIZE` ist natürlich maßgeblich für die Laufzeit, beispielsweise führt ein `GRID_STRIDE_SIZE=128` zu schlechterer performance. Mit `GRID_STRIDE_SIZE=8` haben wir die besten Ergebnisse erzielt. In den folgenden Analysen gilt deswegen stets `GRID_STRIDE_SIZE=8`.
 
-Ein Blick auf das Assembly zeigt, dass der Compiler wegen der Konstante `GRID_STRIDE_SIZE=8` ein Loop-Unrolling der inneren Schleife, welche Distanz-Berechnungen übernimmt, durchgeführt hat. Im Vergleich zur Naiven Variante konnte der Compiler darauf verzichten mehrere Loop-Unrolling Schritte für verschiedene Längen durchzuführen, da bereits beim Kompilieren des Programm die Anzahl an Iterationen feststeht.
+Ein Blick auf das Assembly zeigt, dass der Compiler wegen der Konstante `GRID_STRIDE_SIZE=8` ein Loop-Unrolling der inneren Schleife, welche Distanz-Berechnungen übernimmt, durchgeführt hat. Im Vergleich zur Naiven Variante konnte der Compiler darauf verzichten mehrere Loop-Unrolling Schritte für verschiedene Längen durchzuführen, da bereits beim Kompilieren des Programms die Anzahl an Iterationen feststeht.
 
-| RTX 5070                                                                                                                                       | GTX 1660 Ti                                                                                                                                       |
-| ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_grid_stride_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_grid_stride_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_hypot_grid_stride_euclidean_hypot_resolution=128_points=64,128,256,512.png)     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_hypot_grid_stride_euclidean_hypot_resolution=128_points=64,128,256,512.png)     |
+| RTX 5070                                                                                                                                         | GTX 1660 Ti                                                                                                                                         |
+| ------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_grid_stride_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png)   | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_grid_stride_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png)   |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_hypot_grid_stride_euclidean_hypot_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_hypot_grid_stride_euclidean_hypot_resolution=128_points=64,128,256,512.png) |
 
 Es ist zusehen, dass im Vergleich zur Naiven Variante bei höherer Auflösung und Punkt-Anzahl deutlich Laufzeit eingespart wurde. Interessanterweise ist zu sehen, dass der Algorithmus für kleine Eingaben langsamer geworden ist. Der Grund hierfür ist vermutlich darauf zurückzuführen, dass mehr Overhead durch das Shared-Memory beziehungsweise das Loop-Unrolling entstanden ist. Erst bei größeren Eingaben fällt dieser Overhead weg.
 
@@ -501,11 +501,11 @@ Ein Blick auf die `ncu` Ausgabe zeigt, dass trotz der langsameren Distanz-Berech
           Start by analyzing workloads in the Compute Workload Analysis section.
 ```
 
-Es ist zu beachten das wie bei den anderen `ncu` Ausgaben stets der Fall `resolution=2048` und `points=512` betrachtet wird. Die Laufzeit hat sich deutlich verringert, obwohl die Anzahl an Rechenzyklen nur leicht gesunken ist. Der Grund hierfür der größere Durchsatz.
+Es ist zu beachten das wie bei den anderen `ncu` Ausgaben stets der Fall `resolution=2048` und `points=512` betrachtet wird. Die Laufzeit hat sich deutlich verringert, obwohl die Anzahl an Rechenzyklen nur leicht gesunken ist. Der Grund hierfür ist der größere Durchsatz.
 
 _Wie können die Daten innerhalb eines Warp geladen und mit `shfl_sync` verarbeitet werden werden?_
 
-Das Verfahren hat starke Ähnlichkeit mit dem vorherigen Ansatz. In diesem Fall werden Daten nicht mehr auf auf Block-Ebene geladen, sondern auf Warp-Ebene. Da Threads in einem Warp synchron ablaufen ist kein Aufruf von `cuda.syncthreads()` mehr nötig. Ein Nachteil hierbei ist, dass nun jeder Warp die Daten laden muss. Da nun kein `cuda.shared.array` vorhanden ist, muss eine lokale Variable definiert werden, welches auf ähnliche Weise verwendet wird. Die Variable wurde `point_component_warp_value` benannt und wird für jeden zweiten Thread eines Warp die `x`-Komponente und für jeden anderen Thread des Warp die `x`-Komponente laden. Falls ein Punkt nicht vorhanden ist, werden die Komponenten jeweils auf `np.inf` gesetzt um Fehler bei Rechnungen zu vermeiden. Wenn ein Warp nun die Variable `point_component_warp_value` eines jeden Thread befüllt wurden 16 `x`- und 16 `y`-Komponenten geladen, da es insgesamt 32 Threads pro Warp sind. Nun kann mit `cuda.shfl_sync` auf einen beliebigen Wert eines anderen Thread des gleichen Warp zugegriffen werden. Mit `cuda.shfl_sync(0xFFFFFFFF, point_component_warp_value, index)` und `cuda.shfl_sync(0xFFFFFFFF, point_component_warp_value, index + 1)` werden die Komponenten eines Punkt geladen und es kann die Distanz-Rechnung durchgeführt werden. Die beiden `cuda.shfl_sync` Aufrufe werden 16-mal wiederholt, bis vom Warp geladenen alle Punkte verarbeitet sind. Danach können die nächsten Punkte geladen werden, erneut ohne ein Aufruf von `cuda.syncthreads()`, da die Threads eines Warp synchron ablaufen.
+Das Verfahren hat starke Ähnlichkeit mit dem vorherigen Ansatz. In diesem Fall werden Daten nicht mehr auf auf Block-Ebene geladen, sondern auf Warp-Ebene. Da Threads in einem Warp synchron ablaufen ist kein Aufruf von `cuda.syncthreads()` mehr nötig. Ein Nachteil hierbei ist, dass nun jeder Warp die Daten laden muss. Da nun kein `cuda.shared.array` vorhanden ist, muss eine lokale Variable definiert werden, welches auf ähnliche Weise verwendet wird. Die Variable wurde `point_component_warp_value` benannt und wird für jeden zweiten Thread eines Warp die `x`-Komponente und für jeden anderen Thread des Warp die `y`-Komponente laden. Falls ein Punkt nicht vorhanden ist, werden die Komponenten jeweils auf `np.inf` gesetzt um Fehler bei Rechnungen zu vermeiden. Wenn ein Warp nun die Variable `point_component_warp_value` eines jeden Thread befüllt wurden 16 `x`- und 16 `y`-Komponenten geladen, da es insgesamt 32 Threads pro Warp sind. Nun kann mit `cuda.shfl_sync` auf einen beliebigen Wert eines anderen Thread des gleichen Warp zugegriffen werden. Mit `cuda.shfl_sync(0xFFFFFFFF, point_component_warp_value, index)` und `cuda.shfl_sync(0xFFFFFFFF, point_component_warp_value, index + 1)` werden die Komponenten eines Punkt geladen und es kann die Distanz-Rechnung durchgeführt werden. Die beiden `cuda.shfl_sync` Aufrufe werden 16-mal wiederholt, bis alle die vom Warp geladenen Punkte verarbeitet sind. Danach können die nächsten Punkte geladen werden, erneut ohne ein Aufruf von `cuda.syncthreads()`, da die Threads eines Warp synchron ablaufen.
 
 Wie auch beim vorherigen Ansatz ist ein early-exit nicht möglich aus den gleichen Gründen.
 
@@ -533,7 +533,7 @@ Folgende Diagramme geben die Laufzeiten wieder.
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_grid_stride_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_grid_stride_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_warp_shfl_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png)   | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_warp_shfl_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png)   |
 
-Es hat sich ergeben, dass die Warp mit `shfl_sync` Variante für jede Eingabe eine bessere Laufzeit aufweis.
+Es hat sich ergeben, dass die Warp mit `shfl_sync` Variante für jede Eingabe eine bessere Laufzeit aufweist.
 
 Interessanterweise hat sich in der `ncu` Ausgabe ebenfalls eine deutliche Verbesserung für die Warp mit `shfl_sync` Variante gezeigt.
 
@@ -745,8 +745,8 @@ Die folgenden Diagramme zeigen die gemessenen Kernellaufzeiten für die **quadra
 uv run .\src\task7.py jfa_square_euclidean
 ```
 
-| RTX 5070                                                                                                                                      | GTX 1660 Ti                                                                                                                                      |
-| --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| RTX 5070                                                                                                                                | GTX 1660 Ti                                                                                                                                |
+| --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_jfa_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_jfa_square_euclidean_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_jfa_square_euclidean_resolution=128_points=64,128,256,512.png)                     |
 
@@ -765,9 +765,9 @@ uv run .\src\task7.py jfa_manhattan
 uv run .\src\task7.py compare-jfa_square_euclidean-jfa_manhattan
 ```
 
-| RTX 5070                                                                                                                                      | GTX 1660 Ti                                                                                                                                      |
-| --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_manhattan_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_jfa_manhattan_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |
+| RTX 5070                                                                                                                          | GTX 1660 Ti                                                                                                                          |
+| --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_manhattan_resolution=128,256,512,1024,2048_points=64,128,256,512.png)  | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_jfa_manhattan_resolution=128,256,512,1024,2048_points=64,128,256,512.png)  |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_jfa_square_euclidean_jfa_manhattan_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_jfa_square_euclidean_jfa_manhattan_resolution=128_points=64,128,256,512.png) |
 
 Die Diagramme der Manhattan-Distanz zeigen vergleichbare Laufzeiten und Verhaltensmuster wie die der quadratischen euklidischen Distanz. Die Wahl der Metrik zur Distanzberechnung hat folglich keinen spürbaren Einfluss auf die Gesamtperformance des Kernels. Daraus lässt sich schließen, dass der JFA-Kernel primär _memory-bound_ (speicherbandbreitenbegrenzt) und nicht _compute-bound_ (rechenleistungsbegrenzt) ist. In jeder Iteration müssen die Threads auf die Informationen der 8 benachbarten Pixel zugreifen. Der Aufwand für das Laden dieser Daten aus dem globalen VRAM dominiert die Laufzeit. Ob im Rechenwerk anschließend eine Multiplikation mehr durchgeführt wird (wie bei der euklidischen Distanz: $dx \cdot dx + dy \cdot dy$) oder eine Betragsfunktion (Manhattan: $\left|dx\right| + \left|dy\right|$), fällt leistungstechnisch nicht ins Gewicht.
@@ -927,11 +927,11 @@ uv run .\src\task7.py compare-jfa_square_euclidean-jfa_shared_square_euclidean
 uv run .\src\task6b.py shared-jfa-step-analysis
 ```
 
-| RTX 5070                                                                                                                                                     | GTX 1660 Ti                                                                                                                                                     |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_shared_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_jfa_shared_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |
-| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_jfa_square_euclidean_jfa_shared_square_euclidean_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_jfa_square_euclidean_jfa_shared_square_euclidean_resolution=128_points=64,128,256,512.png) |
-| ![](../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-RTX-5070_Naive-square-euclidean_Shared-memory-square-euclidean_res2048_seeds512.png)             | ![](../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-GTX-1660-Ti_Naive-square-euclidean_Shared-memory-square-euclidean_res2048_seeds512.png)             |
+| RTX 5070                                                                                                                                         | GTX 1660 Ti                                                                                                                                         |
+| ------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_shared_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)   | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_jfa_shared_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)   |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_jfa_square_euclidean_jfa_shared_square_euclidean_resolution=128_points=64,128,256,512.png)  | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_jfa_square_euclidean_jfa_shared_square_euclidean_resolution=128_points=64,128,256,512.png)  |
+| ![](../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-RTX-5070_Naive-square-euclidean_Shared-memory-square-euclidean_res2048_seeds512.png) | ![](../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-GTX-1660-Ti_Naive-square-euclidean_Shared-memory-square-euclidean_res2048_seeds512.png) |
 
 Auch hier zeigt sich wieder die typische JFA-Charakteristik bezüglich der Laufzeitkomplexität in Abhängigkeit von Auflösung. In dem Diagramm, das die Laufzeit in Abhängigkeit zur Schrittweite darstellt, ist bei der `GTX 1660 Ti` zu erkennen, dass beide Implementierungen für die großen Schrittweiten übereinander liegen. Dies ist darauf zurückzuführen, dass die Shared Memory Pipeline hier nicht aktiviert ist. Ab Schrittweite 4 greift der Shared-Memory-Ansatz, der eine höhere Laufzeit als der naive Ansatz aufweist. Vergleicht man die Gesamtlaufzeiten mit denen der naiven quadratischen euklidischen Implementierung, stellt man fest, dass der Einsatz von Shared Memory **keinen Laufzeitvorteil** erbracht hat. Dafür lassen sich folgende mögliche Ursachen identifizieren:
 
@@ -989,11 +989,11 @@ uv run .\src\task7.py compare-jfa_square_euclidean-jfa_soa_square_euclidean
 uv run .\src\task6b.py SoA-jfa-step-analysis
 ```
 
-| RTX 5070                                                                                                                                           | GTX 1660 Ti                                                                                                                                           |
-| -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_soa_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_jfa_soa_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |
+| RTX 5070                                                                                                                                     | GTX 1660 Ti                                                                                                                                     |
+| -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_soa_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)  | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_jfa_soa_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)  |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_jfa_square_euclidean_jfa_soa_square_euclidean_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_jfa_square_euclidean_jfa_soa_square_euclidean_resolution=128_points=64,128,256,512.png) |
-| ![](../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-RTX-5070_Naive-square-euclidean_SoA-square-euclidean_res2048_seeds512.png)             | ![](../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-GTX-1660-Ti_Naive-square-euclidean_SoA-square-euclidean_res2048_seeds512.png)             |
+| ![](../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-RTX-5070_Naive-square-euclidean_SoA-square-euclidean_res2048_seeds512.png)       | ![](../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-GTX-1660-Ti_Naive-square-euclidean_SoA-square-euclidean_res2048_seeds512.png)       |
 
 Ein Vergleich der Messdaten mit der naiven quadratischen euklidischen Implementierung zeigt, dass das umgestellte _Structure of Arrays (SoA)_ Layout keinen messbaren Laufzeitvorteil gegenüber dem _Array of Structures (AoS)_ Layout liefert. Es lassen sich folgende mögliche Ursachen feststellen:
 
@@ -1052,30 +1052,30 @@ Wichtig zu erwähnen ist, dass eine formale Analyse bzw. ein Beweis dieser Schri
 
 _Welche Limitation hat der bisher implementierte JFA Algorithmus?_
 
-Der bisherige JFA Algorithmus verwendet zwei Pixelraster welche abwechselnd gelesen und geschrieben werden. Es sind zwei Raster nötig, da sonst unvollständige Werte in das Raster geschrieben werden könnten, wodurch es zu Race-Conditions kommt. Eine Folge davon könnte sein, dass beim Lesen eines Punkt die `x`-Komponente und die `y`-Komponente von verschiedenen Punkten sind.
+Der bisherige JFA Algorithmus verwendet zwei Pixelraster welche abwechselnd gelesen und geschrieben werden. Es sind zwei Raster nötig, da sonst unvollständige Werte in das Raster geschrieben werden könnten, wodurch es zu Race-Conditions kommt. Eine Folge davon könnte sein, dass beim Lesen eines Punktes die `x`-Komponente und die `y`-Komponente von verschiedenen Punkten verwendet werden.
 
 _Welche Nachteile bringen zwei Raster?_
 
-Zwei Raster haben einige Nachteile. Zum einen muss ist mehr Speicher auf der GPU nötig. Zum anderen muss der Algorithmus ständig die Zeiger auf die Raster nach jedem Kernel-Aufruf wechseln. Zudem kann es auch sein, dass die GPU caches schlechter ausnutzen kann, da es doppeltsoviele Daten zu verarbeiten gibt.
+Zwei Raster haben einige Nachteile. Zum einen ist mehr Speicher auf der GPU erforderlich und zum anderen muss der Algorithmus ständig die Zeiger auf die Raster nach jedem Kernel-Aufruf wechseln. Zudem kann es auch sein, dass die GPU die Caches schlechter ausnutzen kann, da es doppelt so viele Daten zu verarbeiten gibt.
 
 _Sind zwei Raster tatsächlich nötig?_
 
-Beim Algorithmus wird bei jedem Kernel-Aufruf pro Thread nur ein Pixel beschrieben. Ob ein anderer Thread den Pixel aus dieser Iteration oder aus der nächsten Iteration liest, ist dabei tatsächlich nicht wichtig, da nur der nächste Nachbar relevant ist. Es muss also nur verhindert werden, dass ein ungültiger Punkt gelesen wird. Da der lesende Zugriff auf Pixel weit reicht, vorallem in den ersten Iterationen, können die im Kurstext beschriebenen Synchronisations-Methoden nur schwer angewendet werden. Desweiteren würden Synchronisations-Methoden vermutlich den Algorithmus langsamer machen. Um diese Problematik zu umgehen werden Punkte und das Raster separat gespeichert. Statt die coordinaten der Punkte im Raster zu verwalten, werden Verweise auf die Punkte im Raster gespeichert. Diese Indirektion führt dazu, dass mehr Daten aus dem Global-Memory gelanden werden, aber dafür kann auf das zweite Raster verzichtet werden.
+Beim Algorithmus wird bei jedem Kernel-Aufruf pro Thread nur ein Pixel beschrieben. Ob ein anderer Thread den Pixel aus dieser Iteration oder aus der nächsten Iteration liest, ist dabei tatsächlich nicht wichtig, da nur der nächste Nachbar relevant ist. Es muss also nur verhindert werden, dass ein ungültiger Punkt gelesen wird. Da der lesende Zugriff auf Pixel weit reicht, vorallem in den ersten Iterationen, können die im Kurstext beschriebenen Synchronisations-Methoden nur schwer angewendet werden. Des Weiteren würden Synchronisations-Methoden vermutlich den Algorithmus langsamer machen. Um diese Problematik zu umgehen werden Punkte und das Raster separat gespeichert. Statt die Koordinaten der Punkte im Raster zu verwalten, werden Verweise auf die Punkte im Raster gespeichert. Diese Indirektion führt dazu, dass mehr Daten aus dem Global-Memory gelanden werden, aber dafür kann auf das zweite Raster verzichtet werden.
 
-Ein weiterer Vorteil der sich hierraus ergibt, ist, dass für die Punkt-Koordinaten wieder `float32` statt `int32` verwendet werden kann.
+Ein weiterer Vorteil der sich hieraus ergibt, ist, dass für die Punkt-Koordinaten wieder `float32` statt `int32` verwendet werden kann.
 
 Um die Warp-Divergence niedrig zu halten werden zudem alle Verweise im Raster, welche initial keinen Punkt zugewiesen bekommen haben, auf den ersten Punkt der Eingabe gesetzt. Auf diese Weise kann zur Kernel-Laufzeit auf Prüfungen der Punkte verzichtet werden.
 
 _Wie ändert sich die Laufzeit beim verwenden nur eines Rasters?_
 
-Folgene Abbildungen geben die Laufzeiten des beschriebenen Ansatz an.
+Folgene Abbildungen geben die Laufzeiten des beschriebenen Ansatzes an.
 
-| RTX 5070                                                                                                                                             | GTX 1660 Ti                                                                                                                                             |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_inout_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_jfa_inout_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)        |
+| RTX 5070                                                                                                                                       | GTX 1660 Ti                                                                                                                                       |
+| ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_inout_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)  | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_jfa_inout_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png)  |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_jfa_square_euclidean_jfa_inout_square_euclidean_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_jfa_square_euclidean_jfa_inout_square_euclidean_resolution=128_points=64,128,256,512.png) |
 
-Es ist zu sehen, dass für die Eingabe-Größen `512` und `2048` des Raster eine Verbesserung der Laufzeit zu erkennen ist. Die anderen Größen sind in einem ähnlichen Wertebereich wie zuvor. Erstaunlicherweise ist der Algorithmus schneller, wenn die Eingabe-Größe des Raster `512` statt `128` ist. Der Grund hierfür konnte aus zeitlichen Gründen leider nicht bestimmt werden.
+Es ist zu sehen, dass für die Eingabe-Größen `512` und `2048` des Raster eine Verbesserung der Laufzeit zu erkennen ist. Die anderen Größen sind in einem ähnlichen Wertebereich wie zuvor. Erstaunlicherweise ist der Algorithmus bei der `RTX 5070 ` schneller, wenn die Eingabe-Größe des Raster `512` statt `128` ist. Der Grund hierfür konnte aus zeitlichen Gründen leider nicht bestimmt werden.
 
 # Aufgabe 7 - Ergebnisse
 
