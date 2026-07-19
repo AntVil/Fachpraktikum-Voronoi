@@ -1,0 +1,2785 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>README</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/katex@0.18.1/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.18.1/dist/katex.min.css" />
+</head>
+<body>
+<h1 id="dokumentation-voronoi-projekt">Dokumentation Voronoi
+Projekt</h1>
+<ul>
+<li>Modul: <em>Fachpraktikum Parallel Programming - 63782 -
+Prof. Dr. Lena Oden</em></li>
+<li>Gruppe B:
+<ul>
+<li><em>Pius Großmann</em></li>
+<li><em>Anton Böhler</em></li>
+</ul></li>
+</ul>
+<hr />
+<h1 id="vorgehen-und-aufbau">Vorgehen und Aufbau</h1>
+<p>Um ein strukturiertes Vorgehen zu gewährleisten, wurde vorab ein
+Konzept entwickelt. Es beginnt mit dem ersten Abschnitt, bei dem das
+Thema dieses Projekts klar beschrieben und abgesteckt wird. Im darauf
+folgendem Abschnitt wird ein Performance-Analyse-Konzept entwickelt und
+implementiert, um in allen anderen Abschnitten einheitliche
+Zeitmessungen und Analysen durchzuführen. Der dritte Abschnitt befasst
+sich mit einer naiven Implementation, wobei geklärt wird, wie und warum
+diese Implementation funktioniert. Danach werden in Abschnitt vier und
+fünf die aus dem Kurs-Text erlernten Optimierungs-Verfahren angewandt.
+In Abschnitt sechs wird ein Algorithmus aus der Literatur erklärt,
+implementiert und mit dem bisherigem Algorithmus verglichen. Zuletzt
+wird in Abschnitt sieben eine finale Analyse und Zusammenfassung der
+Ergebnisse dargelegt.</p>
+<h1 id="aufgabe-1---beschreibung-des-problems">Aufgabe 1 - Beschreibung
+des Problems</h1>
+<p><em>Was ist das Problem?</em></p>
+<p>Ein Voronoi-Diagramm ist eine Aufteilung eines Raumes. Für eine
+gegebene Punkte-Menge wird diese Aufteilung berechnet, wobei jeder Punkt
+genau einer Region zugeordnet wird. Das Ziel ist es, den Raum so in
+Regionen zu unterteilen, dass alle Punkte innerhalb einer Region als
+nächst gelegenen Nachbarn den Punkt, der innerhalb der Region liegt,
+haben. Je nachdem, welche Distanz-Metrik verwendet wird, sieht das
+Voronoi-Diagramm unterschiedlich aus.</p>
+<p>Als Beispiel wurden folgende Visualisierungen für die gleiche
+Punkte-Menge mit Unterschiedlichen Distanz-Funktionen erstellt.</p>
+<table>
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 32%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Euklidische Distanz</th>
+<th>Manhattan Distanz</th>
+<th>Maximale Distanz</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img src="../data/task1_euclidean_visualization.gif" /></td>
+<td><img src="../data/task1_manhattan_visualization.gif" /></td>
+<td><img src="../data/task1_max_absolute_visualization.gif" /></td>
+</tr>
+</tbody>
+</table>
+<p>Die Regionen im Voronoi-Diagramm werden Voronoi-Regionen genannt.</p>
+<p><em>Was sind verwandte Probleme die nicht berücksichtigt
+werden?</em></p>
+<p>Um den Rahmen des Projekts abzugrenzen, werden verwandte
+Problemstellungen, wie die Delaunay Triangulation oder Voronoi-Diagramme
+im mehr-dimensionalen Raum, nicht betrachtet. In diesem Projekt werden
+lediglich diskrete Voronoi-Diagramme berechnet. Es ist somit nicht von
+Bedeutung die tatsächlichen Voronoi-Regionen zu bestimmen, sondern nur
+das finale Diagramm. Bei den Distanz-Funktionen steht die
+Euklidische-Distanz im Vordergrund. Die Manhattan-Distanz wird an
+einigen Stellen als Exkurs betrachtet.</p>
+<p><em>Was wird berechnet?</em></p>
+<p>Da das Diagramm auf der GPU berechnet wird, wird ein Pixelraster
+(Gitter) verwendet. Für jeden Pixel <span class="math inline">(x,
+y)</span> des Zielbildes wird der Abstand zum nächstgelegenen Punkt
+bestimmt. Am Ende wird jeder Pixel dem Punkt zugewiesen, zu dessen
+Voronoi-Region dieser gehört.</p>
+<p>Es gibt eine Besonderheit die hierbei zu beachten ist. Bei diskreten
+Pixeln kann es dazu kommen, dass ein Pixel nächster Nachbar zu zwei
+Punkten wäre. Dieser Sonderfall ist bei dem Voronoi-Diagramm mit
+Manhattan-Distanz noch stärker ausgeprägt, da hierbei die Grenzen
+zwischen zwei Voronoi-Regionen sogar Flächen sein können. Um diese
+Problematik zu umgehen und einen eindeutigen nächsten Nachbar zu
+garantieren, wird bei zwei Punkten mit gleichem Abstand der Punkt,
+welcher weiter am Anfang der Eingabe liegt, gewählt.</p>
+<p><em>Welche Einschränkungen beziehungsweise Annahmen werden
+gemacht?</em></p>
+<p>Für dieses Projekt werden die folgenden Einschränkungen und Annahmen
+getroffen:</p>
+<ul>
+<li><p>Zweidimensionalität: Die Berechnung ist auf den 2D-Raum
+beschränkt. Dreidimensionale Räume oder höhere Dimensionen werden
+ausgeschlossen.</p></li>
+<li><p>Quadratischer Raum: Das Diagramm ist
+<strong>quadratisch</strong>. Es werden keine rechteckigen Auflösungen
+der Form <span class="math inline">W \times H</span> unterstützt,
+sondern ausschließlich Dimensionen der Form <span class="math inline">N
+\times N</span>.</p></li>
+<li><p>Statische Eingabe-Punkte: Die Positionen der Punkte sind nach der
+Initialisierung fix und verändern sich nicht während der
+Kernel-Laufzeit.</p></li>
+<li><p>Eingabe Punkte liegen innerhalb des Diagramm</p></li>
+</ul>
+<p><em>Was ist die Eingabe und Ausgabe und welcher Daten-Typ wird
+genutzt?</em></p>
+<p>Für die Berechnung des Voronoi-Diagramms sind folgende Parameter
+definiert:</p>
+<table>
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 66%" />
+<col style="width: 17%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Beschreibung</th>
+<th>Datentyp</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Bildauflösung</strong></td>
+<td>Die Seitenlänge des quadratischen Gitters (<span
+class="math inline">N \times N</span>)</td>
+<td><code>int32</code></td>
+</tr>
+<tr class="even">
+<td><strong>Punkte</strong></td>
+<td>Ein Array, das die 2D-Koordinaten der im Raum verteilten Punkte
+enthält</td>
+<td><code>float32</code> / <code>int32</code></td>
+</tr>
+<tr class="odd">
+<td><strong>Ausgabe-Grid</strong></td>
+<td>Das resultierende zweidimensionale Bildraster/Voronoi-Diagramm</td>
+<td><code>int32</code></td>
+</tr>
+</tbody>
+</table>
+<p>Für Punkte wurden die Daten-Typen <code>float32</code>,
+beziehungsweise <code>int32</code> gewählt, da es gewisse Algorithmen
+gibt, welche auf <code>int32</code> angewiesen sind (siehe <em>Aufgabe
+6</em>). Andere Algorithmen können sowohl <code>int32</code>, als auch
+<code>float32</code> verarbeiten. Da es an einigen Stellen vorteilhaft
+ist <code>float32</code> Werte zu haben, wird als alternativer Daten-Typ
+auch <code>float32</code> erlaubt.</p>
+<p>Für manchen Algorithmen werden zusätzliche Eingaben erlaubt, welche
+für die Berechnung nötig sind. Dies betrifft erneut die Algorithmen aus
+<em>Aufgabe 6</em>.</p>
+<p><em>Welche Parameter sind entscheidend für das Problem und welchen
+Einfluss haben diese?</em></p>
+<p>Für die Algorithmen aus diesem Projekt gibt es zwei entscheidende
+Parameter, welche die Laufzeit beeinflussen:</p>
+<ol type="1">
+<li><p>Die Bildauflösung (<span class="math inline">N</span>): Mit
+steigender Auflösung wächst die Anzahl der zu berechnenden Pixel
+quadratisch (<span class="math inline">N^2</span>).</p></li>
+<li><p>Die Anzahl der im Raum zufällig verteilten Punkte, welche bei der
+Distanzberechnung berücksichtigt werden müssen.</p></li>
+</ol>
+<h1 id="aufgabe-2---performance-analyse-konzept">Aufgabe 2 - Performance
+Analyse Konzept</h1>
+<p><em>Wie werden im folgenden Performance Analysen
+durchgeführt?</em></p>
+<p>Für die Performance-Analyse werden die Aufnahme der Messergebnisse
+und die daraus resultierende Generierung der Diagramme getrennt.</p>
+<p>Aufgrund der unterschiedlichen Algorithmen-Strukturen und
+Kernel-Signaturen, ist das einheitliche Messen von Zeiten etwas
+erschwert. Um die Zeitmessungen dennoch zu vereinheitlichen, wurde das
+<code>Protocol</code> (auch bekannt als <em>abstrakte Klasse</em>)
+<code>MeasurableKernel</code> eingeführt. Für jede Klasse von
+Algorithmus wird eine Kind-Klasse von <code>MeasurableKernel</code>
+geschrieben (zum Beispiel <code>PixelAlgorithm</code>). Die Kind-Klasse
+hat die Aufgabe den Aufruf des Algorithmus zu abstrahieren, sodass die
+Routine <code>compute_performance_metrics</code> eine beliebige Instanz
+von einer Kind-Klasse von <code>MeasurableKernel</code> erhalten und
+verarbeiten kann.</p>
+<p>Die Routine <code>compute_performance_metrics</code> verwendet zwei
+CUDA-Events (<code>cuda.event(timing=True)</code>), um die Zeitmessung
+auf der GPU durchzuführen. Ein <code>cuda.synchronize()</code> stellt
+sicher, dass die GPU alle Berechnungen vollständig abgeschlossen hat,
+bevor die finale Laufzeit in Millisekunden via
+<code>.elapsed_time()</code> auf der CPU bestimmt wird. Gemessen wird
+ausschließlich die reine Ausführungszeit des Kernels auf der GPU für die
+Berechnung des Voronoi-Diagramms. Die Messungen werden für mehrere
+vordefinierte Eingabe-Größen durchgeführt. Für jede dieser Größen wird
+20-mal die Zeitmessung durchgeführt. Für die erstellten Diagramme wird
+dann der Median pro Eingabe verwendet.</p>
+<p><em>Wie wird die Zeit für das kompilieren und den Daten-Transfer in
+der Analyse berücksichtigt?</em></p>
+<p>Um saubere Messergebnisse zu erhalten, werden vorab fünf <em>Dry
+Warm-up</em> Durchläufe durchgeführt. Dadurch wird sichergestellt, dass
+die erste Just-In-Time-Kompilierung (JIT) des Kernels die eigentlichen
+Performance-Messungen zeitlich nicht verfälscht.</p>
+<p>Es werden <strong>keine</strong> Transferzeiten, wie Host-to-Device
+(H2D) oder Device-to-Host (D2H), berücksichtigt. Um die Transfer-Zeit
+aus den Analysen auszuschließen, wird der Daten-Transfer manuell mit
+<code>to_device</code> durchgeführt, bevor die <code>record</code>
+Methode der Cuda-Events aufgerufen wird.</p>
+<p><em>Welche Eingabe-, beziehungsweise Ausgabe-Größen werden
+verwendet?</em></p>
+<p>Für die <strong>Eingabe</strong> werden folgende Größen variiert:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Bildauflösung</th>
+<th>Punkteanzahl</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>128 (<span class="math inline">2^7</span>)</td>
+<td>64 (<span class="math inline">2^6</span>)</td>
+</tr>
+<tr class="even">
+<td>256 (<span class="math inline">2^8</span>)</td>
+<td>128 (<span class="math inline">2^7</span>)</td>
+</tr>
+<tr class="odd">
+<td>512 (<span class="math inline">2^9</span>)</td>
+<td>256 (<span class="math inline">2^8</span>)</td>
+</tr>
+<tr class="even">
+<td>1024 (<span class="math inline">2^{10}</span>)</td>
+<td>512 (<span class="math inline">2^9</span>)</td>
+</tr>
+<tr class="odd">
+<td>2048 (<span class="math inline">2^{11}</span>)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Zur visuellen Auswertung der Ergebnisse (<strong>Ausgabe</strong>)
+stehen zwei Diagrammtypen zur Verfügung:</p>
+<ul>
+<li><p>Performance-Vergleichsplot
+(<code>create_kernel_performance_plot</code>): Dieses Diagramm zeigt die
+Kernel-Laufzeit in Abhängigkeit von der Punkteanzahl bei einer
+<strong>festen</strong> Bildauflösung. Sowohl die X-Achse (Input-Größe
+<span class="math inline">N</span>) als auch die Y-Achse (Laufzeit in
+ms) nutzen eine logarithmische Skalierung. Da die Funktion eine Liste
+von Kernel entgegennehmen kann, ist es möglich, mithilfe dieses Plots
+mehrere Kernel-Implementierungen direkt miteinander zu
+vergleichen.</p></li>
+<li><p>Performance-Matrix / Heatmap
+(<code>create_kernel_performance_matrix</code>): Da die Laufzeit von
+zwei Eingabeparameter (Bildauflösung und Punkteanzahl) maßgeblich
+abhängt, zeigt diese Matrix die gegenseitige Beeinflussung der beiden
+Parameter. Die Zeilen repräsentieren die Auflösung, die Spalten die
+Punkteanzahl. In jeder Zelle wird die konkrete Laufzeit
+angezeigt.</p></li>
+</ul>
+<h1 id="aufgabe-3---naive-implementation">Aufgabe 3 - Naive
+Implementation</h1>
+<p><em>Wie viele Threads werden gestartet und welche Aufgabe hat ein
+Jeder?</em></p>
+<p>Für jeden Pixel des Ergebnis wird ein Thread initialisiert. Jeder
+Thread iteriert durch alle Punkte und berechnet die Distanz zu jedem
+Punkt. Der Punkt mit der geringsten Distanz wird dabei gefunden und das
+Ergebnis in die Ausgabe geschrieben.</p>
+<p><em>Wie wird entschieden, ob ein Punkt nächster Nachbar ist?</em></p>
+<p>Beim iterieren wird die Distanz zu jedem Punkt, mit Hilfe von
+<code>cuda.libdevice.hypotf</code> berechnet und der Index, des am
+nächsten liegenden Punkt, gespeichert. Wenn nun ein Punkt mit geringerer
+Distanz gefunden wird, wird der Index überschrieben.</p>
+<p>Folgende Animation gibt an, wie das Ergebnis nach jeder Iteration,
+also Hinzunahme eines weiteren Punktes, aussieht.</p>
+<table>
+<colgroup>
+<col style="width: 46%" />
+<col style="width: 53%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Voronoi</th>
+<th>Distanzen</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img src="../data/task3_euclidean_visualization.gif" /></td>
+<td><img src="../data/task3_euclidean_field_visualization.gif" /></td>
+</tr>
+</tbody>
+</table>
+<p>Aus dieser Animation ist ersichtlich, dass jeder Pixel immer den
+bisherigen nächsten Nachbar verwaltet und inkrementell weitere Punkte
+hinzunimmt. In der beistehenden Animation sind die Distanzen zu sehen.
+Hierbei ist zu erkennen, dass die Distanzen sich mit jeder Iterationen
+verringern (oder gleich bleiben).</p>
+<blockquote>
+<p>[!note] Die berechneten Distanzen wurden aus dem Wertebereich <span
+class="math inline">0</span> bis <span
+class="math inline">\sqrt{2}</span>, in den Wertebereich <span
+class="math inline">0</span> bis <span class="math inline">255</span>
+abgebildet. Zur besseren Visualisierung wurden die Distanzen mit dem
+Faktor <span class="math inline">4</span> hoch-skaliert und an der
+oberen Grenze abgeschnitten. Die Begründung hierfür ist, dass auch bei
+den letzten Iterationen der Animation noch Änderungen mit bloßem Auge zu
+erkennen sind. Für andere Animationen der Distanzen wird ebenfalls mit
+dem gleichen Faktor hoch-skaliert, um Vergleiche zu ermöglichen.</p>
+</blockquote>
+<p><em>Wieso arbeitet der Algorithmus korrekt?</em></p>
+<p>Der Algorithmus arbeitet korrekt, weil für jeden Pixel jeder Punkt
+bei der Suche nach dem nächsten Nachbar berücksichtigt wird. Es kann
+also keinen Punkt geben der näher liegt, als der berechnete Punkt.</p>
+<p><em>Müssen Race-Conditions beachtet werden?</em></p>
+<p>Da der Algorithmus für jeden Pixel einen Thread startet und Threads
+sich um nur deren zugewiesenen Pixel kümmern, gibt es keine
+Race-Conditions. Es müssen also keine Atomic- oder Sync-Operationen
+durchgeführt werden.</p>
+<p><em>Gibt es warp divergence in dieser Implementation?</em></p>
+<p>Diese Implementation hat sehr wenig warp divergence. Bei dem Kernel
+Aufruf terminieren Threads, welche Pixel außerhalb des Ergebnis
+berechnen würden, frühzeitig. Die Schleife wird in jedem Thread für
+jeden Punkt der Eingabe einmal ausgeführt. Das bedeutet jeder Thread
+führt die Schleife genau gleich-oft aus. An dieser Stelle gibt es also
+keine warp divergence. Hingegen bei der Verzweigung, ob die
+neu-berechnete Distanz näher liegt, kann es zu warp divergence kommen.
+Hierbei gibt es jedoch eine kleine Besonderheit. Die Pixel eines Warp
+liegen beieinander, weswegen Abstände zu den meisten Punkten ähnlich
+ausfallen und in vielen Fällen keine warp divergence auftritt.</p>
+<p><em>Welche Probleme beziehungsweise Grenzen hat der Kernel?</em></p>
+<p>Die Ausführungszeit eines Thread des Kernel wächst linear mit der
+Anzahl an Punkten. Gleiches gilt für die Anzahl an benötigten Threads in
+Bezug auf die Ausgabe-Größe. Diese Implementation kann keinen Punkt
+überspringen, da der Algorithmus dadurch nicht korrekt arbeiten
+würde.</p>
+<p><em>Welche Parameter haben den größten Einfluss auf die Performance
+und wieso?</em></p>
+<p>Die Anzahl an Punkten und die Ausgabe-Größe haben den größten
+Einfluss auf die Performance, da weitere Schleifen-Iterationen
+durchgeführt beziehungsweise weitere Threads gestartet werden
+müssen.</p>
+<p>Folgendes Diagramm zeigt die Laufzeit für verschiedene Auflösungen
+und Punktemengen als Matrix. Das Diagramm darunter ist für die feste
+Ausgabe-Größe von <code>128x128</code>.</p>
+<table>
+<colgroup>
+<col style="width: 49%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>RTX 5070</th>
+<th>GTX 1660 Ti</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+</tr>
+<tr class="even">
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_hypot_resolution=128_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_hypot_resolution=128_points=64,128,256,512.png" /></td>
+</tr>
+</tbody>
+</table>
+<p>Es ist leicht zu erkennen, dass größenordnungsmäßig ein Verdoppeln
+der Anzahl an Punkten ein Verdoppeln der Laufzeit mit sich bringt. Ein
+Verdoppeln der Auflösung führt größenordnungsmäßig zu einem
+Vervierfachen der Laufzeit. Das liegt daran, dass ein Verdoppeln der
+Auflösung dazu führt, dass viermal so viele Pixel berechnet werden
+müssen.</p>
+<p>Für den Fall <code>resolution=2048</code> und <code>points=512</code>
+wurde <code>ncu</code> (<a
+href="https://developer.nvidia.com/nsight-compute">Nsight Compute</a>)
+für die <code>RTX 5070</code> ausgeführt. Folgender Ausschnitt der
+Ausgabe ist hierbei wichtig:</p>
+<pre><code>    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- -------------
+    Metric Name             Metric Unit  Metric Value
+    ----------------------- ----------- -------------
+    DRAM Frequency                  Ghz         13,79
+    SM Frequency                    Ghz          2,54
+    Elapsed Cycles                cycle    18.014.478
+    Memory Throughput                 %         31,15
+    DRAM Throughput                   %          0,35
+    Duration                         ms          7,09
+    L1/TEX Cache Throughput           %         31,21
+    L2 Cache Throughput               %          0,55
+    SM Active Cycles              cycle 17.971.334,48
+    Compute (SM) Throughput           %         87,20
+    ----------------------- ----------- -------------
+
+    INF   This workload is utilizing greater than 80.0% of the available compute or memory performance of this device.
+          To further improve performance, work will likely need to be shifted from the most utilized to another unit.
+          Start by analyzing workloads in the Compute Workload Analysis section.</code></pre>
+<p>Laut <code>ncu</code> lastet der Algorithmus die GPU einigermaßen gut
+aus. Dem Vorschlag von <code>ncu</code>, die
+<code>Compute Workload</code> näher zu betrachten, wollen wir nachgehen.
+Um eine nahe-liegende Optimierung zu motivieren, wird als Exkurs die
+Manhattan-Distanz betrachtet.</p>
+<p><em>Exkurs Manhattan-Distanz: Welchen Einfluss hat die
+Manhattan-Distanz als alternative Metrik, und wie verändert sich das
+visuelle Ergebnis?</em></p>
+<p>Die Manhattan-Distanz ist eine alternative Distanz-Funktion zur
+Euklidischen Distanz-Funktion. Sie ist definiert als die Summe der
+absoluten Abstände für jede Dimension.</p>
+<p><span class="math display">\sum_{i=0}^n \left|a_i -
+b_i\right|</span></p>
+<p>Der zuvor beschriebene Algorithmus ist Distanz-Funktion agnostisch,
+weswegen nur eine kleine Änderung nötig ist, um das Voronoi-Diagram mit
+Manhattan-Distanz-Funktion zu berechnen.</p>
+<p>Folgende Animation wurde für die Manhattan-Distanz erstellt.</p>
+<table>
+<colgroup>
+<col style="width: 46%" />
+<col style="width: 53%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Voronoi</th>
+<th>Distanzen</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img src="../data/task3_manhattan_visualization.gif" /></td>
+<td><img src="../data/task3_manhattan_field_visualization.gif" /></td>
+</tr>
+</tbody>
+</table>
+<p>Der Algorithmus funktioniert auf die gleiche Weise, es gibt jedoch
+abgesehen von der Ausgabe einen deutlichen Unterschied in der Laufzeit.
+Der gleiche Algorithmus mit Manhattan-Distanz ist deutlich schneller,
+als mit Euklidischer-Distanz, wie folgendes Diagramm zeigt.</p>
+<table>
+<colgroup>
+<col style="width: 49%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>RTX 5070</th>
+<th>GTX 1660 Ti</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_hypot_naive_manhattan_resolution=128_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_hypot_naive_manhattan_resolution=128_points=64,128,256,512.png" /></td>
+</tr>
+</tbody>
+</table>
+<p>Dies ist natürlich nicht verwunderlich, da für die Berechnung der
+Manhattan-Distanz nur Addition und die Absolut-Funktion nötig sind,
+welche sehr leicht zu berechnen sind. Hingegen für die
+Euklidische-Distanz wird die <code>cuda.libdevice.hypotf</code> Funktion
+aufgerufen, welche schwerer beziehungsweise langsamer zu berechnen ist.
+Es ist also ersichtlich, dass durch eine effizientere Distanz-Prüfung
+eine schnellere Laufzeit möglich ist.</p>
+<p>Das Ausführen von <code>ncu</code> für die Manhattan-Distanz hat
+folgende Ausgabe geliefert:</p>
+<pre><code>    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- ------------
+    Metric Name             Metric Unit Metric Value
+    ----------------------- ----------- ------------
+    DRAM Frequency                  Ghz        13,79
+    SM Frequency                    Ghz         2,54
+    Elapsed Cycles                cycle    8.809.962
+    Memory Throughput                 %        63,71
+    DRAM Throughput                   %         0,06
+    Duration                         ms         3,47
+    L1/TEX Cache Throughput           %        63,83
+    L2 Cache Throughput               %         1,10
+    SM Active Cycles              cycle 8.787.657,25
+    Compute (SM) Throughput           %        73,60
+    ----------------------- ----------- ------------
+
+    INF   Compute and Memory are well-balanced: To reduce runtime, both computation and memory traffic must be reduced.
+          Check both the Compute Workload Analysis and Memory Workload Analysis sections.</code></pre>
+<p>In diesem Fall ist der Algorithmus laut <code>ncu</code> besser
+ausgelastet. Es ist zu erkennen, dass die Anzahl an Rechenzyklen stark
+gesunken ist und damit die Rechenzeit. Um den Algorithmus für die
+Euklidische-Distanz zu optimieren, wäre es wünschenswert, wenn die
+Anzahl an Rechenzyklen ebenfalls niedriger wäre. Diese Thematik wollen
+wir im nächsten Abschnitt näher betrachten.</p>
+<h1 id="aufgabe-4---optimierung-durch-billigere-distanz-prüfung">Aufgabe
+4 - Optimierung durch billigere Distanz-Prüfung</h1>
+<p><em>Welche Optimierungen können bei der Distanz-Prüfung problemlos
+gemacht werden und warum?</em></p>
+<p>Der bisherige Algorithmus arbeitet jeden Punkt ab und berechnet den
+Abstand, um einen nächsten Nachbar zu bestimmen. Es gibt zwei Ansätze
+die an dieser Stelle untersucht werden könnten.</p>
+<ol type="1">
+<li>Schnellere Distanz Berechnung</li>
+</ol>
+<p>Es kann versucht werden das berechnen von Distanz-Funktionen zu
+verbessern. Hierbei gibt es die Möglichkeit die <code>sqrt</code>
+Funktion aufzurufen.</p>
+<p>Ansonsten können mit der <code>fastmath=True</code> Annotation
+schnellere Mathe-Operationen ermöglicht werden. Laut dem <a
+href="https://nvidia.github.io/numba-cuda/user/fastmath.html">nvidia-numba-cuda-user-guide</a>
+werden einige Operationen wie <code>sqrt</code> durch schnellere
+Approximationen ersetzt und Multiplikations- und Additions-Operationen
+verschmolzen. Da unser Algorithmus nicht die exakten Distanzen benötigt,
+sondern nur Distanzen vergleichen muss, ist dies ein klarer
+Anwendungsfall.</p>
+<p>Zuletzt kann darauf verzichtet werden die tatsächliche Euklidische
+Distanz zu berechnen. Da nur Distanzen verglichen werden, können wir
+auch die quadratische euklidische Distanz vergleichen. Auf den ersten
+Blick erscheint dies aufwendiger, jedoch kann auf diese Weise auf alle
+komplizierteren Mathe-Operationen verzichtet werden.</p>
+<ol start="2" type="1">
+<li>Distanz Berechnung überspringen</li>
+</ol>
+<p>Es können schnelle Approximationen der Distanz-Funktion verwendet
+werden, um sich die exakte Berechnung einzusparen. Beispielsweise kann
+der Abstand, unter Berücksichtigung, nur einer Dimension bestimmt
+werden. Auf diese Weise können Punkte, die definitiv zu weit entfernt
+sind, übersprungen werden, indem eine Verzweigung eingesetzt wird.</p>
+<p>Um den Rahmen dieses Projekt nicht zu sprengen, beschränken wir uns
+in diesem Projekt nur mit dem ersten Ansatz. Es sei hier jedoch am Rande
+erwähnt, dass Abzweigungen, wie sie im zweiten Ansatz beschrieben sind,
+vermutlich zu Warp-Divergence führen würden. Dadurch könnte ein solcher
+Ansatz die Performance potentiell verschlechtern.</p>
+<p><em>Welchen Einfluss hat <code>sqrt</code> und wieso?</em></p>
+<p>Für die bisherigen Berechnungen wurde die
+<code>cuda.libdevice.hypotf</code> Funktion verwendet, da diese genau
+die Euklidische-Distanz berechnet. Es ist auch möglich das Äquivalent
+der <code>cuda.libdevice.hypotf</code> Funktion zu berechnen, indem der
+Ausdruck <span class="math inline">\sqrt{(a_x - b_x)^2 + (a_y -
+b_y)^2}</span> mit Hilfe der Funktion <code>cuda.libdevice.sqrtf</code>
+ausgeschrieben wird.</p>
+<p>Die Annahme vorab ist, dass die beiden Funktionen die gleiche
+Laufzeit haben. Es wäre auch denkbar, dass die
+<code>cuda.libdevice.hypotf</code> Funktion bestimmte Optimierungen
+ermöglicht, die bei der generischen Funktion
+<code>cuda.libdevice.sqrtf</code> nicht möglich wären. Tatsächlich hat
+sich in der Praxis das Gegenteil gezeigt, wie folgender Ausschnitt aus
+dem Assembly zeigt.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode diff"><code class="sourceCode diff"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>$L__BB0_6:</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    mul.lo.s64  %rd66, %rd76, %rd8;</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    add.s64     %rd67, %rd1, %rd66;</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    add.s64     %rd68, %rd5, %rd66;</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    ld.global.b32   %r132, [%rd67];</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    add.s64     %rd69, %rd9, %rd68;</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="st">-   ld.b32  %r133, [%rd69];</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="va">+   ld.b32  %r61, [%rd69];</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="st">-   sub.f32     %r134, %r1, %r132;</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="st">-   sub.f32     %r135, %r2, %r133;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="va">+   sub.f32     %r62, %r1, %r60;</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="va">+   sub.f32     %r63, %r2, %r61;</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="st">-   abs.f32     %r136, %r134;</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="st">-   abs.f32     %r137, %r135;</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="st">-   min.s32     %r138, %r137, %r136;</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="st">-   max.s32     %r139, %r136, %r137;</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="st">-   and.b32     %r140, %r139, -33554432;</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="st">-   xor.b32     %r141, %r140, 2122317824;</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="st">-   mul.f32     %r142, %r138, %r141;</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="st">-   mul.f32     %r143, %r139, %r141;</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="st">-   mul.f32     %r144, %r142, %r142;</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="st">-   fma.rn.f32  %r145, %r143, %r143, %r144;</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="st">-   sqrt.rn.f32     %r146, %r145;</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="va">+   mul.f32     %r64, %r63, %r63;</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="va">+   fma.rn.f32  %r65, %r62, %r62, %r64;</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="va">+   sqrt.rn.f32     %r66, %r65;</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="st">-   or.b32  %r147, %r140, 8388608;</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="st">-   mul.f32     %r148, %r146, %r147;</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="st">-   setp.eq.f32     %p36, %r138, 0f00000000;</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="st">-   selp.f32    %r149, %r139, %r148, %p36;</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="st">-   setp.eq.f32     %p37, %r138, 0f7F800000;</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="st">-   selp.f32    %r150, 0f7F800000, %r149, %p37;</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="st">-   setp.lt.f32     %p38, %r150, %r151;</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="st">-   selp.b64    %rd75, %rd76, %rd75, %p38;</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="va">+   setp.lt.f32     %p24, %r66, %r67;</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="va">+   selp.b64    %rd75, %rd76, %rd75, %p24;</span></span></code></pre></div>
+<p>Es ist zu erkennen, dass die <code>cuda.libdevice.hypotf</code> zu
+einem größeren Ausdruck übersetzt wird und innerhalb dieses Ausdrucks
+die intrinsic Funktion <code>sqrt.rn.f32</code> aufgerufen wird. Das
+explizite Ausschreiben des Ausdrucks <span
+class="math inline">\sqrt{(a_x - b_x)^2 + (a_y - b_y)^2}</span> führt
+dazu, dass gewisse Anweisungen wegfallen.</p>
+<p>Ein Abgleich mit der Dokumentation von CUDA für die <a
+href="https://docs.nvidia.com/cuda/cuda-math-api/cuda_math_api/group__CUDA__MATH__SINGLE.html#group__cuda__math__single_1ga2880a4ebf5500aeb74fb01340ea91215">hypotf
+Funktion</a> gibt einen Einblick weswegen diese Anweisungen existieren.
+Die <code>cuda.libdevice.hypotf</code> Funktion muss garantieren,
+dass:</p>
+<ul>
+<li><span class="math inline">\mathrm{hypot}(x,y)</span>, <span
+class="math inline">\mathrm{hypot}(y,x)</span> und <span
+class="math inline">\mathrm{hypot}(x,-y)</span> äquivalent sind</li>
+<li><span class="math inline">\mathrm{hypot}(x, \pm 0)</span> äquivalent
+zu <span class="math inline">\mathrm{fabsf}(x)</span> ist</li>
+<li><span class="math inline">\mathrm{hypot}(\pm \infty,y)</span> immer
+<span class="math inline">+ \infty</span> ergibt, selbst wenn <span
+class="math inline">y=\mathrm{NaN}</span></li>
+<li><span class="math inline">\mathrm{hypot}(\mathrm{NaN},y)</span>
+immer <span class="math inline">\mathrm{NaN}</span> ergibt, selbst wenn
+<span class="math inline">y \neq \pm \infty</span></li>
+</ul>
+<p>Diese Bedingungen erfordern zusätzliche Anweisungen.</p>
+<p>Für den Algorithmus sind die meisten dieser Bedingungen tatsächlich
+irrelevant. Das Verhalten des Algorithmus ändert sich nicht, wenn die
+Funktion <span class="math inline">\mathrm{NaN}</span>, statt <span
+class="math inline">\infty</span> oder andersherum zurückgibt, da nur
+Distanzen verglichen werden und der Algorithmus in beiden Fällen die
+gleiche Verzweigung wählt.</p>
+<p>Durch die verringerte Anzahl an Anweisungen ist eine klare
+Verbesserung in der Laufzeit zu erkennen.</p>
+<table>
+<colgroup>
+<col style="width: 49%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>RTX 5070</th>
+<th>GTX 1660 Ti</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_euclidean_sqrt_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_sqrt_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+</tr>
+<tr class="even">
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_hypot_naive_euclidean_sqrt_resolution=128_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_hypot_naive_euclidean_sqrt_resolution=128_points=64,128,256,512.png" /></td>
+</tr>
+</tbody>
+</table>
+<p>Die verringerte Anzahl an Anweisungen ist auch in der Ausgabe von
+<code>ncu</code> zu sehen.</p>
+<pre><code>    ----------------------- ----------- -------------
+    Metric Name             Metric Unit  Metric Value
+    ----------------------- ----------- -------------
+    DRAM Frequency                  Ghz         13,79
+    SM Frequency                    Ghz          2,54
+    Elapsed Cycles                cycle    13.419.397
+    Memory Throughput                 %         41,82
+    DRAM Throughput                   %          0,12
+    Duration                         ms          5,28
+    L1/TEX Cache Throughput           %         41,90
+    L2 Cache Throughput               %          0,72
+    SM Active Cycles              cycle 13.386.779,33
+    Compute (SM) Throughput           %         83,84
+    ----------------------- ----------- -------------
+
+    INF   This workload is utilizing greater than 80.0% of the available compute or memory performance of this device.
+          To further improve performance, work will likely need to be shifted from the most utilized to another unit.
+          Start by analyzing workloads in the Compute Workload Analysis section.</code></pre>
+<p>Im Vergleich zur initialen Implementation hat diese implementation
+<code>4.595.081</code> (<code>~25.508 %</code>) weniger Rechenzyklen.
+Durch diese Einsparung ist der Algorithmus schneller geworden.</p>
+<p>Es ist hierbei zu beachten, dass effektiv keine günstigere
+Distanz-Rechnung durchgeführt wurde, sondern es wurde auf gewisse
+Garantien bei der bisherigen Distanz-Berechnung verzichtet, da diese für
+den Algorithmus keinen Unterschied machen. Im Folgenden wird auf exakte
+Ergebnisse verzichtet, um den Algorithmus noch schneller zu machen.</p>
+<p><em>Welchen Einfluss hat <code>fastmath</code> und wieso?</em></p>
+<p>Wie bereits erwähnt ermöglicht die Annotation
+<code>fastmath=True</code> auf Genauigkeit zu verzichten, im Austausch
+für schnellere Laufzeiten. Als Beispiel ist folgender Ausschnitt aus dem
+Assembly der regulären <code>sqrtf</code>-Variante und der
+<code>sqrtf</code>-Variante mit <code>fastmath=True</code> gegeben.</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode diff"><code class="sourceCode diff"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>$L__BB0_6:</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    mul.lo.s64  %rd66, %rd76, %rd8;</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    add.s64     %rd67, %rd1, %rd66;</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    add.s64     %rd68, %rd5, %rd66;</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    ld.global.b32   %r60, [%rd67];</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    add.s64     %rd69, %rd9, %rd68;</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    ld.b32  %r61, [%rd69];</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    sub.f32     %r62, %r1, %r60;</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    sub.f32     %r63, %r2, %r61;</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    mul.f32     %r64, %r63, %r63;</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    fma.rn.f32  %r65, %r62, %r62, %r64;</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="st">-   sqrt.rn.f32     %r66, %r65;</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="va">+   sqrt.approx.ftz.f32     %r66, %r65;</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    setp.lt.f32     %p24, %r66, %r67;</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    selp.b64    %rd75, %rd76, %rd75, %p24;</span></code></pre></div>
+<p>In diesem Fall hat der Compiler wegen <code>fastmath=True</code> die
+intrinsic Funktion <code>sqrt.approx.ftz.f32</code> statt
+<code>sqrt.rn.f32</code> ausgewählt. Gleichermaßen wurden Divisionen
+<code>div.rn.f32</code> durch <code>div.approx.ftz.f32</code> ersetzt.
+Abgesehen von diesen beiden Operationen bleibt das Assembly größtenteils
+gleich.</p>
+<p>Für die Laufzeit ergeben sich folgende Unterschiede.</p>
+<table>
+<colgroup>
+<col style="width: 49%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>RTX 5070</th>
+<th>GTX 1660 Ti</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_euclidean_sqrt_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_sqrt_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+</tr>
+<tr class="even">
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_sqrt_naive_euclidean_sqrt_fast_resolution=128_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_sqrt_naive_euclidean_sqrt_fast_resolution=128_points=64,128,256,512.png" /></td>
+</tr>
+</tbody>
+</table>
+<p>Die Laufzeit hat sich durch den Einsatz der
+<code>fastmath=True</code> Annotation deutlich verbessert. Für den Fall
+<code>Resolution=2048</code> und <code>Point-count=512</code> hat sich
+die Laufzeit, im Vergleich zur initialen Implementation aus <em>Aufgabe
+3</em>, ungefähr halbiert.</p>
+<p><em>Welchen Einfluss hat schlicht <span class="math inline">a^2 +
+b^2</span> und wieso?</em></p>
+<p>Es gibt nun noch eine weitere wichtige Optimierung bei der Berechnung
+der Distanz-Funktion, nämlich das Verzichten auf die <code>sqrt</code>
+Operation. Im Algorithmus werden Distanzen nur verglichen und nicht
+anderweitig verwendet. Aus diesem Grund können wir folgende Folgerung
+ausnutzen: <span class="math inline">\sqrt{a} \leq \sqrt{b} \implies a
+\leq b</span>, wenn <span class="math inline">a \geq 0</span> und <span
+class="math inline">b \geq 0</span>. Da im Algorithmus die Eingaben für
+<code>sqrt</code> immer Quadrate (<code>^2</code>) sind, sind die
+Eingaben immer <span class="math inline">0</span> oder positiv.</p>
+<p>Im Assembly ist die Änderung wie zu erwarten (An dieser Stelle wurden
+Register-Namen geändert, um die Übersichtlichkeit zu verbessern):</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode diff"><code class="sourceCode diff"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>$L__BB0_6:</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    mul.lo.s64  %rd66, %rd76, %rd8;</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    add.s64     %rd67, %rd1, %rd66;</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    add.s64     %rd68, %rd5, %rd66;</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    ld.global.b32   %r60, [%rd67];</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    add.s64     %rd69, %rd9, %rd68;</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    ld.b32  %r61, [%rd69];</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    sub.f32     %r62, %r1, %r60;</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    sub.f32     %r63, %r2, %r61;</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    mul.f32     %r64, %r63, %r63;</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    fma.rn.f32  %r65, %r62, %r62, %r64;</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="st">-   sqrt.rn.f32     %r66, %r65;</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="st">-   setp.lt.f32     %p24, %r66, %r67;</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="va">+   setp.lt.f32     %p24, %r65, %r67;</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    selp.b64    %rd75, %rd76, %rd75, %p24;</span></code></pre></div>
+<p>Diese Änderung erscheint auf den ersten Blick ernüchternd, jedoch ist
+die <code>sqrt.rn.f32</code> eine aufwendige Operation und diese
+Operation einzusparen, macht einen großen Unterschied.</p>
+<p>In dem bisherigen Assembly hat der Compiler Loop-Unrolling
+durchgeführt mit bis zu vier Iterationen der Schleife. Durch das
+verzichten auf <code>sqrt.rn.f32</code> scheint der Compiler bis zu acht
+Iterationen der Schleife aufzurollen.</p>
+<p>Folgende Diagramme zeigen die Laufzeit des Algorithmus mit der neuen
+Distanz-Funktion.</p>
+<table>
+<colgroup>
+<col style="width: 49%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>RTX 5070</th>
+<th>GTX 1660 Ti</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+</tr>
+<tr class="even">
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_sqrt_fast_naive_square_euclidean_resolution=128_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_sqrt_fast_naive_square_euclidean_resolution=128_points=64,128,256,512.png" /></td>
+</tr>
+</tbody>
+</table>
+<p>Es ist zu sehen, dass ein verzichten auf die <code>sqrt</code>
+Funktion die Performance steigert. Jedoch ist auch zu erkennen, dass die
+Laufzeit zwischen der <code>sqrt</code> Funktion mit
+<code>fastmath=True</code> und keiner <code>sqrt</code> Funktion relativ
+nahe beieinander liegen.</p>
+<p>An dieser Stelle ist es erneut interessant die Ausgabe von
+<code>ncu</code> zu betrachten:</p>
+<pre><code>    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- ------------
+    Metric Name             Metric Unit Metric Value
+    ----------------------- ----------- ------------
+    DRAM Frequency                  Ghz        13,79
+    SM Frequency                    Ghz         2,54
+    Elapsed Cycles                cycle    9.264.207
+    Memory Throughput                 %        60,58
+    DRAM Throughput                   %         0,12
+    Duration                         ms         3,65
+    L1/TEX Cache Throughput           %        60,70
+    L2 Cache Throughput               %         1,03
+    SM Active Cycles              cycle 9.240.057,88
+    Compute (SM) Throughput           %        73,55
+    ----------------------- ----------- ------------
+
+    OPT   Compute is more heavily utilized than Memory: Look at the Compute Workload Analysis section to see what the
+          compute pipelines are spending their time doing. Also, consider whether any computation is redundant and
+          could be reduced or moved to look-up tables.</code></pre>
+<p>Hierbei weist <code>ncu</code> darauf hin, dass der Algorithmus viele
+Berechnungen durchführt und vergleichsweise wenig Speicherauslastung
+hat. Den Vorschlag die Anzahl an Berechnungen zu verringern oder
+Ergebnisse zwischenzuspeichern funktioniert für diesen Algorithmus
+jedoch leider nicht. Die Ausgabe von <code>ncu</code> wollen wir an
+dieser Stelle nicht ignorieren, jedoch wird erst im nächsten Abschnitt
+die Speicherauslastung optimiert. Vorab betrachten wir noch die
+Kombination aus Quadratischer-Euklidischer-Distanz und
+<code>fastmath=True</code>.</p>
+<p>Das Verwenden von <code>fastmath=True</code> für die neue
+Distanz-Funktion hat nur minimale Auswirkungen, da im Algorithmus nur
+noch Divisionen, die nur selten durchgeführt werden, beschleunigt
+werden, wie folgende Diagramme zeigen.</p>
+<table>
+<colgroup>
+<col style="width: 49%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>RTX 5070</th>
+<th>GTX 1660 Ti</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+</tr>
+<tr class="even">
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_sqrt_fast_naive_square_euclidean_fast_resolution=128_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_sqrt_fast_naive_square_euclidean_fast_resolution=128_points=64,128,256,512.png" /></td>
+</tr>
+</tbody>
+</table>
+<h1 id="aufgabe-5---effizienteres-laden-von-daten">Aufgabe 5 -
+Effizienteres Laden von Daten</h1>
+<p><em>Wie wurden Daten in der Naiven Implementation geladen?</em></p>
+<p>Die Naive Implementation iteriert in jedem Thread mit einer Schleife
+über die Punkte. Das bedeutet jeder Thread greift in den globalen
+Speicher für jeden einzelnen Punkt.</p>
+<p><em>Was kann beim Laden der Daten verbessert werden?</em></p>
+<p>Da in der Naiven Implementation zu jedem Zeitpunkt bekannt ist,
+welcher Punkt als nächstes benötigt wird, wäre es möglich die Daten in
+mehreren Bündeln (Batch-Processing) zu verarbeiten. Das bedeutet, dass
+ein Teil der Daten gleichzeitig geladen und danach gleichzeitig
+verarbeitet wird.</p>
+<p><em>Wie können die Daten ins Shared Memory geladen und mit einem
+Grid-Stride-Loop verarbeitet werden?</em></p>
+<p>Der gewählte Ansatz besteht darin eine feste Konstante
+<code>GRID_STRIDE_SIZE</code> zu definieren. Auf diese Weise kann ein
+<code>cuda.shared.array</code> definiert und im Kernel zugegriffen
+werden. Dieses Array hat, wie die Punkte Eingabe, ebenfalls zwei
+Dimensionen. Nämlich <code>GRID_STRIDE_SIZE</code> und <code>2</code>.
+Nun werden die ersten <code>GRID_STRIDE_SIZE</code> Punkte in das Shared
+Memory geschrieben. Hierbei werden <code>2 * GRID_STRIDE_SIZE</code>
+Threads benötigt, da für jeden Punkt ein <code>x</code> und ein
+<code>y</code> geladen werden muss. Je zwei aufeinander folgende Threads
+laden also die Daten für einen Punkt. Threads, welche keinen Punkt
+berechnen sollen, warten. Falls keine weiteren Punkte vorhanden sind,
+wird <code>np.inf</code> ins Shared Memory geschrieben, um Fehler bei
+Rechnungen zu vermeiden. Bevor lesend auf das Shared Memory zugegriffen
+werden kann, muss <code>cuda.syncthreads()</code> aufgerufen werden, um
+Race-Conditions zu vermeiden. Nun können alle Threads aus dem Block
+durch das Array iterieren und Distanzen berechnen. Falls ein neuer
+nächster Nachbar entdeckt wurde, muss der korrekte Index des Punktes
+berechnet werden (Der Index in das Shared Memory Array wäre nicht
+korrekt). Zuletzt muss erneut <code>cuda.syncthreads()</code> aufgerufen
+werden, bevor die Schleife sich wiederholt, erneut um Race-Conditions zu
+vermeiden.</p>
+<p>Ein weiteres Detail ist, dass ein early-exit nicht mehr möglich ist
+für Threads, die Pixel außerhalb des Diagramms berechnen. Das liegt
+daran, dass Threads neben dem Pixel-Berechnen auch Punkte laden müssen.
+Es kann also sein, dass ein Thread zwar außerhalb des Diagramms liegt,
+aber trotzdem Punkte für andere Threads laden muss. Erst nachdem keine
+Punkte mehr geladen werden müssen, ist ein exit für diese Threads
+möglich beziehungsweise nötig.</p>
+<p><em>Welchen Einfluss hat das Laden der Daten ins Shared Memory und
+Verarbeiten mit einem Grid-Stride-Loop und wieso?</em></p>
+<p>Um den Einfluss der Shared Memory Verarbeitung mit Grid-Stride-Loop
+besser darzustellen, wird im Folgenden mit der naiven Implementation aus
+<em>Aufgabe 3</em> verglichen. Die Distanz-Berechnung wird für beide
+Varianten mit <code>cuda.libdevice.hypotf</code> durchgeführt, um
+vergleichbare Resultate zu erhalten.</p>
+<p>Die Größe <code>GRID_STRIDE_SIZE</code> ist natürlich maßgeblich für
+die Laufzeit, beispielsweise führt ein <code>GRID_STRIDE_SIZE=128</code>
+zu schlechterer performance. Mit <code>GRID_STRIDE_SIZE=8</code> haben
+wir die besten Ergebnisse erzielt. In den folgenden Analysen gilt
+deswegen stets <code>GRID_STRIDE_SIZE=8</code>.</p>
+<p>Ein Blick auf das Assembly zeigt, dass der Compiler wegen der
+Konstante <code>GRID_STRIDE_SIZE=8</code> ein Loop-Unrolling der inneren
+Schleife, welche Distanz-Berechnungen übernimmt, durchgeführt hat. Im
+Vergleich zur Naiven Variante konnte der Compiler darauf verzichten
+mehrere Loop-Unrolling Schritte für verschiedene Längen durchzuführen,
+da bereits beim Kompilieren des Programms die Anzahl an Iterationen
+feststeht.</p>
+<table>
+<colgroup>
+<col style="width: 49%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>RTX 5070</th>
+<th>GTX 1660 Ti</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-RTX-5070_grid_stride_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_grid_stride_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+</tr>
+<tr class="even">
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_hypot_grid_stride_euclidean_hypot_resolution=128_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_hypot_grid_stride_euclidean_hypot_resolution=128_points=64,128,256,512.png" /></td>
+</tr>
+</tbody>
+</table>
+<p>Es ist zu sehen, dass im Vergleich zur Naiven Variante, bei höherer
+Auflösung und Punkt-Anzahl deutlich Laufzeit eingespart wurde.
+Interessanterweise ist zu sehen, dass der Algorithmus für kleine
+Eingaben langsamer geworden ist. Der Grund hierfür ist vermutlich darauf
+zurückzuführen, dass mehr Overhead durch das Shared-Memory,
+beziehungsweise das Loop-Unrolling entstanden ist. Erst bei größeren
+Eingaben fällt dieser Overhead weg.</p>
+<p>Ein Blick auf die <code>ncu</code> Ausgabe zeigt, dass trotz der
+langsameren Distanz-Berechnung die <code>Compute (SM) Throughput</code>
+so hoch, wie noch bei keiner anderen Implementation liegt.</p>
+<pre><code>    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- -------------
+    Metric Name             Metric Unit  Metric Value
+    ----------------------- ----------- -------------
+    DRAM Frequency                  Ghz         13,79
+    SM Frequency                    Ghz          2,54
+    Elapsed Cycles                cycle    14.116.124
+    Memory Throughput                 %         40,37
+    DRAM Throughput                   %          0,11
+    Duration                         ms          5,56
+    L1/TEX Cache Throughput           %         40,45
+    L2 Cache Throughput               %          0,20
+    SM Active Cycles              cycle 14.081.178,23
+    Compute (SM) Throughput           %         92,81
+    ----------------------- ----------- -------------
+
+    INF   This workload is utilizing greater than 80.0% of the available compute or memory performance of this device.
+          To further improve performance, work will likely need to be shifted from the most utilized to another unit.
+          Start by analyzing workloads in the Compute Workload Analysis section.</code></pre>
+<p>Es ist zu beachten das wie bei den anderen <code>ncu</code> Ausgaben
+stets der Fall <code>resolution=2048</code> und <code>points=512</code>
+betrachtet wird. Die Laufzeit hat sich deutlich verringert, obwohl die
+Anzahl an Rechenzyklen nur leicht gesunken ist. Der Grund hierfür ist
+der größere Durchsatz.</p>
+<p><em>Wie können die Daten innerhalb eines Warp geladen und mit
+<code>shfl_sync</code> verarbeitet werden werden?</em></p>
+<p>Das folgende Verfahren hat starke Ähnlichkeit mit dem vorherigen
+Ansatz. In diesem Fall werden Daten nicht mehr auf Block-Ebene, sondern
+auf Warp-Ebene geladen. Da Threads in einem Warp synchron ablaufen, ist
+kein Aufruf von <code>cuda.syncthreads()</code> mehr nötig. Ein Nachteil
+hierbei ist, dass nun jeder Warp die Daten laden muss. Da nun kein
+<code>cuda.shared.array</code> vorhanden ist, muss eine lokale Variable
+definiert werden, welches auf ähnliche Weise verwendet wird. Die
+Variable wurde <code>point_component_warp_value</code> benannt und wird
+für jeden zweiten Thread eines Warp die <code>x</code>-Komponente und
+für jeden anderen Thread des Warp die <code>y</code>-Komponente laden.
+Falls ein Punkt nicht vorhanden ist, werden die Komponenten jeweils auf
+<code>np.inf</code> gesetzt um Fehler bei Rechnungen zu vermeiden. Wenn
+die Variable <code>point_component_warp_value</code> für jeden Thread
+eines Warp gesetzt wurde, wurden 16 <code>x</code>- und 16
+<code>y</code>-Komponenten geladen, da es insgesamt 32 Threads pro Warp
+sind. Nun kann mit <code>cuda.shfl_sync</code> auf einen beliebigen Wert
+eines anderen Thread des gleichen Warp zugegriffen werden. Mit
+<code>cuda.shfl_sync(0xFFFFFFFF, point_component_warp_value, index)</code>
+und
+<code>cuda.shfl_sync(0xFFFFFFFF, point_component_warp_value, index + 1)</code>
+werden die Komponenten eines Punkt geladen und es kann die
+Distanz-Rechnung durchgeführt werden. Die beiden
+<code>cuda.shfl_sync</code> Aufrufe werden 16-mal wiederholt, bis alle
+die vom Warp geladenen Punkte verarbeitet sind. Danach können die
+nächsten Punkte geladen werden, erneut ohne ein Aufruf von
+<code>cuda.syncthreads()</code>, da die Threads eines Warp synchron
+ablaufen.</p>
+<p>Wie auch beim vorherigen Ansatz ist ein early-exit nicht möglich aus
+den gleichen Gründen.</p>
+<p><em>Welchen Einfluss hat das Laden der Daten in einen Warp und das
+Verarbeiten mit <code>shfl_sync</code> und wieso?</em></p>
+<p>Diese Variante benötigt kein Ausprobieren von verschiedenen
+<code>GRID_STRIDE_SIZE</code>, da hierbei die Konstante
+<code>WARP_SIZE=32</code> verwendet wird.</p>
+<p>Wie zu erwarten ist im Assembly die intrisic Operation
+<code>shfl.sync.idx</code> zu sehen. Der Compiler hat in diesem Fall
+wegen der Konstante <code>WARP_SIZE=32</code> erneut ein Loop-Unrolling
+durchgefürt. Erneut konnte der Compiler darauf verzichten mehrere
+Loop-Unrolling für verschiedenen Längen zu erzeugen, da die Anzahl an
+Iterationen der inneren Schleife eindeutig ist. Der Compiler hat jedoch
+nicht 16 sondern nur vier Iterationen aufgerollt.</p>
+<table>
+<colgroup>
+<col style="width: 49%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>RTX 5070</th>
+<th>GTX 1660 Ti</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-RTX-5070_warp_shfl_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_warp_shfl_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+</tr>
+<tr class="even">
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_warp_shfl_euclidean_hypot_resolution=128_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_warp_shfl_euclidean_hypot_resolution=128_points=64,128,256,512.png" /></td>
+</tr>
+</tbody>
+</table>
+<p>Es ist zu sehen, dass diese Variante ebenfalls schneller arbeitet,
+als die initiale Variante. Interessanterweise ist nun kein Unterschied
+bei kleinen Eingaben zu sehen, der Grund ist an dieser Stelle leider
+nicht ganz eindeutig, aber es könnte daran liegen, dass kein
+<code>cuda.syncthreads</code> nötig ist. Für größere Eingaben erscheint
+der Grid-Stride-Loop mit Shared-Memory effektiver.</p>
+<p><em>Wie verhalten sich die Kernel durch den Einsatz von schnelleren
+Distanz-Berechnungen und effizienterem Laden von Daten?</em></p>
+<p>Wir haben nun die Berechnungen (Compute) und die Speicherzugriffe
+(Memory) separat voneinander optimiert. Nun möchten wir die beiden
+Optimierungen zusammenführen. Von der Distanz-Berechnung wählen wir die
+Square-Euclidean Variante mit <code>fastmath=True</code> und kombinieren
+diese mit je der Grid-Stride-Loop mit Shared-Memory als auch Warp mit
+<code>shfl_sync</code>. Der Grund hierfür ist, dass bei den
+Speicher-Optimierungen keine Methode eindeutig schneller als eine andere
+war.</p>
+<p>Folgende Diagramme geben die Laufzeiten wieder.</p>
+<table>
+<colgroup>
+<col style="width: 49%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>RTX 5070</th>
+<th>GTX 1660 Ti</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-RTX-5070_grid_stride_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_grid_stride_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+</tr>
+<tr class="even">
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-RTX-5070_warp_shfl_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_warp_shfl_square_euclidean_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+</tr>
+</tbody>
+</table>
+<p>Es hat sich ergeben, dass die Warp mit <code>shfl_sync</code>
+Variante für jede Eingabe eine bessere Laufzeit aufweist.</p>
+<p>Interessanterweise hat sich in der <code>ncu</code> Ausgabe ebenfalls
+eine deutliche Verbesserung für die Warp mit <code>shfl_sync</code>
+Variante gezeigt.</p>
+<pre><code>    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- ------------
+    Metric Name             Metric Unit Metric Value
+    ----------------------- ----------- ------------
+    DRAM Frequency                  Ghz        13,79
+    SM Frequency                    Ghz         2,54
+    Elapsed Cycles                cycle    5.815.751
+    Memory Throughput                 %        99,51
+    DRAM Throughput                   %         0,91
+    Duration                         ms         2,29
+    L1/TEX Cache Throughput           %        99,74
+    L2 Cache Throughput               %         1,66
+    SM Active Cycles              cycle 5.798.622,54
+    Compute (SM) Throughput           %        99,51
+    ----------------------- ----------- ------------
+
+    INF   This workload is utilizing greater than 80.0% of the available compute or memory performance of this device.
+          To further improve performance, work will likely need to be shifted from the most utilized to another unit.
+          Start by analyzing workloads in the Compute Workload Analysis section.</code></pre>
+<p>Die <code>Compute (SM) Throughput</code> beziehungsweise
+<code>Memory Throughput</code> Metrik liegt nun fast beim Maximum und
+ist erneut so hoch wie bei keiner der bisherigen Analysen. Ebenso ist
+die Anzahl an Rechenzyklen so niedrig wie bei keiner der anderen
+Implementationen.</p>
+<p>Dieser Algorithmus ist nun möglichst effizient implementiert. Im
+folgenden wollen wir betrachten, ob durch einen alternativen Algorithmus
+beziehungsweise Ansatz eine weitere Verbesserung der Laufzeit möglich
+ist.</p>
+<h1
+id="aufgabe-6---alternativer-ansatz-jump-flooding-algorithmus-jfa">Aufgabe
+6 - Alternativer Ansatz: Jump Flooding Algorithmus (JFA)</h1>
+<blockquote>
+<p>[!NOTE]</p>
+<ul>
+<li>Für die Diastanzberechnung wird im Folgenden die quadrierte
+euklidische Distanz beziehungsweise im Exkurs die Manhattan-Distanz
+verwendet.</li>
+<li>Der in den vorherigen Aufgaben verwendete Algorithmus wird im
+Folgenden teilweise referenziert und verwendet. Dabei wird er als
+<em>“Pixel-Algorithmus”</em> bezeichnet.</li>
+</ul>
+</blockquote>
+<p>Der Jump Flooding Algorithmus (JFA) wurde im Jahr 2006 von
+<strong>Guodong Rong</strong> und <strong>Tiow-Seng Tan</strong> auf der
+Computergrafik-Konferenz <em>ACM Symposium on Interactive 3D Graphics
+and Games (I3D)</em> in Redwood City vorgestellt (vgl. <a
+href="https://www.comp.nus.edu.sg/~tants/jfa/i3d06.pdf">Jump Flooding in
+GPU</a>). Die Autoren konzipierten den Algorithmus gezielt für die
+parallele Architektur von GPUs, um geometrische Probleme wie die
+Berechnung von Voronoi-Diagrammen oder Distanzfeldern zu lösen.</p>
+<h2 id="aufgabe-6a---beschreibung-und-initiale-implementation">Aufgabe
+6a - Beschreibung und initiale Implementation</h2>
+<p><em>Wie funktioniert der Algorithmus?</em></p>
+<p>Für den Algorithmus wird ein quadratisches Grid der Größe <span
+class="math inline">N \times N</span> definiert. Bevor der Algorithmus
+startet, wird das leere Grid initialisiert, indem die zuvor zufällig
+generierten Punkt-Koordinaten gesetzt werden: Jeder Punkt (auch
+<code>seed</code> genannt) weiß zu Beginn, zu welchem Pixel er gehört.
+Alle anderen Pixel werden mit einem <strong>undefinierten</strong>
+Startzustand initialisiert. Das bedeutet, ein normaler Pixel weiß
+anfangs nicht, zu welchem Punkt er am nächsten liegt.</p>
+<p>Der Jump Flooding Algorithmus wird nun in mehreren Schritten iterativ
+ausgeführt. Die erste Schrittweite beträgt <span class="math inline">k =
+\frac{N}{2}</span>, wobei <span class="math inline">N</span> die
+Auflösung des Grids ist. Für jede Schrittweite <span
+class="math inline">k</span> prüft jeder Pixel im Grid seine 8
+<strong>Nachbarpixel</strong> (Norden, Nordost, Osten, Südost, Süden,
+Südwest, Westen, Nordwest), die genau <span class="math inline">k</span>
+Pixel entfernt sind. Dabei wird überprüft, ob diese Nachbarn bereits
+gültige Punkt-Koordinaten besitzen (also nicht mehr das
+<em>Uninitialized-Flag</em> haben):</p>
+<ul>
+<li>Ist das der Fall, übernimmt der aktuelle Pixel die Punkt-Koordinaten
+des Nachbarpixels und betrachtet diesen Punkt vorerst als den
+nächstgelegenen.</li>
+<li>Hat ein Nachbarpixel ebenfalls keine Punkt-Koordinaten, wird er
+ignoriert.</li>
+<li>Wird bei einer späteren Prüfung oder in einem späteren Schritt ein
+Punkt gefunden, dessen Distanz zum aktuellen Pixel kürzer ist als die
+des bereits gespeicherten Punkte, werden die neuen, näheren Koordinaten
+übernommen und die alten überschrieben.</li>
+</ul>
+<p>Nach jeder Iteration wird die Schrittweite <span
+class="math inline">k</span> halbiert (<span class="math inline">k =
+\frac{k}{2}</span>), bis der Wert <strong>1</strong> erreicht und
+berechnet wurde.</p>
+<p>Aufgrund dieser fortlaufenden Halbierung ist es <strong>zwingend
+erforderlich</strong>, dass das Grid eine Auflösung mit einer
+Zweierpotenz (<span class="math inline">2^m</span>) besitzt. Für
+rechteckige Grids müsste man das schrittweise Halbieren der Schrittweite
+entlang der längeren Kante durchführen.</p>
+<p><em>Wie wird der JFA implementiert?</em></p>
+<p>In dieser <strong>ersten naiven</strong> Implementation wird das Grid
+als 3D-Array der Form <code>shape=(resolution, resolution, 2)</code> vom
+Typ <code>int32</code> definiert. Dieses Layout wird auch als <em>Array
+of Structures (AoS)</em> bezeichnet, weil es für jeden Pixel die X- und
+Y-Koordinate des nächstgelegenen Punktes speichert (vgl.
+<code>generate_AoS_grid_jfa()</code>). Für den undefinierten
+Startzustand der Pixel, die kein Punkt sind, wird der Wert
+<code>-1</code> verwendet. Dieser signalisiert, dass der Pixel noch
+keine Punkt-Koordinaten kennt.</p>
+<p>Eine Besonderheit liegt in der Steuerung auf der Host-Seite: Das
+Voronoi-Diagramm wird hier iterativ in einer Schleife nach dem eben
+beschriebenen Verfahren bestimmt. Die Kernel-Implementierung auf der GPU
+beinhaltet also keine vollständige Berechnung des gesamten Diagramms,
+sondern führt nur einen einzelnen <strong>Pass</strong> (einen
+Iterationsschritt) aus. Der Kernel nimmt folgende Parameter
+entgegen:</p>
+<ul>
+<li>Ein Eingabe-Grid-Array (<code>grid_in</code>)</li>
+<li>Ein Ausgabe-Grid-Array (<code>grid_out</code>)</li>
+<li>Die aktuelle Schrittweite <span class="math inline">k</span> für den
+Pass (<code>step_size</code>)</li>
+<li>Die Auflösung des Diagramms (<code>size</code>)</li>
+</ul>
+<p>Die Verwendung von zwei getrennten Grids ist notwendig, da das
+Eingabe-Grid während des Schrittes gelesen wird, um das Ausgabe-Grid
+parallel zu aktualisieren. Auf der Host-Seite wird der Kernel in einer
+Schleife so oft aufgerufen, bis die Schrittweite den Wert
+<strong>1</strong> abgearbeitet hat. Nach jedem Kernel-Aufruf werden das
+Eingabe- und Ausgabe-Grid getauscht (<strong>Swapping</strong>), sodass
+ein Ping-Pong-artiges Konstrukt entsteht.</p>
+<p>Bei der Verwendung eines gemeinsamen Grids kann es zu <strong>Race
+Conditions</strong> kommen: Ein Thread liest dann möglicherweise den von
+einem anderen Thread neu geschriebenen Wert anstelle des ursprünglichen
+Werts vor diesem Pass. Da die X- und Y-Koordinate eines Punktes als zwei
+separate Schreiboperationen erfolgen, könnte ein Thread die X-Koordinate
+eines Punktes mit der noch nicht aktualisierten Y-Koordinate eines
+anderen Punktes kombinieren, wodurch ein Punkt entsteht, der in der Form
+gar nicht existiert.</p>
+<p>Um am Ende aus dem 3D-Array (das die Punkt-Koordinaten als X/Y-Tupel
+speichert) ein finales 2D-Array mit eindeutigen UIDs der Punkte zu
+erzeugen, wird für jeden Pixel der berechnete X-Wert mit dem Wert <span
+class="math inline">Y \cdot \mathrm{resolution}</span> addiert:</p>
+<p><span class="math display">\text{UID} = X + (Y \cdot
+\text{resolution})</span></p>
+<p>Dadurch entstehen eindeutige IDs für identische
+Punkt-Koordinaten.</p>
+<p>Die folgenden Visualisierungen zeigen den Zustand des Diagramms nach
+jedem Schritt <span class="math inline">k</span> (Auflösung: <span
+class="math inline">2048 \times 2048</span>, Punkte: <span
+class="math inline">256</span>):</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run .<span class="dt">\s</span>rc<span class="dt">\t</span>ask6a.py jfa-euclidean-visualization</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run .<span class="dt">\s</span>rc<span class="dt">\t</span>ask6a.py jfa-manhattan-visualization</span></code></pre></div>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><code>JFA - square euclidean distance</code></th>
+<th><code>JFA - manhattan distance</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img src="../data/task6a_jfa_euclidean_visualization.gif" /></td>
+<td><img src="../data/task6a_jfa_manhattan_visualization.gif" /></td>
+</tr>
+</tbody>
+</table>
+<p>Sowohl bei der quadratischen euklidischen Distanz als auch bei der
+Manhattan-Distanz ist gut zu erkennen, wie das zu Beginn leere, schwarze
+Bild mit jedem Schritt “voller” wird. Das typische
+<em>“Flooding-Verhalten”</em> (Fluten) des Algorithmus wird hierbei in
+jeder Iteration sichtbar.</p>
+<p><em>Wo liegen die Unterschiede zum Ansatz der vorherigen
+Implementierung?</em></p>
+<p>Ursprünglich wurde zur Initialisierung der kürzesten Distanz wie beim
+Pixel-Algorithmus Folgendes verwendet:
+<code>best_dist = np.float32(np.inf)</code>. Ein
+<code>.inspect_types()</code>-Aufruf nach dem Kernel-Lauf zeigt jedoch,
+dass trotz des expliziten <code>float32</code>-Casts eine
+<code>float64</code>-Variable initialisiert wird.</p>
+<p>Da in dieser Aufgabe die Distanzberechnung auf die quadrierte
+euklidische Distanz (beziehungsweise im Exkurs auf die
+Manhattan-Distanz) festgelegt ist und der Kernel auf diskreten
+Ganzzahl-Koordinaten operiert, ist ein Ausweichen auf Fließkommazahlen
+mathematisch nicht notwendig: Das Ergebnis einer Summe von Quadraten
+ganzer Zahlen ist stets wieder eine Ganzzahl. Deshalb wird die kürzeste
+Distanz (<code>best_dist</code>) mit dem maximalen
+<code>int32</code>-Wert initialisiert. Folgender Code zeigt die
+minimalen und maximalen Werte für den NumPy-Datentyp
+<code>int32</code>:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>info <span class="op">=</span> np.iinfo(np.int32)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Minimum:&quot;</span>, info.<span class="bu">min</span>)  <span class="co"># -2147483647</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Maximum:&quot;</span>, info.<span class="bu">max</span>)  <span class="co">#  2147483647</span></span></code></pre></div>
+<p>Bei der Festlegung auf <code>int32</code> muss sichergestellt sein,
+dass die quadrierte euklidische Distanz das Limit von <span
+class="math inline">2147483647</span> nicht überschreitet:</p>
+<p><span class="math display">\mathrm{dist} = \Delta x^2 + \Delta
+y^2</span></p>
+<p>Geht man von einem quadratischen Bild der Seitenlänge <span
+class="math inline">N \times N</span> aus, tritt die maximale Distanz im
+Worst Case zwischen den diagonal gegenüberliegenden Bildeckpunkten auf.
+Daraus folgt für die maximale quadrierte Distanz:</p>
+<p><span class="math display">\mathrm{dist}_{\max} = N^2 + N^2 =
+2N^2</span></p>
+<p>Um einen Überlauf zu verhindern, muss gelten:</p>
+<p><span class="math display">2N^2 \le 2147483647</span></p>
+<p><span class="math display">N^2 \le 1073741823,5</span></p>
+<p><span class="math display">N \le \sqrt{1073741823,5} =
+32768</span></p>
+<p>Demnach würde diese Obergrenze bei Bildgrößen ab <span
+class="math inline">32768 \times 32768</span> Pixeln überschritten
+werden, was für die meisten Auflösungen allerdings ausreichend sein
+sollte. Da beim JFA zudem nie zwei diagonal gegenüberliegende
+Bildeckpunkte verwendet werden - aufgrund der höchsten Schritte von
+<span class="math inline">\frac{N}{2}</span> zu Beginn - ist die
+tatsächliche maximale Grenze für den JFA nochmal höher.</p>
+<p><em>Gibt es Warp-Divergenz?</em></p>
+<p>Ja, in dieser Implementierung gibt es Warp-Divergenz: Die Threads
+innerhalb eines Warps können sich in unterschiedliche Ausführungspfade
+aufteilen. Der Grund liegt darin, dass jeder Thread genau einen Pixel
+bearbeitet und die dabei geprüften Bedingungen datenabhängig sind -
+insbesondere, ob ein Pixel oder dessen Nachbar bereits eine gültige
+Punkt-Koordinate kennt (<code>!= -1</code>) oder noch den initialen
+Default-Wert (<code>-1</code>) trägt.</p>
+<p>Diese Divergenz lässt sich aufgrund der JFA-Charakteristik nur schwer
+vermeiden: Zu Beginn (großer <code>step_size</code>) kennen viele Pixel
+noch keinen Punkt, wodurch die <code>-1</code>-Prüfungen und
+Distanzvergleiche stark zwischen den Threads eines Warps variieren
+können. Mit kleiner werdender Schrittweite besitzen zunehmend mehr Pixel
+bereits einen gültigen Punkt, sodass sich die Pfade der Threads
+innerhalb eines Warps angleichen können und die Divergenz tendenziell
+abnimmt.</p>
+<p><em>Gibt es Qualitätsunterschiede (Pixelfehler) im Diagramm?</em></p>
+<p>In der Literatur wird der JFA als Approximations-Algorithmus
+bezeichnet. Das bedeutet, dass der Algorithmus mathematisch nicht immer
+ein zu <code>100%</code> korrektes Ergebnis liefert. Auch im originalen
+Paper von Guodong Rong und Tiow-Seng Tan wird dieses Thema explizit
+behandelt (vgl. <a
+href="https://www.comp.nus.edu.sg/~tants/jfa/i3d06.pdf">5. Errors in
+Jump Flooding</a>). Die Autoren zeigen dort aber auch auf, dass die
+Fehlerrate in der Praxis minimal ist.</p>
+<p>Experimente in der Studie zeigen, dass diese Fehler hauptsächlich
+entlang der Grenzen von Voronoi-Regionen auftreten. Genauer gesagt: Bei
+Voronoi-Zellen, die entlang der Gittergrenze liegen, können sich
+fehlerhafte Gitterpunkte um die Voronoi-Kanten herum ansammeln. Bei den
+übrigen Voronoi-Zellen sind fast alle fehlerhaften Gitterpunkte
+überwiegend Voronoi-Eckpunkte oder gruppieren sich um diese herum.</p>
+<p>Als Ursache für diese Fehler wird der Informationstransport des JFA
+über abnehmende Schrittweiten genannt. Ein Pixel im Gitter speichert zu
+jedem Zeitpunkt immer nur <strong>eine</strong> Information zu einem ihm
+nächstgelegenen Punkt. Wenn nun in einer Iteration mehrere
+Punktkoordinaten verglichen werden, speichert das Pixel am Ende nur die
+aktuell lokal optimalste Koordinate. Andere Koordinaten, die für
+umliegende Pixel relevant sein könnten, breiten sich über dieses Pixel
+nicht weiter aus. Man spricht dabei von einem <em>getöteten</em> Punkt
+(<em>killed seed</em>). Für die weiteren Iterationsschritte fehlen
+nachfolgenden Pixeln im Gitter genau diese verloren gegangenen
+Informationen, um ihren mathematisch tatsächlich nächstgelegenen Punkt
+zu finden. Dies resultiert letztlich in einer fehlerhaften Zuordnung der
+Punktkoordinaten.</p>
+<p>Zur Verbesserung der Ergebnisse schlägt die Studie mehrere Varianten
+vor, um diese Fehler gezielt an den Voronoi-Eckpunkten und entlang der
+Kanten zu eliminieren - darunter <code>JFA+1</code> und
+<code>JFA+2</code>. Dabei wird zunächst der Standard-JFA durchgeführt.
+Am Ende werden jedoch zusätzliche Durchläufe mit einer Schrittweite von
+<strong>1</strong> (für <code>JFA+1</code>) beziehungsweise
+<strong>2</strong> und anschließend <strong>1</strong> (für
+<code>JFA+2</code>) angehängt. Diese lokalen Suchen erlauben es den
+betroffenen Pixeln, korrekte Daten aus ihrer unmittelbaren Nachbarschaft
+zu übernehmen, selbst wenn der primäre Ausbreitungspfad zuvor blockiert
+wurde.</p>
+<p>Um diesem Aspekt im Projekt nachzugehen, wurde der naive JFA-Ansatz
+mit der quadrierten euklidischen Distanz
+(<code>_jfa_pass_square_euclidean_kernel</code>) mit der
+Referenzimplementierung aus der vorherigen Aufgabe
+(<code>_voroni_square_euclidean_kernel</code>) verglichen. Der
+pixelbasierte Algorithmus dient dabei als exakte
+<code>100%</code>-Referenz. Der Vergleich wurde mit einer Auflösung von
+<strong><span class="math inline">2048 \times 2048</span>
+Pixeln</strong> und <strong>512</strong> Punkten durchgeführt.</p>
+<p>Die folgenden <em>Error Maps</em> visualisieren die Abweichungen der
+verschiedenen JFA-Varianten, wobei identische Zuordnungen schwarz und
+fehlerhafte Pixel rot dargestellt werden:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run .<span class="dt">\s</span>rc<span class="dt">\t</span>ask6a.py jfa-accuracy</span></code></pre></div>
+<table>
+<colgroup>
+<col style="width: 34%" />
+<col style="width: 32%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><code>Standard JFA</code></th>
+<th><code>JFA+1</code></th>
+<th><code>JFA+2</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img
+src="../data/task6a_error_map_standard_jfa_res2048_seeds512.png" /></td>
+<td><img
+src="../data/task6a_error_map_jfa_plus_1_res2048_seeds512.png" /></td>
+<td><img
+src="../data/task6a_error_map_jfa_plus_2_res2048_seeds512.png" /></td>
+</tr>
+</tbody>
+</table>
+<p>Die Auswertung der Genauigkeiten lieferte folgende Ergebnisse:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Standard</span> JFA: 99.9635%</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">JFA</span> + 1: 99.9637%</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="ex">JFA</span> + 2: 99.9637%</span></code></pre></div>
+<p>Es ist zu erkennen, dass bereits beim Standard-JFA ohne zusätzliche
+Durchläufe der Anteil fehlerhafter Pixel im Vergleich zur
+Gesamtpixelanzahl deutlich unter 1 % liegt. Mit den zusätzlichen
+Durchläufen von <code>JFA+1</code> und <code>JFA+2</code> lassen sich im
+Experiment zwar messbare Verbesserungen der Genauigkeit erzielen, diese
+fallen bei der gewählten Konstellation jedoch nicht mehr allzu
+signifikant aus, da die Basisgenauigkeit bereits recht hoch ist.</p>
+<p><em>Was muss bei der Performancemessung beachtet werden?</em></p>
+<p>In <a href="#aufgabe-2---performance-analyse-konzept">Aufgabe 2</a>
+wurde das Konzept für die Performanceanalyse vorgestellt. Für den JFA
+ergeben sich hierbei besondere Herausforderungen. Neben der
+unterschiedlichen Kernel-Signatur ist vor allem die Hostseitige
+Steuerung ein wesentlicher Unterschied: Während beim Pixel-Algorithmus
+ein einzelner Kernel-Aufruf das Voronoi-Diagramm vollständig berechnet,
+benötigt der Standard-JFA mehrere sequenzielle Kernel-Aufrufe. Das
+beeinflusst, wie die tatsächliche Kernel-Laufzeit korrekt gemessen
+werden kann.</p>
+<p>Zwischen jedem Kernel-Aufruf müssen Ein- und Ausgabe-Grid getauscht
+(<em>Ping-Pong-Swap</em>) und die Schrittweite halbiert werden. Diese
+Operationen werden vom Python-Interpreter ausgeführt. Die dabei
+entstehenden Zeiten sollen bei der Laufzeitmessung möglichst nicht
+erfasst werden.</p>
+<p>Da in <em>Aufgabe 2</em> entschieden wurde, CUDA-Events für die
+Laufzeitmessung zu verwenden, scheidet <code>time.perf_counter()</code>
+aus. Für CUDA-Events stehen zwei Varianten zur Auswahl:</p>
+<p><strong>Variante 1: Events pro Iteration mit
+Synchronisierung:</strong></p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>total_ms: <span class="bu">float</span> <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> k <span class="op">&gt;=</span> <span class="dv">1</span>:</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    kernel_start.record()</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    kernel[blocks_per_grid, threads_per_block](grid_in, grid_out, k, resolution)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    kernel_end.record()</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    cuda.synchronize()</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    total_ms <span class="op">+=</span> kernel_start.elapsed_time(kernel_end)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    grid_in, grid_out <span class="op">=</span> grid_out, grid_in</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    k <span class="op">//=</span> <span class="dv">2</span></span></code></pre></div>
+<p>Hier wird jeder Kernel-Aufruf einzeln geklammert und seine Laufzeit
+zur Gesamtzeit addiert. Dies entspricht dem Vorgehen beim
+Pixel-Algorithmus. Der Vorteil ist, dass ausschließlich reine
+Kernel-Ausführungszeiten summiert werden. Der entscheidende Nachteil ist
+jedoch, dass <code>cuda.synchronize()</code> <em>innerhalb</em> der
+Schleife die CPU nach jedem Kernel-Aufruf blockiert, bis die GPU fertig
+ist. Dadurch wird die GPU <em>serialisiert</em>: Sie kann erst dann den
+nächsten Kernel empfangen, wenn die CPU nach der Synchronisierung wieder
+die Kontrolle übernommen hat.</p>
+<p><strong>Variante 2: Events um die gesamte
+Ping-Pong-Schleife:</strong></p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>kernel_start.record()</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> k <span class="op">&gt;=</span> <span class="dv">1</span>:</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    kernel[blocks_per_grid, threads_per_block](grid_in, grid_out, k, resolution)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    grid_in, grid_out <span class="op">=</span> grid_out, grid_in</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    k <span class="op">//=</span> <span class="dv">2</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>kernel_end.record()</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>cuda.synchronize()</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>total_ms <span class="op">=</span> kernel_start.elapsed_time(kernel_end)</span></code></pre></div>
+<p>Das Start-Event wird einmalig vor der Schleife, das End-Event
+einmalig danach in den GPU-Stream eingetragen. Laut <a
+href="https://numba.readthedocs.io/en/stable/cuda-reference/host.html#numba.cuda.cudadrv.driver.Event">Numba-Dokumentation</a>
+gilt ein Event als eingetreten, sobald alle Aufgaben, die zum Zeitpunkt
+des Aufrufs von <code>.record()</code> in der Warteschlange des Streams
+standen, abgeschlossen sind. Da Kernel-Aufrufe in Numba standardmäßig
+asynchron sind und in den Default-Stream eingereiht werden, sieht die
+GPU den Stream als geordnete Sequenz:</p>
+<pre><code>[start_event =&gt; kernel_1 =&gt; kernel_2 =&gt; ... =&gt; kernel_N =&gt; end_event]</code></pre>
+<p>Der Python-Code (Swap, Halbierung von <code>k</code>) läuft
+ausschließlich auf der CPU und erscheint <strong>nicht</strong> in der
+GPU-Timeline. <code>elapsed_time</code> misst daher reine GPU-Zeit
+zwischen den beiden Markern.</p>
+<p>Für die Messungen in <em>Aufgabe 2</em> wurde <strong>Variante
+2</strong> gewählt.</p>
+<p><em>Was liefert die Performance-Analyse?</em></p>
+<p>Die folgenden Diagramme zeigen die gemessenen Kernellaufzeiten für
+die <strong>quadratische euklidische Distanz</strong>:</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run .<span class="dt">\s</span>rc<span class="dt">\t</span>ask7.py jfa_square_euclidean</span></code></pre></div>
+<table>
+<colgroup>
+<col style="width: 49%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>RTX 5070</th>
+<th>GTX 1660 Ti</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_jfa_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+</tr>
+<tr class="even">
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-RTX-5070_jfa_square_euclidean_resolution=128_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_jfa_square_euclidean_resolution=128_points=64,128,256,512.png" /></td>
+</tr>
+</tbody>
+</table>
+<p>Aus den Messungen geht hervor, dass die Kernellaufzeit primär von der
+Bildauflösung abhängt und unabhängig von der Anzahl der gesetzten Punkte
+ist. In den <em>Heatmaps</em> ist visuell deutlich zu erkennen, dass der
+Farbverlauf innerhalb einer Zeile (also bei konstanter Bildauflösung)
+gleich bleibt und die Laufzeit erst beim Wechsel in die nächste Zeile
+(steigende Bildauflösung) zunimmt.</p>
+<p>Dieses Verhalten spiegelt die Charakteristik des JFA wider: Da der
+Algorithmus in jedem Schritt das gesamte Gitter parallel durchläuft und
+die Anzahl der Gesamtschritte durch die Auflösung vorgegeben ist, bleibt
+der Rechenaufwand pro Pixel konstant - unabhängig davon, wie viele
+Punkte die Voronoi-Regionen erzeugen. Pro Iterationsschritt besitzt der
+JFA eine Komplexität von <span class="math inline">O(1)</span>, da ein
+Thread pro Pixel immer die gleiche Arbeit macht. Bezogen auf die
+Gesamtgrafik ergibt sich durch die Halbierung der Schrittweite eine
+logarithmische Laufzeitabhängigkeit von der Auflösung <span
+class="math inline">N</span>:</p>
+<p><span class="math display">O(\log_2(N))</span></p>
+<p>Auch in den unteren Linien-Diagrammen (Performance-Plots bei einer
+festen Auflösung von <span class="math inline">128 \times 128</span>)
+wird dieses Verhalten bei genauerer Betrachtung deutlich. Obwohl die
+Kurve auf den ersten Blick stark schwankt, zeigt ein Blick auf die
+Zahlen der Y-Achse, dass sich die Werte in einem kleinen Wertebereich
+bewegen. Die visuellen Schwankungen resultieren aus der automatischen
+Skalierung des Diagramms, welches auf die Kurve <em>“herangezoomt”</em>
+hat. In absoluten Zahlen ausgedrückt sind diese Schwankungen
+vernachlässigbar und bestätigen die Unabhängigkeit von der
+Punkteanzahl.</p>
+<p>Die folgenden Diagramme zeigen die gemessenen Kernellaufzeiten für
+die <strong>Manhattan-Distanz</strong>:</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run .<span class="dt">\s</span>rc<span class="dt">\t</span>ask7.py jfa_manhattan</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run .<span class="dt">\s</span>rc<span class="dt">\t</span>ask7.py compare-jfa_square_euclidean-jfa_manhattan</span></code></pre></div>
+<table>
+<colgroup>
+<col style="width: 49%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>RTX 5070</th>
+<th>GTX 1660 Ti</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_manhattan_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_jfa_manhattan_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+</tr>
+<tr class="even">
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-RTX-5070_jfa_square_euclidean_jfa_manhattan_resolution=128_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_jfa_square_euclidean_jfa_manhattan_resolution=128_points=64,128,256,512.png" /></td>
+</tr>
+</tbody>
+</table>
+<p>Die Diagramme der Manhattan-Distanz zeigen vergleichbare Laufzeiten
+und Verhaltensmuster wie die der quadratischen euklidischen Distanz. Die
+Wahl der Metrik zur Distanzberechnung hat folglich keinen spürbaren
+Einfluss auf die Gesamtperformance des Kernels. Daraus lässt sich
+schließen, dass der JFA-Kernel primär <em>memory-bound</em>
+(speicherbandbreitenbegrenzt) und nicht <em>compute-bound</em>
+(rechenleistungsbegrenzt) ist. In jeder Iteration müssen die Threads auf
+die Informationen der 8 benachbarten Pixel zugreifen. Der Aufwand für
+das Laden dieser Daten aus dem globalen VRAM dominiert die Laufzeit. Ob
+im Rechenwerk anschließend eine Multiplikation mehr durchgeführt wird
+(wie bei der euklidischen Distanz: <span class="math inline">dx \cdot dx
++ dy \cdot dy</span>) oder eine Betragsfunktion (Manhattan: <span
+class="math inline">\left|dx\right| + \left|dy\right|</span>), fällt
+leistungstechnisch nicht ins Gewicht.</p>
+<p><em>Was liefert die ncu-Analyse?</em></p>
+<p>Schaut man sich die ncu-erzeugten Logdateien <a
+href="../data/ncu_NVIDIA-GeForce-RTX-5070_jfa_sqaure_euclidean_resolution=2048_points=512.log">square
+euclidean ncu</a> und <a
+href="../data/ncu_NVIDIA-GeForce-RTX-5070_jfa_manhattan_resolution=2048_points=512.log">manhattan
+ncu</a> an, fällt zunächst auf, dass für jeden Iterationsschritt ein
+separater Eintrag anlegt wird (Auflösung von <code>2048</code> mit
+<code>512</code> Punkten). Dies liegt daran, dass ncu für jeden der
+insgesamt <strong>11</strong> Kernelaufrufe (<span
+class="math inline">\log_2(2048) = 11</span>) eine separate Analyse
+durchführt. Da die Performance-Metriken der quadratischen euklidischen
+Distanz und der Manhattan-Distanz nahezu identisch sind, beschränkt sich
+die weitere Analyse exemplarisch auf die euklidische Metrik.</p>
+<p>Ein interessanter Aspekt ist die Betrachtung der Laufzeit
+(<em>Duration</em>) auf der GPU in der <em>Section: GPU Speed Of Light
+Throughput</em>. Summiert man die Werte aller 11 Iterationen, erhält man
+die kumulierte Kernellaufzeit - ohne Overhead des Python-Interpreters
+für das Tauschen der Gitter und der Berechnung der neuen
+Schrittweite:</p>
+<p><span class="math display">t_{\mathrm{kernel}} = 158.34 + 140.83 +
+138.75 + 139.78 + 140.13 + 141.28 + 144.64 + 132.51 + 128.58 + 125.18 +
+125.66 = 1515.68 \mathrm{µs}</span></p>
+<p>Vergleicht man diese ca. <strong>1,516 ms</strong> mit dem in der
+Performancemessung (<a
+href="../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png">Heatmap</a>)
+ermittelten Gesamtwert von <strong>1,525 ms</strong> (Auflösung=<span
+class="math inline">2048</span>, Punkte=<span
+class="math inline">512</span>, quadratische euklidische Distanz,
+<code>RTX 5070</code>), zeigt sich eine sehr hohe Übereinstimmung. Die
+geringe Differenz von rund <strong>0,09 ms</strong> lässt sich auf den
+CPU- und Synchronisations-Overhead zurückführen, der mit steigender
+Iterationsanzahl leicht zunimmt. Dies verifiziert, dass die verwendete
+Methode zur Leistungsmessung valide arbeitet.</p>
+<p>Darüber hinaus identifiziert die ncu-Analyse auch den primären
+Flaschenhals des JFA: Der Kernel ist <strong>memory-bound</strong>
+(speicherbandbreitenbegrenzt). Zwar scheint die Auslastung in einzelnen
+Iterationen ausgewogen (NCU meldet: <em>“Compute and Memory are
+well-balanced”</em>), der überwiegende Hinweis ist jedoch, dass der
+Speicher stärker genutzt wird als der Compute: <em>“Memory is more
+heavily utilized than Compute”</em>. Bei der Manhattan-Distanz ist dies
+noch deutlicher zu erkennen. Der Durchsatz des Speichers (<em>Memory
+Throughput</em>) liegt in der ersten Iteration bei <code>81,08 %</code>
+und sinkt in den späteren Verläufen leicht auf Werte um die
+<code>70 %</code>. Im Gegensatz dazu starten die Recheneinheiten
+(<em>Compute (SM) Throughput</em>) bei lediglich <code>30,42 %</code>
+und erreichen zum Ende hin <code>65,21 %</code>. Ausschlaggebend ist
+hierbei die Auslastung der Caches L1 und L2. Zu Beginn des Algorithmus
+ist die Schrittweite sehr groß. Benachbarte Threads eines Warps fragen
+Pixeldaten ab, die im globalen Speicher weit auseinanderliegen. Die
+Caches können diese verstreuten Daten kaum puffern, weshalb die
+Recheneinheiten auf Daten warten müssen und blockieren. Bei kleinen
+Schrittweiten am Ende des Algorithmus liegen die benötigten Nachbarpixel
+im Speicher hingegen nah beieinander. Das zeigt auch der <em>L1/TEX
+Cache Throughput</em> bzw. <em>L2 Cache Throughput</em>: Zu Beginn ist
+die Aulastung bei <code>23,00 %</code> bzw. <code>30,82 %</code> und
+erreicht im Laufe des JFA maximale Werte von <code>55,06 %</code> bzw.
+<code>66,95 %</code>. Dadurch kann der Zugriff auf den globalen VRAM
+reduziert und die Rechenauslastung teilweise erhöht werden.
+Nichtsdestotrotz dominieren die Speicherzugriffe die Kernellaufzeit
+(<strong>memory-bound</strong>).</p>
+<p><em>Wie verhält sich die Kernel-Laufzeit bei jedem
+Iterationsschritt?</em></p>
+<p>Um dem Ergebnis der ncu-Analyse weiter nachzugehen, wurde die
+Kernellaufzeit über die Schrittweite <span class="math inline">k</span>
+analysiert. Um Vergleiche ziehen zu können, wurden auch hier eine
+Auflösung von <code>2048</code> und eine Punktemenge von
+<code>512</code> gewählt. Die folgenden Diagramme zeigen das
+Verhalten:</p>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run .<span class="dt">\s</span>rc<span class="dt">\t</span>ask6b.py naive-jfa-step-analysis</span></code></pre></div>
+<table>
+<colgroup>
+<col style="width: 49%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>RTX 5070</th>
+<th>GTX 1660 Ti</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img
+src="../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-RTX-5070_Naive-square-euclidean_Naive-manhattan_res2048_seeds512.png" /></td>
+<td><img
+src="../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-GTX-1660-Ti_Naive-square-euclidean_Naive-manhattan_res2048_seeds512.png" /></td>
+</tr>
+</tbody>
+</table>
+<table>
+<tr>
+<td>
+<p>Device: NVIDIA GeForce RTX 5070 | Resolution: 2048 | Seeds: 512</p>
+<table>
+<thead>
+<tr class="header">
+<th>Step size (<span class="math inline">k</span>)</th>
+<th>Naive square euclidean</th>
+<th>Naive manhattan</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1024</td>
+<td>0.3194 ms</td>
+<td>0.3713 ms</td>
+</tr>
+<tr class="even">
+<td>512</td>
+<td>0.1705 ms</td>
+<td>0.1591 ms</td>
+</tr>
+<tr class="odd">
+<td>256</td>
+<td>0.1574 ms</td>
+<td>0.1495 ms</td>
+</tr>
+<tr class="even">
+<td>128</td>
+<td>0.1541 ms</td>
+<td>0.1515 ms</td>
+</tr>
+<tr class="odd">
+<td>64</td>
+<td>0.1567 ms</td>
+<td>0.1381 ms</td>
+</tr>
+<tr class="even">
+<td>32</td>
+<td>0.1978 ms</td>
+<td>0.1415 ms</td>
+</tr>
+<tr class="odd">
+<td>16</td>
+<td>0.1751 ms</td>
+<td>0.1407 ms</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>0.1598 ms</td>
+<td>0.1506 ms</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>0.1508 ms</td>
+<td>0.1437 ms</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>0.1440 ms</td>
+<td>0.1267 ms</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>0.1296 ms</td>
+<td>0.1393 ms</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td>
+<p>NVIDIA GeForce GTX 1660 Ti | Resolution: 2048 | Seeds: 512</p>
+<table>
+<thead>
+<tr class="header">
+<th>Step size (<span class="math inline">k</span>)</th>
+<th>Naive square euclidean</th>
+<th>Naive manhattan</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1024</td>
+<td>0.4962 ms</td>
+<td>0.5618 ms</td>
+</tr>
+<tr class="even">
+<td>512</td>
+<td>0.6631 ms</td>
+<td>0.6772 ms</td>
+</tr>
+<tr class="odd">
+<td>256</td>
+<td>0.7414 ms</td>
+<td>0.7391 ms</td>
+</tr>
+<tr class="even">
+<td>128</td>
+<td>0.7859 ms</td>
+<td>0.7825 ms</td>
+</tr>
+<tr class="odd">
+<td>64</td>
+<td>0.7989 ms</td>
+<td>0.8042 ms</td>
+</tr>
+<tr class="even">
+<td>32</td>
+<td>0.7882 ms</td>
+<td>0.7977 ms</td>
+</tr>
+<tr class="odd">
+<td>16</td>
+<td>0.7615 ms</td>
+<td>0.6992 ms</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>0.6349 ms</td>
+<td>0.6922 ms</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>0.5895 ms</td>
+<td>0.6164 ms</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>0.5591 ms</td>
+<td>0.5783 ms</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>0.5593 ms</td>
+<td>0.5731 ms</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</table>
+<p>Für die <code>RTX 5070</code> ist die Laufzeit zu Beginn ($k = 1024)
+maximal und sinkt in der nächsten Iteration stark auf einen Wert, um den
+sich die Laufzeiten der folgenden Iterationen bewegen. Das unterstützt
+die Annahme, dass die Laufzeit für die großen Schrittweiten stark durch
+die globalen Speicherzugriffe begrenzt ist und die Caches L1 und L2
+keine Daten zwischenspeichern können (vgl. ncu-Analyse). Ab einer
+gewissen Größe - in diesem Fall bei der Schrittweite <span
+class="math inline">k = 512</span> - reicht die Größe des Caches aus,
+sodass die Daten überwiegend gepuffert werden können und folglich
+weniger Zeit für die Speicherzugriffe benötigt wird. Dies wirkt sich auf
+eine erhöhte Rechenauslastung und eine kürzere Kernellaufzeit aus.</p>
+<p>Bei der <code>GTX 1660 Ti</code> verhält es sich anders: Die Laufzeit
+ist zu Beginn (<span class="math inline">k = 1024</span>) recht niedrig,
+steigt dann für die mittleren Schrittweiten an und flacht für die
+kleinen wieder ab (parabelförmiges Verhalten). Bei <span
+class="math inline">k = 1024</span> liegen viele Nachbarpixel außerhalb
+des logischen Bildes und müssen somit gar nicht geprüft werden. Dadurch
+muss keine Speicheranfrage an das globale VRAM gestellt werden, was zu
+einer reduzierten Kernellaufzeit führt (<em>Out-of-Bounds-Effekt</em>).
+Mit abnehmender Schrittweite liegen immer mehr Nachbarpixel im Raster,
+wodurch mehr Daten geladen werden müssen und die Kernellaufzeit steigt.
+Ab <span class="math inline">k = 32</span> greift dann auch bei der GTX
+der oben beschriebene Cache-Effekt, der in einer reduzierten
+Kernellaufzeit resultiert und die Kurve somit abflacht.</p>
+<p>Zu beachten ist, dass die ncu-Analyse hier mit der
+<code>RTX 5070</code> durchgeführt wurde (vgl. <a
+href="#anhang">Anhang</a>) und es starke Hardwareunterschiede zu der
+<code>GTX 1660 Ti</code> gibt. Das aus der ncu-Analyse resultierende
+Verhalten muss nicht direkt für die <code>GTX 1660 Ti</code> gelten. Der
+L1- und L2-Cache der <code>RTX 5070</code> ist beispielsweise deutlich
+größer als der der <code>GTX 1660 Ti</code>, weshalb der Effekt deutlich
+früher eintritt (vgl. <a
+href="https://technical.city/de/video/GeForce-GTX-1660-Ti-vs-GeForce-RTX-5070">GPU-Vergleich</a>).</p>
+<h2 id="aufgabe-6b---optimierungen">Aufgabe 6b - Optimierungen</h2>
+<p><em>Können Optimierungen durchgeführt werden? Wenn ja, warum? Wenn
+nein, warum nicht?</em></p>
+<p><strong>Shared Memory</strong></p>
+<p>Wie zuvor erläutert, ist der JFA primär memory bound (vgl.
+ncu-Analyse). Um diesem Aspekt nachzugehen, wird als erster
+Optimierungsansatz <strong>Shared Memory</strong> evaluiert. Der Einsatz
+von Shared Memory ist primär dann sinnvoll, wenn benachbarte Threads
+innerhalb eines Blocks redundant auf dieselben Speicheradressen im
+globalen VRAM der GPU zugreifen müssen. Durch das einmalige, kollektive
+Laden der Daten aus dem VRAM in das Shared Memory können nachfolgende,
+mehrfache Lesezugriffe beschleunigt werden.</p>
+<p><em>Problemstellung bei JFA</em></p>
+<p>Im Hinblick auf den Einsatz von Shared Memory beim JFA ergibt sich
+folgende Herausforderung: Pro Iteration benötigt jeder Thread die Daten
+von sich selbst sowie von 8 Nachbarpixeln. Die Problematik hierbei ist,
+dass das Zugriffsfenster stark mit der aktuellen Schrittweite
+(<code>step_size</code>) je nach Iterationsschritt variiert:</p>
+<ul>
+<li><p><strong>Große Schrittweiten:</strong> Die benötigten Nachbardaten
+liegen weit auseinander und außerhalb des Thread-Blocks. Um diese
+Distanzen abzudecken, müsste der Shared-Memory-Buffer unrealistisch groß
+dimensioniert werden. Dies würde nicht nur das Hardware-Limit des Shared
+Memory pro Block sprengen, sondern auch zu einem Overhead beim Laden der
+Daten führen. Der Einsatz von Shared Memory ist in diesen Phasen daher
+<strong>nicht sinnvoll</strong>.</p></li>
+<li><p><strong>Kleine Schrittweiten:</strong> Erst wenn die Schrittweite
+klein genug ist und unter einen bestimmten Schwellenwert fällt, liegen
+alle von einem Thread-Block benötigten Pixeldaten räumlich so nah
+beieinander, dass sie gemeinsam in den Shared Memory geladen werden
+können und der Einsatz von Shared Memory könnte von Nutzen
+sein.</p></li>
+</ul>
+<p><em>Die hybride Strategie</em></p>
+<p>Um diesem Verhalten gerecht zu werden, wurde eine <em>hybride</em>
+Kernel-Strategie implementiert. Die Konstante
+<code>JFA_SHARED_THRESHOLD</code> dient als Weiche:</p>
+<ul>
+<li><strong>Schrittweite <span class="math inline">&lt;</span>
+Threshold:</strong> Die Shared-Memory-Pipeline wird aktiviert.</li>
+<li><strong>Schrittweite <span class="math inline">\ge</span>
+Threshold:</strong> Die Threads greifen direkt auf das globale VRAM zu
+(Fallback-Pipeline).</li>
+</ul>
+<p><em>Edge Cases und das Halo-Padding</em></p>
+<p>Für die Implementierung wird das Grid in Blöcke aufgeteilt und pro
+Block soll ein Shared-Memory-Buffer angelegt werden. Ein Problem bei der
+Blockaufteilung sind die Rand-Threads (<em>Edge Cases</em>). Threads,
+die sich am äußeren Rand eines <span class="math inline">16 \times
+16</span>-Blocks befinden, müssen zur Distanzberechnung Pixel abfragen,
+die außerhalb ihres eigenen Blocks liegen. Um dieses Problem zu
+adressieren, stehen unter anderem 2 Möglichkeiten zur Auswahl:</p>
+<ul>
+<li>Für Zugriffe auf Edge Cases wieder auf den Zugriff auf das globale
+VRAM zurückfallen</li>
+<li>Den Shared-Memory-Buffer um eine gewisse Größe vergrößern (Abhängig
+von der <code>JFA_SHARED_THRESHOLD</code>)</li>
+</ul>
+<p>Um einen Zugriff auf das globale VRAM zu verhindern, wird der
+Shared-Memory-Buffer um eine Sicherheitszone - dem <strong>Halo</strong>
+(Heiligenschein) - in alle vier Richtungen erweitert. Das folgende Bild
+soll die Aufteilung schematisch darstellen.</p>
+<center>
+<p><img src="../data/task6b_sharedMemory_Concept.svg" /></p>
+</center>
+<p>Die maximale Breite dieses Halos (<code>MAX_HALO_RADIUS</code>)
+leitet sich direkt aus der maximal erlaubten Schrittweite innerhalb des
+Shared Memorys ab (<span
+class="math inline">\mathrm{JFA\_SHARED\_THRESHOLD} / 2</span>).</p>
+<p><em>Kooperatives Laden mittels Grid-Stride-Loop</em></p>
+<p>Da der Shared-Memory-Buffer inklusive Halo größer ist als die Anzahl
+der verfügbaren Threads im Block (z.B. <span class="math inline">24
+\times 24 = 576</span> Elemente vs. <span class="math inline">16 \times
+16 = 256</span> Threads), kann nicht jeder Thread einfach genau ein
+Pixel laden. Um die Daten dennoch komplett ins Shared-Memory-Buffer zu
+laden, wird eine <strong>Grid-Stride-Loop</strong> verwendet:</p>
+<ol type="1">
+<li>Das zweidimensionale Array im Shared Memory wird virtuell in ein
+eindimensionales Array linearisiert.</li>
+<li>Die 256 Threads arbeiten sich in Schritten der Blockgröße durch die
+Elemente und laden die Daten kooperativ.</li>
+<li>Falls ein Block am echten Bildrand liegt und der Halo über die
+Bildauflösung hinausragt, fangen die Threads dies ab und beschreiben das
+Shared Memory mit einem <em>Uninitialized-Flag</em>
+(<code>-1</code>).</li>
+</ol>
+<p>Nach dem Ladevorgang stellt <code>cuda.syncthreads()</code> sicher,
+dass erst alle Elemente im Shared Memory liegen, bevor die Threads mit
+der eigentlichen JFA-Distanzberechnung starten. Threads, die außerhalb
+der echten Bildgrenzen liegen, terminieren erst <strong>nach</strong>
+diesem Sync, da sie beim kooperativen Laden des Halos mithelfen mussten.
+Die JFA-Distanzberechnung wird dann auf den Pixeldaten im
+Shared-Memory-Buffer durchgeführt.</p>
+<p><em>Gibt es Bank Conflicts?</em></p>
+<p>Shared Memory ist in 32 Banks aufgeteilt, wobei jede Bank 4 Byte (32
+Bit) breit ist. Wenn mehrere Threads desselben Warps im selben
+Taktzyklus auf unterschiedliche Adressen <strong>innerhalb</strong>
+derselben Bank zugreifen wollen, entsteht ein Bank Conflict. Der Zugriff
+auf diese Bank wird dann serialisiert, bis alle anfragenden Threads
+bedient wurden, was zu einem Leistungsverlust führen kann (vgl. <a
+href="https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/writing-cuda-kernels.html#shared-memory-access-patterns">NVIDIA-Dokumentation</a>).</p>
+<p>In diesem Kernel liegt das <code>shared_buffer</code>-Array als
+3D-Layout <code>(SHARED_MEMORY_SIZE, SHARED_MEMORY_SIZE, 2)</code> vor,
+wobei die letzte Dimension die X- und Y-Koordinate eines Punkts
+<em>interleaved</em> speichert. Dadurch beträgt der Adressabstand
+zwischen zwei in <code>x</code>-Richtung benachbarten Threads nicht 1
+Wort (4 Byte; 32 Bit), sondern 2 Worte (2 Banks). Dadurch, landen bei
+einem Zugriff wie
+<code>shared_buffer[shared_pixel_y, shared_pixel_x, 0]</code> jeweils
+zwei Threads in derselben Bank: Thread 0 und Thread 16 greifen auf Bank
+0 zu, Thread 1 und Thread 17 auf Bank 2, Thread 2 und Thread 18 auf Bank
+4 usw. Es entsteht somit ein <strong>2-way Bank Conflict</strong>, der
+sowohl beim kooperativen Laden des Shared Memory als auch beim Lesen des
+eigenen Punktes und bei der Nachbarschaftsauswertung auftritt.</p>
+<p><em>Dimensionierung von <code>SHARED_MEMORY_SIZE</code></em></p>
+<p>Der Shared-Memory-Buffer wird statisch für den Worst-Case
+dimensioniert:</p>
+<p><span class="math display">\mathrm{SHARED\_MEMORY\_SIZE} =
+\mathrm{BLOCK\_DIM} + 2 \times \mathrm{MAX\_HALO\_RADIUS}</span></p>
+<p>Bei kleiner werdenden Schrittweiten (<span
+class="math inline">2</span> und <span class="math inline">1</span>)
+schrumpft der tatsächlich benötigte Halo-Bereich dynamisch zusammen. Da
+der Shared-Memory-Buffer jedoch statisch allokiert sein muss, bleibt ein
+Teil des äußeren Randes in den letzten Schritten ungenutzt. Zudem führt
+das Halo-Verfahren dazu, dass sich die Speicherbereiche benachbarter
+Blöcke <em>“überschneiden”</em> und manche Pixeldaten trozdem noch von
+mehreren Blöcken redundant geladen werden müssen.</p>
+<p>Für die Dimensionierung gilt es, das Hardware-Limit von standardmäßig
+<strong>48 KB Shared Memory pro Thread-Block</strong> nicht zu
+überschreiten (vgl. <a
+href="https://forums.developer.nvidia.com/t/question-about-max-shared-memory-in-block-and-multiprocessor/283345">Forum-Beitrag</a>):</p>
+<ul>
+<li>Für <code>BLOCK_DIM = 16</code> und
+<code>JFA_SHARED_THRESHOLD = 8</code> ergeben sich <span
+class="math inline">24 \times 24 = 576</span> Pixel-Elemente. Da für
+jeden Pixel zwei Koordinaten (<code>x</code> und <code>y</code>) als
+<code>int32</code> (4 Byte) gespeichert werden, belegt der Buffer im
+Speicher:</li>
+</ul>
+<p><span class="math display">576 \times 2 \times 4\mathrm{ Byte} =
+4608\mathrm{ Byte} \approx 4,6\mathrm{ KB}</span></p>
+<ul>
+<li>Für <code>JFA_SHARED_THRESHOLD = 16</code> steigt die Anzahl der
+Elemente bereits auf <span class="math inline">(16 + 2 \times 8)^2 =
+1024</span> Pixel an, was zu folgendem Speicherbedarf führt:</li>
+</ul>
+<p><span class="math display">1024 \times 2 \times 4\mathrm{ Byte} =
+8192\mathrm{ Byte} = 8\mathrm{ KB}</span></p>
+<ul>
+<li>Für <code>JFA_SHARED_THRESHOLD = 32</code> steigt der Speicherbedarf
+zu:</li>
+</ul>
+<p><span class="math display">(16 + 2 \times 16)^2 = 48 \times 48 =
+2304\mathrm{ Pixel}</span> <span class="math display">2304 \times 2
+\times 4\mathrm{ Byte} = 18432\mathrm{ Byte} \approx 18,4\mathrm{
+KB}</span></p>
+<ul>
+<li>Erst bei <code>JFA_SHARED_THRESHOLD = 64</code> steigt die
+Pixelanzahl auf <span class="math inline">(16 + 2 \times 32)^2 = 80
+\times 80 = 6400</span> Pixel. Dies entspricht im Speicher: <span
+class="math display">6400 \times 2 \times 4\mathrm{ Byte} =
+51200\mathrm{ Byte} = 50\mathrm{ KB}</span> Damit wird das
+Hardware-Limit von <strong>48 KB</strong> (<span
+class="math inline">\approx</span> 0xc000 Bytes) gesprengt. Dies wird
+bereits beim Kompilieren verhindert und bricht mit folgender
+Fehlermeldung ab:</li>
+</ul>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uses</span> too much shared data <span class="er">(</span><span class="ex">0xc800</span> bytes, 0xc000 max<span class="kw">)</span></span></code></pre></div>
+<p>Da ein zu großer Schwellenwert den Shared-Memory-Bedarf ansteigen
+lässt und den Ladeaufwand für den Halo-Bereich vergrößert, wird der
+Schwellenwert <code>JFA_SHARED_THRESHOLD = 8</code> festgelegt. Daraus
+ergeben sich die folgenden Performancemessungen:</p>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run .<span class="dt">\s</span>rc<span class="dt">\t</span>ask7.py jfa_shared_square_euclidean</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run .<span class="dt">\s</span>rc<span class="dt">\t</span>ask7.py compare-jfa_square_euclidean-jfa_shared_square_euclidean</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run .<span class="dt">\s</span>rc<span class="dt">\t</span>ask6b.py shared-jfa-step-analysis</span></code></pre></div>
+<table>
+<colgroup>
+<col style="width: 49%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>RTX 5070</th>
+<th>GTX 1660 Ti</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_shared_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_jfa_shared_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+</tr>
+<tr class="even">
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-RTX-5070_jfa_square_euclidean_jfa_shared_square_euclidean_resolution=128_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_jfa_square_euclidean_jfa_shared_square_euclidean_resolution=128_points=64,128,256,512.png" /></td>
+</tr>
+<tr class="odd">
+<td><img
+src="../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-RTX-5070_Naive-square-euclidean_Shared-memory-square-euclidean_res2048_seeds512.png" /></td>
+<td><img
+src="../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-GTX-1660-Ti_Naive-square-euclidean_Shared-memory-square-euclidean_res2048_seeds512.png" /></td>
+</tr>
+</tbody>
+</table>
+<p>Auch hier zeigt sich wieder die typische JFA-Charakteristik bezüglich
+der Laufzeitkomplexität in Abhängigkeit von Auflösung. In dem Diagramm,
+das die Laufzeit in Abhängigkeit zur Schrittweite darstellt, ist bei der
+<code>GTX 1660 Ti</code> zu erkennen, dass beide Implementierungen für
+die großen Schrittweiten übereinander liegen. Dies ist darauf
+zurückzuführen, dass die Shared Memory Pipeline hier nicht aktiviert
+ist. Ab Schrittweite 4 greift der Shared-Memory-Ansatz, der eine höhere
+Laufzeit als der naive Ansatz aufweist. Vergleicht man die
+Gesamtlaufzeiten mit denen der naiven quadratischen euklidischen
+Implementierung, stellt man fest, dass der Einsatz von Shared Memory
+<strong>keinen Laufzeitvorteil</strong> erbracht hat. Dafür lassen sich
+folgende mögliche Ursachen identifizieren:</p>
+<ul>
+<li><p>Für das kooperative Laden mittels Grid-Stride-Loop sind innerhalb
+des Kernels Ganzzahl-Divisionen (<code>//</code>) und Modulo-Operationen
+(<code>%</code>) notwendig, um die linearen Thread-Indizes wieder in
+2D-Koordinaten für das Shared-Memory-Array zu übersetzen. Diese
+Operationen sind mathematisch aufwändig und können die Laufzeit
+verschlechtern.</p></li>
+<li><p>Der Befehl <code>cuda.syncthreads()</code> ist ein
+Synchronisations-Barriere, bei der alle 256 Threads des Blocks
+aufeinander warten müssen, bis das Laden des Buffers abgeschlossen ist.
+Bei der naiven Implementierung entfällt diese Barriere, wodurch die
+Threads unabhängiger voneinander agieren können.</p></li>
+<li><p>Die hardwareseitigen L1- und L2-Caches leisten bereits bei der
+naiven Implementierung einen enormen Beitrag bei den kleinen
+Schrittweiten, wodurch der softwareseitig verwaltete
+Shared-Memory-Buffer keinen signifikanten Zusatznutzen mehr generieren
+kann.</p></li>
+</ul>
+<p>Die von <a
+href="../data/ncu_NVIDIA-GeForce-RTX-5070_jfa_shared_square_euclidean_resolution=2048_points=512.log">ncu
+erzeugte Datei</a> unterstreicht das. In den Iterationen 1 bis 8 meldet
+ncu ein Memory-Bound-Problem, da hier noch der naive Ansatz über VRAM
+als Fallback verwendet wird (vgl. ncu Analse der naiven Implementation).
+Ab Iteration 9 (Schrittweite 4) greift die Shared-Memory-Pipeline, und
+ncu meldet nun eine höhere Compute- als Memory-Auslastung. Das zeigt
+zwar, dass der Shared-Memory-Ansatz hier den ursprünglichen
+Speicher-Engpass auf die Recheneinheiten verlagert, dieser Effekt jedoch
+durch den zusätzlichen Rechenaufwand (Indexberechnung via
+Ganzzahl-Division/Modulo, Synchronisationsbarriere) wieder kompensiert
+wird, wodurch unterm Strich keine Laufzeitverbesserung gegenüber der
+naiven Implementierung entsteht.</p>
+<!-- Abschließend lässt sich festhalten, dass die Optimierung mittels Shared Memory beim JFA **keinen Performancegewinn** erzielt hat. Dies liegt vor allem an der Natur des Algorithmus selbst: Ein softwareseitiges Caching im Shared Memory ist konzeptionell überhaupt erst bei kleinen Schrittweiten möglich. Doch selbst bei diesen konnte kein Gewinn erzielt werden. Hier ist die Redundanz der Speicherzugriffe innerhalb eines Thread-Blocks nicht hoch genug, um den zusätzlichen Overhead für das kollaborative Laden, die Thread-Synchronisation und die Indexberechnung mittels Division und Modulo zu kompensieren. -->
+<p>Um dem Problem der interleaved 3D-Struktur (<em>Bank Conflicts</em>)
+nachzugehen, wird im folgenden Abschnitt ein alternatives Datenlayout
+betrachtet. Da der Shared-Memory-Ansatz gegenüber der naiven
+Implementierung keine relevante Laufzeitverbesserung brachte, wird
+wieder die naive, ursprüngliche Implementierung verwendet, wobei das
+zugrunde liegende Problem gleich bleibt.</p>
+<p><strong>Datenlayout optimieren</strong></p>
+<p><em>Structure of Arrays (SoA) vs. Array of Structures (AoS)</em></p>
+<p>Bei der naiven Implementierung
+<code>_jfa_pass_square_euclidean_kernel</code> eines
+JFA-Iterationsschritts wird für das Grid ein <strong>Array of Structures
+(AoS)</strong> Layout verwendet. Das bedeutet, es wird ein 3D-Array der
+Form <code>(Height, Width, 2)</code> genutzt, welches pro Pixel ein
+Tupel von (x, y) Punkt-Koordinaten speichert. Dieses Layout wird häufig
+verwendet, weil es für den Menschen einfacher vorzustellen und im Code
+intuitiv zu handhaben ist. Im Speicher liegen die Daten dabei
+abwechselnd in folgender Form:</p>
+<pre class="plaintext"><code>X0 Y0 X1 Y1 X2 Y2 X3 Y3 ...</code></pre>
+<p>Allerdings hat dieses Layout in CUDA häufig einen Nachteil bezüglich
+des Speicherzugriffs: Threads innerhalb eines gemeinsamen Warps (32
+Threads) können keine vollständig <em>coalesced</em> Speicherzugriff
+durchführen. Wenn Thread 0 die X-Koordinate des ersten Pixels und Thread
+1 die X-Koordinate des zweiten Pixels laden möchte, liegt im Speicher
+das <code>Y0</code> des ersten Threads im Weg. Die Zugriffe sind somit
+mit einer Schrittweite von 2 gestreckt, was zu einer höheren Anzahl von
+Speicher-Transaktionen führt.</p>
+<p>Um globale Speicherzugriffe zu bündeln, wird in diesem
+Optimierungsschritt das gegensätzliche Layout <strong>Structure of
+Arrays (SoA)</strong> verwendet. Dabei werden die Daten nach Komponenten
+getrennt im Speicher abgelegt:</p>
+<pre class="plaintext"><code>X0 X1 X2 X3 ... Y0 Y1 Y2 Y3 ...</code></pre>
+<p>Wenn nun die 32 Threads eines Warps die X-Koordinaten von 32
+nebeneinanderliegenden Pixeln abfragen, liegen diese Daten lückenlos
+hintereinander im Speicher. Die Hardware kann diese Anfrage in einer
+Speichertransaktion (Coalesced Access) abarbeiten. Das Gleiche gilt
+anschließend für die Y-Koordinaten (vgl. <a
+href="https://forums.developer.nvidia.com/t/structures-of-arrays-vs-arrays-of-structures/13581">Forum-Beitrag</a>).</p>
+<p><em>Umsetzung für JFA</em></p>
+<p>Im JFA wird das ursprüngliche Grid der Form
+<code>shape=(resolution, resolution, 2)</code> so angepasst, dass es
+eine Dimension weniger besitzt, dafür aber die doppelte logische Höhe
+aufweist: <code>shape=(resolution * 2, resolution)</code>. Die Daten für
+die X- und Y-Koordinaten der Punkte werden planar untereinander
+angeordnet:</p>
+<ul>
+<li><strong>Obere Hälfte (Zeile <span class="math inline">0</span> bis
+<span class="math inline">\mathrm{size} - 1</span>):</strong> Hält die
+X-Koordinaten der Punkte</li>
+<li><strong>Untere Hälfte (Zeile <span
+class="math inline">\mathrm{size}</span> bis <span class="math inline">2
+\times \mathrm{size} - 1</span>):</strong> Hält die Y-Koordinaten der
+Punkte</li>
+</ul>
+<p>Um im Kernel auf die Daten zuzugreifen, muss für die Y-Koordinate
+lediglich der Offset der Bildauflösung (<code>size</code>) auf den
+Zeilenindex hinzuaddiert werden, während der X-Wert auf der normalen
+Zeile geladen werden kann:</p>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>grid_in[pixel_y, pixel_x]</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>grid_in[pixel_y <span class="op">+</span> size, pixel_x]</span></code></pre></div>
+<p>Für das <em>Structure of Arrays (SoA)</em> Layout ergeben sich
+folgende Performancemessungen:</p>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run .<span class="dt">\s</span>rc<span class="dt">\t</span>ask7.py jfa_soa_square_euclidean</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run .<span class="dt">\s</span>rc<span class="dt">\t</span>ask7.py compare-jfa_square_euclidean-jfa_soa_square_euclidean</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run .<span class="dt">\s</span>rc<span class="dt">\t</span>ask6b.py SoA-jfa-step-analysis</span></code></pre></div>
+<table>
+<colgroup>
+<col style="width: 49%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>RTX 5070</th>
+<th>GTX 1660 Ti</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_soa_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_jfa_soa_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+</tr>
+<tr class="even">
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-RTX-5070_jfa_square_euclidean_jfa_soa_square_euclidean_resolution=128_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_jfa_square_euclidean_jfa_soa_square_euclidean_resolution=128_points=64,128,256,512.png" /></td>
+</tr>
+<tr class="odd">
+<td><img
+src="../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-RTX-5070_Naive-square-euclidean_SoA-square-euclidean_res2048_seeds512.png" /></td>
+<td><img
+src="../data/task6b_jfa_runtime_over_stepSize_NVIDIA-GeForce-GTX-1660-Ti_Naive-square-euclidean_SoA-square-euclidean_res2048_seeds512.png" /></td>
+</tr>
+</tbody>
+</table>
+<p>Ein Vergleich der Messdaten mit der naiven quadratischen euklidischen
+Implementierung zeigt, dass das umgestellte <em>Structure of Arrays
+(SoA)</em> Layout keinen messbaren Laufzeitvorteil gegenüber dem
+<em>Array of Structures (AoS)</em> Layout liefert. Es lassen sich
+folgende mögliche Ursachen feststellen:</p>
+<ul>
+<li>Beim laden der Pixel-Koordinaten liegen die Daten im AoS-Layout
+(<code>X0 Y0 X1 Y1 ...</code>) sequenziell hintereinander. Fordert der
+Warp die X-Koordinate an, lädt die Hardware implizit die dazugehörige
+Y-Koordinate innerhalb derselben Speicheranfrage in den Cache. Der
+unmittelbar folgende Lesezugriff auf die Y-Komponente kann direkt aus
+dem Cache erfolgen.
+<ul>
+<li>Beim Laden der eigenen Pixel-Koordinaten (<code>best_seed_x</code>
+und <code>best_seed_y</code>) ist beim AoS dadurch nur eine
+Speicheranfrage nötig, wohingegen beim SoA durch die planare Trennung
+für den Y-Wert eine zweite, separate Speicheranfrage an das VRAM
+gestellt werden muss.</li>
+<li>Beim Laden der Koordinaten der 8 Nachbarpixel wirkt sich SoA
+ebenfalls nachteilig aus. Da sich das SoA-Grid in eine obere (X) und
+untere (Y) Hälfte mit dem Offset <code>size</code> aufteilt, erfordert
+jede Nachbarabfrage das Laden von zwei weit auseinanderliegenden
+Speicheradressen. Müssen die Threads eines Warps aufgrund großer
+Schrittweiten (<code>step_size</code>) ohnehin <strong>nicht</strong>
+zusammenhängende Speicherbereiche anfordern, kann das SoA-Layout die
+Anzahl der Speicheranforderungen im Vergleich zu AoS - bei dem X- und
+Y-Wert in derselben Speicheranfrage liegen - erhöhen.</li>
+</ul></li>
+<li>Das theoretische <em>Memory Coalescing</em> von SoA setzt voraus,
+dass die Threads <strong>lückenlos</strong> auf benachbarte Adressen
+zugreifen. Beim JFA ist dies durch die variierenden Sprungweiten
+(<code>step_size</code>) in der horizontalen und insbesondere in der
+vertikalen Dimension (Zeilensprünge) über die meisten Iterationen hinweg
+nicht gegeben. Da die Threads dadurch ohnehin nicht zusammenhängende
+Speichersegmente anfordern müssen, kann der Strukturvorteil von SoA
+nicht greifen.</li>
+</ul>
+<p>Die <a
+href="../data/ncu_NVIDIA-GeForce-RTX-5070_jfa_soa_square_euclidean_resolution=2048_points=512.log">ncu-Datei</a>
+zeigt, dass in der Iteration 1 bis 3 der Speicher mehr ausgelastet ist
+als der Compute. Ab Iteration 4 bis zum Ende meldet ncu dann, dass beide
+Aspekte gut ausgeglichen sind (<em>Compute and Memory are
+well-balanced</em>).</p>
+<!-- TODO: Erklärung wieso? -->
+<p><strong>Shuffle</strong></p>
+<p>Beim Shuffle können Daten von Threads innerhalb desselben Warps
+direkt ausgetauscht werden, ohne den Umweg über Shared oder Global
+Memory. Numba stellt dafür unter anderem <code>shfl_sync</code>,
+<code>shfl_up_sync</code>, <code>shfl_down_sync</code> und
+<code>shfl_xor_sync</code> bereit, die alle auf die <code>laneid</code>
+eines Threads referenzieren - also seine Position (0-31) innerhalb des
+Warps (vgl. <a
+href="https://numba.pydata.org/numba-doc/0.41.0/cuda-reference/kernel.html#numba.cuda.shfl_sync">Numba-Dokumentation</a>).</p>
+<p><em>Die Grundidee für den Einsatz in JFA</em></p>
+<p>Zu Beginn jedes Passes lädt jeder Thread den aktuell gespeicherten
+Punkt seines eigenen Pixels aus dem Grid (als Ausgangsbasis für den
+Distanzvergleich). Braucht Thread A nun die Punkt-Daten von Pixel <span
+class="math inline">P+k</span>, so hat Thread B, der zu <span
+class="math inline">P+k</span> gehört, diesen Wert im selben
+Kernel-Aufruf ebenfalls bereits geladen. Sitzen A und B im selben Warp,
+könnte A die Daten von B per Shuffle direkt lesen, statt diese
+zusätzlich selbst aus dem Global Memory zu laden. Auf diese Weise ließe
+sich theoretisch eine der VRAM-Anfragen pro Nachbarschaftsprüfung
+einsparen.</p>
+<p>Dieser Ansatz stößt bei JFA jedoch auf zwei grundlegende
+Einschränkungen:</p>
+<ol type="1">
+<li>Die Threads eines Blocks werden nach der X-Dimension zu Warps
+zusammengefasst, wodurch ein Warp einer horizontalen Gridzeile
+entspricht. Shuffle kann dann grundsätzlich nur auf die Pixel <span
+class="math inline">P+k</span> und <span class="math inline">P-k</span>
+<strong>nach rechts bzw. links</strong> zugreifen. Die Nachbarn oben,
+unten und auf den vier Diagonalen liegen per Definition in anderen
+Zeilen und damit außerhalb des Warps. Dafür bleibt zwingend ein Fallback
+auf Global Memory nötig, wodurch Shuffle im besten Fall also nur 2 der 8
+Nachbarschaftsprüfungen betreffen würde
+(<code>dy == 0 and dx == +/-1</code>).
+<ul>
+<li>Anmerkung: Bei einer Blockkonfiguration, bei der
+<code>blockDim.x</code> <strong>kein</strong> Vielfaches von 32 ist -
+wie in diesem Fall für <code>BLOCK_DIM = 16</code> - verschiebt sich
+dieses Bild leicht: Ein Warp fasst dann zwei volle Zeilen zusammen
+(<span class="math inline">2 \cdot 16 = 32</span>), sodass für einen
+Teil der Threads sogar der direkt vertikale Nachbar im selben Warp läge.
+In der Vertikalen gewinnt man zwar einen Schritt, in der Horizontalen
+verliert man jedoch die Hälfte. Zudem ändert das nichts am
+grundsätzlichen Problem, da weiterhin nur benachbarte Zeilenpaare
+betroffen sind (nicht beliebige y-Distanzen).</li>
+</ul></li>
+<li>Ein Warp umfasst <strong>32 Threads</strong>. Damit deckt ein Warp
+bei der typischen 1D-Lane-Anordnung exakt 32 konsekutive horizontale
+(x-)Pixel ab. Ein Thread an Lane-Position <span
+class="math inline">L</span> kann seinen <strong>rechten</strong>
+Nachbarn bei Schrittweite <span class="math inline">k</span> nur dann
+per Shuffle “erreichen”, wenn dieser Nachbar (Lane <span
+class="math inline">L+k</span>) noch innerhalb desselben Warps liegt,
+also <span class="math inline">L + k \le 31</span> gilt. Je größer <span
+class="math inline">k</span>, desto weniger Threads erfüllen diese
+Bedingung (Für die <strong>linken</strong> Nachbarn funktioniert
+dieselbe Logik spiegelverkehrt: Bedingung <span class="math inline">L -
+k \ge 0</span>):
+<ul>
+<li><span class="math inline">k=1</span>: 31 von 32 Threads können
+shuffeln. Nur der Thread ganz rechts (Lane 31) hat keinen rechten
+Nachbarn mehr im Warp.</li>
+<li><span class="math inline">k=2</span>: 30 von 32 Threads</li>
+<li><span class="math inline">k=4</span>: 28 von 32 Threads</li>
+<li><span class="math inline">k=8</span>: 24 von 32 Threads</li>
+<li><span class="math inline">k=16</span>: 16 von 32 Threads</li>
+<li><span class="math inline">k=32</span>: 0 von 32 Threads. Ab hier ist
+Shuffle vollständig ausgeschlossen.</li>
+<li><span class="math inline">k&gt;32</span>: ebenfalls 0 von 32
+Threads</li>
+</ul>
+Für alle Schrittweiten ab <span class="math inline">k=32</span> ist
+Shuffle also von vornherein nicht einsetzbar. Erst für die letzten,
+kleinen Passes (<span class="math inline">k &lt; 32</span>) wird
+überhaupt ein Teil der Threads <em>shuffle-fähig</em>, wobei auch dort
+der nutzbare Anteil mit wachsendem <span class="math inline">k</span>
+abnimmt.</li>
+</ol>
+<p><em>Implementierungsaufwand und Warp-Divergenz</em></p>
+<p>Eine Umsetzung würde für jeden Thread diverse
+<code>if</code>-Abfragen erfordern. Es muss geprüft werden ob der
+Nachbar bei gegebener <code>step_size</code> tatsächlich innerhalb
+desselben Warps liegt. Ist das nicht der Fall, muss es einen
+Fallback-Pfad geben, der auf Global Memory basiert. Da innerhalb eines
+Warps dann ein Teil der Threads den Shuffle-Pfad und ein anderer Teil
+den Global-Memory-Pfad nimmt, divergiert der Warp an dieser Stelle
+(<em>Warp Divergenz</em>). Dieser Effekt kann dann einen Großteil des
+theoretischen Shuffle-Vorteils wieder aufheben und im ungünstigsten Fall
+verschlechtert sich die Performance sogar gegenüber der naiven, rein
+VRAM-basierten Variante.</p>
+<p><em>Fazit</em></p>
+<p>Sowohl die Analyse zu Shared Memory zuvor als auch die hier
+dargelegten Überlegungen zu Shuffle deuten für die
+Schrittweiten-Charakteristik von JFA auf <strong>keinen</strong>
+Performancegewinn hin: Shuffle wäre lediglich auf
+<strong>kleine</strong> Schrittweiten (<span class="math inline">k &lt;
+32</span>) und auf 2 der 8 Nachbarn anwendbar, wodurch zusätzliche
+Index-Berechnungen, Index-Prüfungen und Warp-Divergenz resultieren
+würden. Aus diesem Grund wird eine <em>JFA-Shuffle-Variante</em> nicht
+implementiert. Der Ansatz wird an dieser Stelle dennoch dokumentiert, da
+er im Rahmen der Optimierungsüberlegungen diskutiert und geprüft
+wurde.</p>
+<p><strong>Ausblick: JFA+ und JFA*</strong></p>
+<p>Eine interessante Weiterentwicklung stellen die von <strong>Maciej A.
+Czyzewski (2019)</strong> vorgeschlagenen Varianten <em>JFA+</em> und
+<em>JFA*</em> dar. Beide adressieren das Problem der “leeren”
+Grid-Bereiche im klassischen JFA, in denen keine Daten vorhanden sind
+und damit Zeit verloren geht. Als Lösung wird vorgeschlagen, leere
+Grid-Bereiche mit zufälligem Rauschen zu befüllen, sodass auch initial
+undefinierte Zellen früh Informationen zu Punkten erhalten. Ziel ist es,
+den Algorithmus dadurch in einer geringeren Anzahl von Schritten
+durchzuführen, wodurch die Gesamtlaufzeit reduziert werden soll:</p>
+<ul>
+<li>Foliensatz: <a
+href="https://maciejczyzewski.github.io/fast_gpu_voronoi/slides_small.pdf">PDF</a></li>
+<li>Implementierung: <a
+href="https://github.com/maciejczyzewski/fast_gpu_voronoi">Git-Hub
+Repository</a></li>
+</ul>
+<p>Wichtig zu erwähnen ist, dass eine formale Analyse bzw. ein Beweis
+dieser Schrittzahl bislang aussteht. Trotzdem soll im Rahmen dieser
+Arbeit diese mögliche Idee aufgeführt und genannt werden, da die zuvor
+eigenentwickelten Optimierungsversuche keinen Laufzeitvorteil gegenüber
+dem klassischen JFA erzielen konnten.</p>
+<h1 id="aufgabe-6c---jump-flooding-in-out-ansatz">Aufgabe 6c - Jump
+Flooding In-Out-Ansatz</h1>
+<p><em>Welche Limitation hat der bisher implementierte JFA
+Algorithmus?</em></p>
+<p>Der bisherige JFA Algorithmus verwendet zwei Pixelraster welche
+abwechselnd gelesen und geschrieben werden. Es sind zwei Raster nötig,
+da sonst unvollständige Werte in das Raster geschrieben werden könnten,
+wodurch es zu Race-Conditions kommt. Eine Folge davon könnte sein, dass
+beim Lesen eines Punktes die <code>x</code>-Komponente und die
+<code>y</code>-Komponente von verschiedenen Punkten verwendet
+werden.</p>
+<p><em>Welche Nachteile bringen zwei Raster?</em></p>
+<p>Zwei Raster haben einige Nachteile. Zum einen ist mehr Speicher auf
+der GPU erforderlich und zum anderen muss der Algorithmus ständig die
+Zeiger auf die Raster nach jedem Kernel-Aufruf wechseln. Zudem kann es
+auch sein, dass die GPU die Caches schlechter ausnutzen kann, da es
+doppelt so viele Daten zu verarbeiten gibt.</p>
+<p><em>Sind zwei Raster tatsächlich nötig?</em></p>
+<p>Beim Algorithmus wird bei jedem Kernel-Aufruf pro Thread nur ein
+Pixel bearbeitet. Ob ein anderer Thread den Pixel aus dieser Iteration
+oder aus der nächsten Iteration liest, ist dabei tatsächlich nicht
+wichtig, da nur der nächste Nachbar relevant ist. Es muss also nur
+verhindert werden, dass ein ungültiger Punkt gelesen wird. Da der
+lesende Zugriff auf Pixel räumlich-weit reicht, vorallem in den ersten
+Iterationen, können die im Kurstext beschriebenen
+Synchronisations-Methoden nur schwer angewendet werden. Des Weiteren
+würden Synchronisations-Methoden vermutlich den Algorithmus langsamer
+machen. Um diese Problematik zu umgehen werden Punkte und das Raster
+separat gespeichert. Statt die Koordinaten der Punkte im Raster zu
+verwalten, werden Verweise auf die Punkte im Raster gespeichert. Diese
+Indirektion führt dazu, dass mehr Daten aus dem Global-Memory gelanden
+werden, aber dafür kann auf das zweite Raster verzichtet werden.</p>
+<p>Ein weiterer Vorteil der sich hieraus ergibt, ist, dass für die
+Punkt-Koordinaten wieder <code>float32</code> statt <code>int32</code>
+verwendet werden kann.</p>
+<p>Um die Warp-Divergence niedrig zu halten werden zudem alle Verweise
+im Raster, welche initial keinen Punkt zugewiesen bekommen haben, auf
+den ersten Punkt der Eingabe gesetzt. Auf diese Weise kann zur
+Kernel-Laufzeit auf Prüfungen der Punkte verzichtet werden.</p>
+<p><em>Wie ändert sich die Laufzeit beim verwenden nur eines
+Rasters?</em></p>
+<p>Folgene Abbildungen geben die Laufzeiten des beschriebenen Ansatzes
+an.</p>
+<table>
+<colgroup>
+<col style="width: 49%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>RTX 5070</th>
+<th>GTX 1660 Ti</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_inout_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_jfa_inout_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png" /></td>
+</tr>
+<tr class="even">
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-RTX-5070_jfa_square_euclidean_jfa_inout_square_euclidean_resolution=128_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_jfa_square_euclidean_jfa_inout_square_euclidean_resolution=128_points=64,128,256,512.png" /></td>
+</tr>
+</tbody>
+</table>
+<p>Es ist zu sehen, dass für die Eingabe-Größen <code>512</code> und
+<code>2048</code> des Raster eine Verbesserung der Laufzeit zu erkennen
+ist. Die anderen Größen sind in einem ähnlichen Wertebereich wie zuvor.
+Erstaunlicherweise ist der Algorithmus bei der <code>RTX 5070</code>
+schneller, wenn die Eingabe-Größe des Raster <code>512</code> statt
+<code>128</code> ist. Der Grund hierfür konnte aus zeitlichen Gründen
+leider nicht bestimmt werden.</p>
+<h1 id="aufgabe-7---ergebnisse">Aufgabe 7 - Ergebnisse</h1>
+<blockquote>
+<p>[!NOTE] <strong>Maximale Pfadlänge unter Windows</strong></p>
+<p>Windows begrenzt Pfade auf <a
+href="https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=registry">260
+Zeichen</a>. Da die Dateinamenerstellung der Performanceplots in Aufgabe
+7 diese Grenze überschreiten können, wurde die Option eines Identifiers
+eingeführt - in diesem Fall <code>final</code>. Ohne diesen schlägt das
+Speichern mit
+<code>FileNotFoundError: [Errno 2] No such file or directory: ...</code>
+fehl, weil der gesamte Pfad zu lang ist.</p>
+</blockquote>
+<p>Abschließend werden die besten Algorithmen gemeinsam betrachtet und
+gegenübergestellt. Die folgenden Diagramme zeigen die Laufzeiten der
+jeweiligen Kernel für eine feste Bildgröße von <span
+class="math inline">128 \times 128</span> und eine variierende Anzahl an
+Punkten:</p>
+<table>
+<colgroup>
+<col style="width: 49%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>RTX 5070</th>
+<th>GTX 1660 Ti</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-RTX-5070_final_resolution=128_points=64,128,256,512.png" /></td>
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_final_resolution=128_points=64,128,256,512.png" /></td>
+</tr>
+</tbody>
+</table>
+<p>Der Pixel-Algorithmus ist vor allem bei einer geringen Punktemenge
+sehr schnell und weist eine deutlich bessere Laufzeit als der JFA auf.
+Mit zunehmender Anzahl von Punkten im Diagramm nimmt die Laufzeit jedoch
+quadratisch zu. Ab einer bestimmten Anzahl greift die JFA-Charakteristik
+und der JFA ist schneller. Dieser Übergang erfolgt je nach
+Implementierung des Pixel-Algorithmus zu einem späteren Zeitpunkt, aber
+irgendwann wird der Schnittpunkt zwingend erreicht.</p>
+<p>Das gleiche Diagramm wurde für die Bildgröße <span
+class="math inline">2048 \times 2048</span> erstellt um diesen
+Schnittpunkt zu zeigen.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>RTX 5070</th>
+<th>GTX 1660 Ti</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-RTX-5070_final_resolution=2048_points=64,128,256,512.png" /></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><em>Welche der Optimierungen hat den größten Laufzeit-gewinn
+erbracht?</em></p>
+<p><em>Wie viel schneller ist die Finale Implementation im Vergleich zur
+Naiven Implementation?</em></p>
+<p><em>Ausblick</em></p>
+<h1 id="anhang">Anhang</h1>
+<blockquote>
+<p>[!NOTE] <strong>Einschränkung bei Keyword (Named)-Arguments in
+CUDA-Kernels</strong></p>
+<p>Je nach installierter <strong>Numba</strong>-Version kann es zu
+Problemen kommen, wenn innerhalb eines CUDA-Kernels Keyword-Arguments
+(benannte Argumente) für Device-Funktionen verwendet werden.</p>
+<ul>
+<li><strong>Problem:</strong> Die Kompilierung schlägt fehl und scheint
+direkt bei der Kernel-Signatur “stehenzubleiben”. Der Traceback zeigt
+jedoch, dass die Ursache weiter unten im Kernel liegt. Ein Aufruf der
+Art <code>get_thread_position(image=out_image)</code> kann nicht
+verarbeitet werden</li>
+<li><strong>Lösung:</strong> Den Aufruf auf positionale Argumente
+umstellen: <code>get_thread_position(out_image)</code></li>
+</ul>
+<p>Verwendete Versionen anzeigen: <code>pip freeze</code></p>
+</blockquote>
+<blockquote>
+<p>[!NOTE] <strong>Fokussierung der hardwarenahen Optimierung auf die
+NVIDIA GeForce RTX 5070</strong></p>
+<p>Für die Performance-Optimierung werden hardwarespezifische Daten
+mithilfe der NVIDIA Profiling Tools <code>nsys</code>, <code>ncu</code>
+sowie der Numba Funktion <code>.inspect_asm()</code> erzeugt. Um eine
+saubere Vergleichbarkeit der Messergebnisse zu gewährleisten und den
+Umfang der erzeugten Dateien nicht zu sprengen, beschränken sich die
+hardwarenahen Analysen auf die <strong>NVIDIA GeForce RTX 5070</strong>.
+Die Performance-Diagramme werden weiterhin für beide GPUs erstellt.</p>
+</blockquote>
+</body>
+</html>
