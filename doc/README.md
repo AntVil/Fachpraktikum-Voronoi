@@ -1077,7 +1077,7 @@ Zwei Raster haben einige Nachteile. Zum einen ist mehr Speicher auf der GPU erfo
 
 _Sind zwei Raster tatsächlich nötig?_
 
-Beim Algorithmus wird bei jedem Kernel-Aufruf pro Thread nur ein Pixel beschrieben. Ob ein anderer Thread den Pixel aus dieser Iteration oder aus der nächsten Iteration liest, ist dabei tatsächlich nicht wichtig, da nur der nächste Nachbar relevant ist. Es muss also nur verhindert werden, dass ein ungültiger Punkt gelesen wird. Da der lesende Zugriff auf Pixel weit reicht, vorallem in den ersten Iterationen, können die im Kurstext beschriebenen Synchronisations-Methoden nur schwer angewendet werden. Des Weiteren würden Synchronisations-Methoden vermutlich den Algorithmus langsamer machen. Um diese Problematik zu umgehen werden Punkte und das Raster separat gespeichert. Statt die Koordinaten der Punkte im Raster zu verwalten, werden Verweise auf die Punkte im Raster gespeichert. Diese Indirektion führt dazu, dass mehr Daten aus dem Global-Memory gelanden werden, aber dafür kann auf das zweite Raster verzichtet werden.
+Beim Algorithmus wird bei jedem Kernel-Aufruf pro Thread nur ein Pixel bearbeitet. Ob ein anderer Thread den Pixel aus dieser Iteration oder aus der nächsten Iteration liest, ist dabei tatsächlich nicht wichtig, da nur der nächste Nachbar relevant ist. Es muss also nur verhindert werden, dass ein ungültiger Punkt gelesen wird. Da der lesende Zugriff auf Pixel räumlich-weit reicht, vorallem in den ersten Iterationen, können die im Kurstext beschriebenen Synchronisations-Methoden nur schwer angewendet werden. Des Weiteren würden Synchronisations-Methoden vermutlich den Algorithmus langsamer machen. Um diese Problematik zu umgehen werden Punkte und das Raster separat gespeichert. Statt die Koordinaten der Punkte im Raster zu verwalten, werden Verweise auf die Punkte im Raster gespeichert. Diese Indirektion führt dazu, dass mehr Daten aus dem Global-Memory gelanden werden, aber dafür kann auf das zweite Raster verzichtet werden.
 
 Ein weiterer Vorteil der sich hieraus ergibt, ist, dass für die Punkt-Koordinaten wieder `float32` statt `int32` verwendet werden kann.
 
@@ -1101,13 +1101,19 @@ Es ist zu sehen, dass für die Eingabe-Größen `512` und `2048` des Raster eine
 >
 > Windows begrenzt Pfade auf [260 Zeichen](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=registry). Da die Dateinamenerstellung der Performanceplots in Aufgabe 7 diese Grenze überschreiten können, wurde die Option eines Identifiers eingeführt - in diesem Fall `final`. Ohne diesen schlägt das Speichern mit `FileNotFoundError: [Errno 2] No such file or directory: ...` fehl, weil der gesamte Pfad zu lang ist.
 
-Abschließend werden beide Algorithmen gemeinsam betrachtet und gegenübergestellt. Die folgenden Diagramme zeigen die Laufzeiten der jeweiligen Kernel für eine feste Bildgröße von $128 \times 128$ und eine variierende Anzahl an Punkten:
+Abschließend werden die besten Algorithmen gemeinsam betrachtet und gegenübergestellt. Die folgenden Diagramme zeigen die Laufzeiten der jeweiligen Kernel für eine feste Bildgröße von $128 \times 128$ und eine variierende Anzahl an Punkten:
 
 | RTX 5070                                                                                             | GTX 1660 Ti                                                                                             |
 | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_final_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_final_resolution=128_points=64,128,256,512.png) |
 
 Der Pixel-Algorithmus ist vor allem bei einer geringen Punktemenge sehr schnell und weist eine deutlich bessere Laufzeit als der JFA auf. Mit zunehmender Anzahl von Punkten im Diagramm nimmt die Laufzeit jedoch quadratisch zu. Ab einer bestimmten Anzahl greift die JFA-Charakteristik und der JFA ist schneller. Dieser Übergang erfolgt je nach Implementierung des Pixel-Algorithmus zu einem späteren Zeitpunkt, aber irgendwann wird der Schnittpunkt zwingend erreicht.
+
+Das gleiche Diagramm wurde für die Bildgröße $2048 \times 2048$ erstellt um diesen Schnittpunkt zu zeigen.
+
+RTX 5070                                                                                             | GTX 1660 Ti                                                                                             |
+|-|-|
+|![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_final_resolution=2048_points=64,128,256,512.png)||
 
 _Welche der Optimierungen hat den größten Laufzeit-gewinn erbracht?_
 

@@ -20,7 +20,7 @@ from utils import (
 T = TypeVar("T")
 
 # Different sizes for the resolution
-RESOLUTION_SIZES = np.array([
+RESOLUTION_SIZES: np.ndarray[tuple[int], np.dtype[np.int64]] = np.array([
     2**7,  # 128
     2**8,  # 256
     2**9,  # 512
@@ -35,7 +35,7 @@ RESOLUTION_SIZES = np.array([
 # TODO: 2^16 might be a bit big; We will see ...
 
 # Different values for the seeds (points) in the diagram
-POINT_COUNTS = np.array([
+POINT_COUNTS: np.ndarray[tuple[int], np.dtype[np.int64]] = np.array([
     2**6,
     2**7,
     2**8,
@@ -122,8 +122,11 @@ def kernel_performance_analysis(kernel: MeasurableKernel) -> None:
 
 def kernel_performance_analysis_compare(
     kernels: list[MeasurableKernel],
-    plot_identifier: str | None = None
+    plot_identifier: str | None = None,
+    resolution_size_index: int = 0
 ) -> None:
+    assert 0 <= resolution_size_index < len(RESOLUTION_SIZES), "Unknown resolution size index"
+
     performances: list[tuple[str, np.ndarray[tuple[int], np.dtype[np.float32] | np.dtype[np.float64]]]] = []
     for kernel in kernels:
         metrics = compute_performance_metrics(
@@ -136,12 +139,12 @@ def kernel_performance_analysis_compare(
         performances.append(
             (
                 kernel.get_name(),
-                np.median(metrics[0], axis=1)
+                np.median(metrics[resolution_size_index], axis=1)
             )
         )
 
     create_kernel_performance_plot(
-        resolution=RESOLUTION_SIZES[0],
+        resolution=RESOLUTION_SIZES[resolution_size_index],
         input_sizes=POINT_COUNTS,
         performances=performances,
         plot_identifier=plot_identifier

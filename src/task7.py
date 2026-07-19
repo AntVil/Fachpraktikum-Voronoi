@@ -1,8 +1,11 @@
+import re
+
 from utils import (
     get_up_to_two_arguments,
 )
 
 from task2 import (
+    RESOLUTION_SIZES,
     MeasurableKernel,
     PixelAlgorithm,
     JFAPingPongAoSAlgorithm,
@@ -81,9 +84,25 @@ def main() -> None:
         if identifier is None or identifier == "":
             print("Warning: Not specifying an identifier may result long file names")
 
+        parts = command.split("-")[1:]
+
+        if len(parts) == 0:
+            print(f"Error: unknown command '{command} {identifier}'")
+            exit(1)
+
+        match = re.match(pattern=r"^\d+$", string=parts[0])
+        resolution_size_index: int
+        if not match is None:
+            resolution_size_index = list(RESOLUTION_SIZES).index(int(match.group(0))) # type: ignore
+            parts.pop(0)
+        else:
+            resolution_size_index = 0
+
+
         kernel_performance_analysis_compare(
-            kernels=list(map(lambda k: kernels_dictionary[k], command.split("-")[1:])),
-            plot_identifier=identifier
+            kernels=list(map(lambda k: kernels_dictionary[k], parts)),
+            plot_identifier=identifier,
+            resolution_size_index=resolution_size_index
         )
     else:
         print(f"Error: unknown command '{command} {identifier}'")
