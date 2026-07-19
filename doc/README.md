@@ -9,18 +9,18 @@
 
 # Vorgehen und Aufbau
 
-Um ein strukturiertes Vorgehen zu gewährleisten wurde vorab ein Konzept entwickelt. Es beginnt mit dem ersten Abschnitt bei dem das Thema dieses Projekts klar beschrieben und abgesteckt wird.
+Um ein strukturiertes Vorgehen zu gewährleisten, wurde vorab ein Konzept entwickelt. Es beginnt mit dem ersten Abschnitt, bei dem das Thema dieses Projekts klar beschrieben und abgesteckt wird.
 Im darauf folgendem Abschnitt wird ein Performance-Analyse-Konzept entwickelt und implementiert, um in allen anderen Abschnitten einheitliche Zeitmessungen und Analysen durchzuführen.
-Der dritte Abschnitt befasst sich mit einer Naiven Implementation, wobei geklärt wird wie und warum diese funktioniert. Danach werden in Abschnitt vier und fünf die aus dem Kurs-Text erlernten Optimierungs-Verfahren angewandt. In Abschnitt sechs wird ein Algorithmus aus der Literatur erklärt, implementiert und mit dem bisherigem Algorithmus verglichen.
+Der dritte Abschnitt befasst sich mit einer naiven Implementation, wobei geklärt wird, wie und warum diese Implementation funktioniert. Danach werden in Abschnitt vier und fünf die aus dem Kurs-Text erlernten Optimierungs-Verfahren angewandt. In Abschnitt sechs wird ein Algorithmus aus der Literatur erklärt, implementiert und mit dem bisherigem Algorithmus verglichen.
 Zuletzt wird in Abschnitt sieben eine finale Analyse und Zusammenfassung der Ergebnisse dargelegt.
 
 # Aufgabe 1 - Beschreibung des Problems
 
 _Was ist das Problem?_
 
-Ein Voronoi-Diagramm ist eine Aufteilung eines Raumes. Für eine gegebene Punkte-Menge wird diese Aufteilung berechnet, wobei jeder Punkt genau einer Region zugeordnet wird. Das Ziel ist es, den Raum so in Regionen zu unterteilen, dass alle Punkte innerhalb einer Region als nächst gelegenen Nachbarn den Punkt, der innerhalb der Region liegt, haben. Je nachdem welche Distanz-Metrik verwendet wird sieht das Voronoi-Diagramm unterschiedlich aus.
+Ein Voronoi-Diagramm ist eine Aufteilung eines Raumes. Für eine gegebene Punkte-Menge wird diese Aufteilung berechnet, wobei jeder Punkt genau einer Region zugeordnet wird. Das Ziel ist es, den Raum so in Regionen zu unterteilen, dass alle Punkte innerhalb einer Region als nächst gelegenen Nachbarn den Punkt, der innerhalb der Region liegt, haben. Je nachdem, welche Distanz-Metrik verwendet wird, sieht das Voronoi-Diagramm unterschiedlich aus.
 
-Als Beispiel wurden folgende Visualisierungen erstellt für die gleiche Punkte-Menge mit Unterschiedlichen Distanz-Funktionen.
+Als Beispiel wurden folgende Visualisierungen für die gleiche Punkte-Menge mit Unterschiedlichen Distanz-Funktionen erstellt.
 
 | Euklidische Distanz                            | Manhattan Distanz                              | Maximale Distanz                                  |
 | ---------------------------------------------- | ---------------------------------------------- | ------------------------------------------------- |
@@ -30,13 +30,13 @@ Die Regionen im Voronoi-Diagramm werden Voronoi-Regionen genannt.
 
 _Was sind verwandte Probleme die nicht berücksichtigt werden?_
 
-Um den Rahmen des Projekts abzugrenzen, werden verwandte Problemstellungen wie die Delaunay Triangulation oder Voronoi-Diagramme im mehr-dimensionalen Raum nicht betrachtet. In diesem Projekt werden lediglich diskrete Voronoi-Diagramme berechnet. Es ist somit nicht von Bedeutung die tatsächlichen Voronoi-Regionen zu bestimmen, sondern nur das finale Diagramm. Bei den Distanz-Funktionen steht die Euklidische-Distanz im Vordergrund. Die Manhattan-Distanz wird an einigen Stellen als Exkurs betrachtet.
+Um den Rahmen des Projekts abzugrenzen, werden verwandte Problemstellungen, wie die Delaunay Triangulation oder Voronoi-Diagramme im mehr-dimensionalen Raum, nicht betrachtet. In diesem Projekt werden lediglich diskrete Voronoi-Diagramme berechnet. Es ist somit nicht von Bedeutung die tatsächlichen Voronoi-Regionen zu bestimmen, sondern nur das finale Diagramm. Bei den Distanz-Funktionen steht die Euklidische-Distanz im Vordergrund. Die Manhattan-Distanz wird an einigen Stellen als Exkurs betrachtet.
 
 _Was wird berechnet?_
 
 Da das Diagramm auf der GPU berechnet wird, wird ein Pixelraster (Gitter) verwendet. Für jeden Pixel $(x, y)$ des Zielbildes wird der Abstand zum nächstgelegenen Punkt bestimmt. Am Ende wird jeder Pixel dem Punkt zugewiesen, zu dessen Voronoi-Region dieser gehört.
 
-Es gibt eine Besonderheit die hierbei zu beachten ist. Bei diskreten Pixeln kann es dazu kommen, dass ein Pixel nächster Nachbar zu zwei Punkten wäre. Dieser Sonderfall ist bei dem Voronoi-Diagramm mit Manhattan-Distanz noch stärker ausgeprägt, da hierbei die Grenzen zwischen zwei Voronoi-Regionen sogar Flächen sein können. Um diese Problematik zu umgehen und einen eindeutigen nächsten Nachbar zu garantieren, wird bei zwei Punkten mit gleichem Abstand der Punkt der weiter am Anfang der Eingabe liegt gewählt.
+Es gibt eine Besonderheit die hierbei zu beachten ist. Bei diskreten Pixeln kann es dazu kommen, dass ein Pixel nächster Nachbar zu zwei Punkten wäre. Dieser Sonderfall ist bei dem Voronoi-Diagramm mit Manhattan-Distanz noch stärker ausgeprägt, da hierbei die Grenzen zwischen zwei Voronoi-Regionen sogar Flächen sein können. Um diese Problematik zu umgehen und einen eindeutigen nächsten Nachbar zu garantieren, wird bei zwei Punkten mit gleichem Abstand der Punkt, welcher weiter am Anfang der Eingabe liegt, gewählt.
 
 _Welche Einschränkungen beziehungsweise Annahmen werden gemacht?_
 
@@ -46,7 +46,9 @@ Für dieses Projekt werden die folgenden Einschränkungen und Annahmen getroffen
 
 - Quadratischer Raum: Das Diagramm ist **quadratisch**. Es werden keine rechteckigen Auflösungen der Form $W \times H$ unterstützt, sondern ausschließlich Dimensionen der Form $N \times N$.
 
-- Statische Eingabe Punkte: Die Positionen der Punkte sind nach der Initialisierung fix und verändern sich während der Kernel-Laufzeit nicht.
+- Statische Eingabe-Punkte: Die Positionen der Punkte sind nach der Initialisierung fix und verändern sich nicht während der Kernel-Laufzeit.
+
+- Eingabe Punkte liegen innerhalb des Diagramm
 
 _Was ist die Eingabe und Ausgabe und welcher Daten-Typ wird genutzt?_
 
@@ -58,9 +60,9 @@ Für die Berechnung des Voronoi-Diagramms sind folgende Parameter definiert:
 | **Punkte**        | Ein Array, das die 2D-Koordinaten der im Raum verteilten Punkte enthält | `float32` / `int32` |
 | **Ausgabe-Grid**  | Das resultierende zweidimensionale Bildraster/Voronoi-Diagramm          | `int32`             |
 
-Für Punkte wurden die Daten-Typen `float32` beziehungsweise `int32` gewählt, da es gewisse Algorithmen gibt, welche auf `int32` angewiesen sind (siehe _Aufgabe 6_). Andere Algorithmen können sowohl `int32` als auch `float32` verarbeiten. Da es an einigen Stellen vorteilhaft ist `float32` Werte zu haben, wird als alternativer Daten-Typ auch `float32` erlaubt.
+Für Punkte wurden die Daten-Typen `float32`, beziehungsweise `int32` gewählt, da es gewisse Algorithmen gibt, welche auf `int32` angewiesen sind (siehe _Aufgabe 6_). Andere Algorithmen können sowohl `int32`, als auch `float32` verarbeiten. Da es an einigen Stellen vorteilhaft ist `float32` Werte zu haben, wird als alternativer Daten-Typ auch `float32` erlaubt.
 
-Für machen Algorithmen werden zusätzliche Eingaben erlaubt, welche für die Berechnung nötig sind, dies betrifft erneut die Algorithmen aus _Aufgabe 6_.
+Für manchen Algorithmen werden zusätzliche Eingaben erlaubt, welche für die Berechnung nötig sind. Dies betrifft erneut die Algorithmen aus _Aufgabe 6_.
 
 _Welche Parameter sind entscheidend für das Problem und welchen Einfluss haben diese?_
 
@@ -68,7 +70,7 @@ Für die Algorithmen aus diesem Projekt gibt es zwei entscheidende Parameter, we
 
 1. Die Bildauflösung ($N$): Mit steigender Auflösung wächst die Anzahl der zu berechnenden Pixel quadratisch ($N^2$).
 
-2. Die Anzahl der im Raum zufällig verteilten Punkte, die bei der Distanzberechnung berücksichtigt werden müssen.
+2. Die Anzahl der im Raum zufällig verteilten Punkte, welche bei der Distanzberechnung berücksichtigt werden müssen.
 
 # Aufgabe 2 - Performance Analyse Konzept
 
@@ -76,17 +78,17 @@ _Wie werden im folgenden Performance Analysen durchgeführt?_
 
 Für die Performance-Analyse werden die Aufnahme der Messergebnisse und die daraus resultierende Generierung der Diagramme getrennt.
 
-Aufgrund der unterschiedlichen Algorithmenstrukturen und Kernelsignaturen ist das einheitliche Messen von Zeiten etwas erschwert. Um die Zeitmessungen dennoch zu vereinheitlichen wurde das `Protocol` (auch bekannt als _abstrakte Klasse_) `MeasurableKernel` eingeführt. Für jede Klasse von Algorithmus wird eine Kind-Klasse von `MeasurableKernel` geschrieben (zum Beispiel `PixelAlgorithm`). Die Kind-Klasse hat die Aufgabe den Aufruf des Algorithmus zu abstrahieren, sodass die Routine `compute_performance_metrics` eine beliebige Instanz von einer Kind-Klasse von `MeasurableKernel` erhalten und verarbeiten kann.
+Aufgrund der unterschiedlichen Algorithmen-Strukturen und Kernel-Signaturen, ist das einheitliche Messen von Zeiten etwas erschwert. Um die Zeitmessungen dennoch zu vereinheitlichen, wurde das `Protocol` (auch bekannt als _abstrakte Klasse_) `MeasurableKernel` eingeführt. Für jede Klasse von Algorithmus wird eine Kind-Klasse von `MeasurableKernel` geschrieben (zum Beispiel `PixelAlgorithm`). Die Kind-Klasse hat die Aufgabe den Aufruf des Algorithmus zu abstrahieren, sodass die Routine `compute_performance_metrics` eine beliebige Instanz von einer Kind-Klasse von `MeasurableKernel` erhalten und verarbeiten kann.
 
-Die Routine `compute_performance_metrics` verwendet zwei CUDA-Events (`cuda.event(timing=True)`) um die Zeitmessung auf der GPU durchzuführen. Ein `cuda.synchronize()` stellt sicher, dass die GPU alle Berechnungen vollständig abgeschlossen hat, bevor die finale Laufzeit in Millisekunden via `.elapsed_time()` auf der CPU bestimmt wird. Gemessen wird ausschließlich die reine Ausführungszeit des Kernels auf der GPU für die Berechnung des Voronoi-Diagramms. Die Messungen werden für mehrere vordefinierte Eingabe-Größen durchgeführt. Für jede dieser Größen wird 20-mal die Zeitmessung durchgeführt. Für die erstellten Diagramme wird dann der Median pro Eingabe verwendet.
+Die Routine `compute_performance_metrics` verwendet zwei CUDA-Events (`cuda.event(timing=True)`), um die Zeitmessung auf der GPU durchzuführen. Ein `cuda.synchronize()` stellt sicher, dass die GPU alle Berechnungen vollständig abgeschlossen hat, bevor die finale Laufzeit in Millisekunden via `.elapsed_time()` auf der CPU bestimmt wird. Gemessen wird ausschließlich die reine Ausführungszeit des Kernels auf der GPU für die Berechnung des Voronoi-Diagramms. Die Messungen werden für mehrere vordefinierte Eingabe-Größen durchgeführt. Für jede dieser Größen wird 20-mal die Zeitmessung durchgeführt. Für die erstellten Diagramme wird dann der Median pro Eingabe verwendet.
 
 _Wie wird die Zeit für das kompilieren und den Daten-Transfer in der Analyse berücksichtigt?_
 
 Um saubere Messergebnisse zu erhalten, werden vorab fünf _Dry Warm-up_ Durchläufe durchgeführt. Dadurch wird sichergestellt, dass die erste Just-In-Time-Kompilierung (JIT) des Kernels die eigentlichen Performance-Messungen zeitlich nicht verfälscht.
 
-Es werden **keine** Transferzeiten wie Host-to-Device (H2D) oder Device-to-Host (D2H) berücksichtigt. Um die Transfer-Zeit aus den Analysen auszuschließen wird der Daten-Transfer manuell mit `to_device` durchgeführt, bevor die `record` Methode der Cuda-Events aufgerufen wird.
+Es werden **keine** Transferzeiten, wie Host-to-Device (H2D) oder Device-to-Host (D2H), berücksichtigt. Um die Transfer-Zeit aus den Analysen auszuschließen, wird der Daten-Transfer manuell mit `to_device` durchgeführt, bevor die `record` Methode der Cuda-Events aufgerufen wird.
 
-_Welche Eingabe- beziehungsweise Ausgabe-Größen werden verwendet?_
+_Welche Eingabe-, beziehungsweise Ausgabe-Größen werden verwendet?_
 
 Für die **Eingabe** werden folgende Größen variiert:
 
@@ -106,15 +108,16 @@ Zur visuellen Auswertung der Ergebnisse (**Ausgabe**) stehen zwei Diagrammtypen 
 
 # Aufgabe 3 - Naive Implementation
 
-_Wie viele Threads werden gestartet und welche Aufgabe hat ein jeder?_
+_Wie viele Threads werden gestartet und welche Aufgabe hat ein
+Jeder?_
 
 Für jeden Pixel des Ergebnis wird ein Thread initialisiert. Jeder Thread iteriert durch alle Punkte und berechnet die Distanz zu jedem Punkt. Der Punkt mit der geringsten Distanz wird dabei gefunden und das Ergebnis in die Ausgabe geschrieben.
 
-_Wie wird entschieden ob ein Punkt nächster Nachbar ist?_
+_Wie wird entschieden, ob ein Punkt nächster Nachbar ist?_
 
-Beim iterieren wird die Distanz zu jedem Punkt mit Hilfe von `cuda.libdevice.hypotf` berechnet und der Index des am nächsten liegenden Punkt gespeichert. Wenn nun ein Punkt mit geringerer Distanz gefunden wird, wird der Index überschrieben.
+Beim iterieren wird die Distanz zu jedem Punkt, mit Hilfe von `cuda.libdevice.hypotf` berechnet und der Index, des am nächsten liegenden Punkt, gespeichert. Wenn nun ein Punkt mit geringerer Distanz gefunden wird, wird der Index überschrieben.
 
-Folgende Animation gibt an, wie das Ergebnis nach jeder Iteration, also Hinzunahme eines weiteren Punkt, aussieht.
+Folgende Animation gibt an, wie das Ergebnis nach jeder Iteration, also Hinzunahme eines weiteren Punktes, aussieht.
 
 | Voronoi                                        | Distanzen                                            |
 | ---------------------------------------------- | ---------------------------------------------------- |
@@ -123,19 +126,19 @@ Folgende Animation gibt an, wie das Ergebnis nach jeder Iteration, also Hinzunah
 Aus dieser Animation ist ersichtlich, dass jeder Pixel immer den bisherigen nächsten Nachbar verwaltet und inkrementell weitere Punkte hinzunimmt. In der beistehenden Animation sind die Distanzen zu sehen. Hierbei ist zu erkennen, dass die Distanzen sich mit jeder Iterationen verringern (oder gleich bleiben).
 
 > [!note]
-> Die berechneten Distanzen wurden aus dem Wertebereich $0$ bis $\sqrt{2}$ in den Wertebereich $0$ bis $255$ abgebildet. Zur besseren Visualisierung wurden die Distanzen mit dem Faktor $4$ hoch-skaliert und an der Oberen-Grenze abgeschnitten. Die Begründung hierfür ist, dass auch bei den letzten Iterationen der Animation noch Änderungen mit bloßem Auge zu erkennen sind. Für andere Animationen der Distanzen wird ebenfalls mit dem gleichen Faktor hoch-skaliert um Vergleiche zu ermöglichen.
+> Die berechneten Distanzen wurden aus dem Wertebereich $0$ bis $\sqrt{2}$,  in den Wertebereich $0$ bis $255$ abgebildet. Zur besseren Visualisierung wurden die Distanzen mit dem Faktor $4$ hoch-skaliert und an der oberen Grenze abgeschnitten. Die Begründung hierfür ist, dass auch bei den letzten Iterationen der Animation noch Änderungen mit bloßem Auge zu erkennen sind. Für andere Animationen der Distanzen wird ebenfalls mit dem gleichen Faktor hoch-skaliert, um Vergleiche zu ermöglichen.
 
 _Wieso arbeitet der Algorithmus korrekt?_
 
-Der Algorithmus arbeitet korrekt, weil für jeden Pixel jeder Punkt bei der Suche nach dem nächsten Nachbar berücksichtigt wird. Es kann also keinen Punkt geben der näher liegt als der berechnete Punkt.
+Der Algorithmus arbeitet korrekt, weil für jeden Pixel jeder Punkt bei der Suche nach dem nächsten Nachbar berücksichtigt wird. Es kann also keinen Punkt geben der näher liegt, als der berechnete Punkt.
 
 _Müssen Race-Conditions beachtet werden?_
 
-Da der Algorithmus für jeden Pixel einen Thread startet und Threads sich um nur deren zugewiesenen Pixel kümmern gibt es keine Race-Conditions. Es müssen also keine Atomic- oder Sync-Operationen durchgeführt werden.
+Da der Algorithmus für jeden Pixel einen Thread startet und Threads sich um nur deren zugewiesenen Pixel kümmern, gibt es keine Race-Conditions. Es müssen also keine Atomic- oder Sync-Operationen durchgeführt werden.
 
 _Gibt es warp divergence in dieser Implementation?_
 
-Diese Implementation hat sehr wenig warp divergence. Bei dem Kernel Aufruf terminieren Threads die Pixel außerhalb des Ergebnis berechnen würden frühzeitig. Die Schleife wird in jedem Thread für jeden Punkt der Eingabe einmal ausgeführt. Das bedeutet jeder Thread führt die Schleife genau gleich-oft aus. An dieser Stelle gibt es also keine warp divergence. Hingegen bei der Verzweigung, ob die neu-berechnete Distanz näher liegt, kann es zu warp divergence kommen. Hierbei gibt es jedoch eine kleine Besonderheit. Die Pixel eines Warp liegen beieinander, weswegen Abstände zu den meisten Punkten ähnlich ausfallen und in vielen Fällen keine warp divergence auftritt.
+Diese Implementation hat sehr wenig warp divergence. Bei dem Kernel Aufruf terminieren Threads, welche Pixel außerhalb des Ergebnis berechnen würden, frühzeitig. Die Schleife wird in jedem Thread für jeden Punkt der Eingabe einmal ausgeführt. Das bedeutet jeder Thread führt die Schleife genau gleich-oft aus. An dieser Stelle gibt es also keine warp divergence. Hingegen bei der Verzweigung, ob die neu-berechnete Distanz näher liegt, kann es zu warp divergence kommen. Hierbei gibt es jedoch eine kleine Besonderheit. Die Pixel eines Warp liegen beieinander, weswegen Abstände zu den meisten Punkten ähnlich ausfallen und in vielen Fällen keine warp divergence auftritt.
 
 _Welche Probleme beziehungsweise Grenzen hat der Kernel?_
 
@@ -145,14 +148,14 @@ _Welche Parameter haben den größten Einfluss auf die Performance und wieso?_
 
 Die Anzahl an Punkten und die Ausgabe-Größe haben den größten Einfluss auf die Performance, da weitere Schleifen-Iterationen durchgeführt beziehungsweise weitere Threads gestartet werden müssen.
 
-Folgendes Diagramm zeigt die Laufzeit für verschiedene Auflösungen und Punktemengen als Matrix. Das Diagram darunter ist für die feste Ausgabe-Größe von `128x128`.
+Folgendes Diagramm zeigt die Laufzeit für verschiedene Auflösungen und Punktemengen als Matrix. Das Diagramm darunter ist für die feste Ausgabe-Größe von `128x128`.
 
 | RTX 5070                                                                                                                                 | GTX 1660 Ti                                                                                                                                 |
 | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png) |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_hypot_resolution=128_points=64,128,256,512.png)                     | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_hypot_resolution=128_points=64,128,256,512.png)                     |
 
-Es ist leicht zu erkennen, dass größenordnungsmäßig ein verdoppeln der Anzahl an Punkten ein verdoppeln der Laufzeit mit sich bringt. Ein verdoppeln der Auflösung führt größenordnungsmäßig zu einem vervierfachen der Laufzeit. Das liegt daran, dass ein verdoppeln der Auflösung dazu führt, dass viermal so viele Pixel berechnet werden müssen.
+Es ist leicht zu erkennen, dass größenordnungsmäßig ein Verdoppeln der Anzahl an Punkten ein Verdoppeln der Laufzeit mit sich bringt. Ein Verdoppeln der Auflösung führt größenordnungsmäßig zu einem Vervierfachen der Laufzeit. Das liegt daran, dass ein Verdoppeln der Auflösung dazu führt, dass viermal so viele Pixel berechnet werden müssen.
 
 Für den Fall `resolution=2048` und `points=512` wurde `ncu` ([Nsight Compute](https://developer.nvidia.com/nsight-compute)) für die `RTX 5070` ausgeführt. Folgender Ausschnitt der Ausgabe ist hierbei wichtig:
 
@@ -178,7 +181,7 @@ Für den Fall `resolution=2048` und `points=512` wurde `ncu` ([Nsight Compute](h
           Start by analyzing workloads in the Compute Workload Analysis section.
 ```
 
-Laut `ncu` lastet der Algorithmus die GPU einigermaßen gut aus. Dem Vorschlag von `ncu` die `Compute Workload` näher zu betrachten wollen wir nachgehen. Um eine nahe-liegende Optimierung zu motivieren, wird als Exkurs die Manhattan-Distanz betrachtet.
+Laut `ncu` lastet der Algorithmus die GPU einigermaßen gut aus. Dem Vorschlag von `ncu`, die `Compute Workload` näher zu betrachten, wollen wir nachgehen. Um eine nahe-liegende Optimierung zu motivieren, wird als Exkurs die Manhattan-Distanz betrachtet.
 
 _Exkurs Manhattan-Distanz: Welchen Einfluss hat die Manhattan-Distanz als alternative Metrik, und wie verändert sich das visuelle Ergebnis?_
 
@@ -195,7 +198,7 @@ Folgende Animation wurde für die Manhattan-Distanz erstellt.
 | ![](../data/task3_manhattan_visualization.gif) | ![](../data/task3_manhattan_field_visualization.gif) |
 
 Der Algorithmus funktioniert auf die gleiche Weise, es gibt jedoch abgesehen von der Ausgabe einen deutlichen Unterschied in der Laufzeit.
-Der gleiche Algorithmus mit Manhattan-Distanz ist deutlich schneller als mit Euklidischer-Distanz, wie folgendes Diagramm zeigt.
+Der gleiche Algorithmus mit Manhattan-Distanz ist deutlich schneller, als mit Euklidischer-Distanz, wie folgendes Diagramm zeigt.
 
 | RTX 5070                                                                                                                             | GTX 1660 Ti                                                                                                                             |
 | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
@@ -228,27 +231,27 @@ Das Ausführen von `ncu` für die Manhattan-Distanz hat folgende Ausgabe geliefe
           Check both the Compute Workload Analysis and Memory Workload Analysis sections.
 ```
 
-In diesem Fall ist der Algorithmus laut `ncu` besser ausgelastet. Es ist zu erkennen, dass die Anzahl an Rechenzyklen stark gesunken ist und damit die Rechenzeit. Um den Algorithmus für die Euklidische-Distanz zu optimieren wäre es also wünschenswert, wenn die Anzahl an Rechenzyklen ebenfalls niedriger wäre. Diese Thematik wollen wir in der nächsten Aufgabe betrachten.
+In diesem Fall ist der Algorithmus laut `ncu` besser ausgelastet. Es ist zu erkennen, dass die Anzahl an Rechenzyklen stark gesunken ist und damit die Rechenzeit. Um den Algorithmus für die Euklidische-Distanz zu optimieren, wäre es wünschenswert, wenn die Anzahl an Rechenzyklen ebenfalls niedriger wäre. Diese Thematik wollen wir im nächsten Abschnitt näher betrachten.
 
 # Aufgabe 4 - Optimierung durch billigere Distanz-Prüfung
 
 _Welche Optimierungen können bei der Distanz-Prüfung problemlos gemacht werden und warum?_
 
-Der bisherige Algorithmus arbeitet jeden Punkt ab und berechnet den Abstand um einen nächsten Nachbar zu bestimmen. Es gibt zwei Ansätze die an dieser Stelle untersucht werden könnten.
+Der bisherige Algorithmus arbeitet jeden Punkt ab und berechnet den Abstand, um einen nächsten Nachbar zu bestimmen. Es gibt zwei Ansätze die an dieser Stelle untersucht werden könnten.
 
 1. Schnellere Distanz Berechnung
 
 Es kann versucht werden das berechnen von Distanz-Funktionen zu verbessern. Hierbei gibt es die Möglichkeit die `sqrt` Funktion aufzurufen.
 
-Ansonsten können mit der `fastmath=True` Annotation schnellere Mathe-Operationen ermöglicht werden. Laut dem [nvidia-numba-cuda-user-guide](https://nvidia.github.io/numba-cuda/user/fastmath.html) werden einige Operationen wie `sqrt` durch schnellere Approximationen ersetzt und Multiplikations- und Additions-Operationen verschmolzen. Da unser Algorithmus nicht die exakten Distanzen benötigt sondern nur Distanzen vergleichen muss ist dies ein klarer Anwendungsfall.
+Ansonsten können mit der `fastmath=True` Annotation schnellere Mathe-Operationen ermöglicht werden. Laut dem [nvidia-numba-cuda-user-guide](https://nvidia.github.io/numba-cuda/user/fastmath.html) werden einige Operationen wie `sqrt` durch schnellere Approximationen ersetzt und Multiplikations- und Additions-Operationen verschmolzen. Da unser Algorithmus nicht die exakten Distanzen benötigt, sondern nur Distanzen vergleichen muss, ist dies ein klarer Anwendungsfall.
 
 Zuletzt kann darauf verzichtet werden die tatsächliche Euklidische Distanz zu berechnen. Da nur Distanzen verglichen werden, können wir auch die quadratische euklidische Distanz vergleichen. Auf den ersten Blick erscheint dies aufwendiger, jedoch kann auf diese Weise auf alle komplizierteren Mathe-Operationen verzichtet werden.
 
 2. Distanz Berechnung überspringen
 
-Es können schnelle Approximationen der Distanz-Funktion verwendet werden um sich die exakte Berechnung einzusparen. Beispielsweise kann der Abstand unter Berücksichtigung nur einer Dimension bestimmt werden. Auf diese Weise können Punkte die definitiv zu Weit entfernt sind übersprungen werden, indem eine Verzweigung eingesetzt wird.
+Es können schnelle Approximationen der Distanz-Funktion verwendet werden, um sich die exakte Berechnung einzusparen. Beispielsweise kann der Abstand, unter Berücksichtigung, nur einer Dimension bestimmt werden. Auf diese Weise können Punkte, die definitiv zu weit entfernt sind, übersprungen werden, indem eine Verzweigung eingesetzt wird.
 
-Um den Rahmen dieses Projekt nicht zu sprengen beschränken wir uns in diesem Projekt nur mit dem ersten Ansatz. Es sei hier jedoch am Rande erwähnt, dass Abzweigungen wie sie im zweiten Ansatz beschrieben sind, vermutlich zu Warp-Divergence führen würden. Dadurch könnten ein solcher Ansatz die Performance potentiell verschlechtern.
+Um den Rahmen dieses Projekt nicht zu sprengen, beschränken wir uns in diesem Projekt nur mit dem ersten Ansatz. Es sei hier jedoch am Rande erwähnt, dass Abzweigungen, wie sie im zweiten Ansatz beschrieben sind, vermutlich zu Warp-Divergence führen würden. Dadurch könnte ein solcher Ansatz die Performance potentiell verschlechtern.
 
 _Welchen Einfluss hat `sqrt` und wieso?_
 
@@ -295,7 +298,7 @@ $L__BB0_6:
 +	selp.b64 	%rd75, %rd76, %rd75, %p24;
 ```
 
-Es ist zu erkennen, dass die `cuda.libdevice.hypotf` zu einem größeren Ausdruck übersetzt wird und innerhalb dieses Ausdruck die intrinsic Funktion `sqrt.rn.f32` aufgerufen wird. Das explizite Ausschreiben des Ausdruck $\sqrt{(a_x - b_x)^2 + (a_y - b_y)^2}$ führt dazu, dass gewisse Anweisungen wegfallen.
+Es ist zu erkennen, dass die `cuda.libdevice.hypotf` zu einem größeren Ausdruck übersetzt wird und innerhalb dieses Ausdrucks die intrinsic Funktion `sqrt.rn.f32` aufgerufen wird. Das explizite Ausschreiben des Ausdrucks $\sqrt{(a_x - b_x)^2 + (a_y - b_y)^2}$ führt dazu, dass gewisse Anweisungen wegfallen.
 
 Ein Abgleich mit der Dokumentation von CUDA für die [hypotf Funktion](https://docs.nvidia.com/cuda/cuda-math-api/cuda_math_api/group__CUDA__MATH__SINGLE.html#group__cuda__math__single_1ga2880a4ebf5500aeb74fb01340ea91215) gibt einen Einblick weswegen diese Anweisungen existieren.
 Die `cuda.libdevice.hypotf` Funktion muss garantieren, dass:
@@ -307,7 +310,7 @@ Die `cuda.libdevice.hypotf` Funktion muss garantieren, dass:
 
 Diese Bedingungen erfordern zusätzliche Anweisungen.
 
-Für den Algorithmus sind die meisten dieser Bedingungen tatsächlich irrelevant. Das Verhalten des Algorithmus ändert sich nicht, wenn die Funktion $\mathrm{NaN}$ statt $\infty$ oder andersherum zurückgibt, da nur Distanzen verglichen werden und der Algorithmus in beiden Fällen die gleiche Verzweigung wählt.
+Für den Algorithmus sind die meisten dieser Bedingungen tatsächlich irrelevant. Das Verhalten des Algorithmus ändert sich nicht, wenn die Funktion $\mathrm{NaN}$, statt $\infty$ oder andersherum zurückgibt, da nur Distanzen verglichen werden und der Algorithmus in beiden Fällen die gleiche Verzweigung wählt.
 
 Durch die verringerte Anzahl an Anweisungen ist eine klare Verbesserung in der Laufzeit zu erkennen.
 
@@ -341,11 +344,11 @@ Die verringerte Anzahl an Anweisungen ist auch in der Ausgabe von `ncu` zu sehen
 
 Im Vergleich zur initialen Implementation hat diese implementation `4.595.081` (`~25.508 %`) weniger Rechenzyklen. Durch diese Einsparung ist der Algorithmus schneller geworden.
 
-Es ist hierbei zu beachten, dass effektiv keine günstigere Distanz-Rechnung durchgeführt wurde, sondern es wurde auf gewisse Garantien bei der bisherigen Distanz-Berechnung verzichtet, da diese für den Algorithmus keinen Unterschied machen. Im folgenden wird auf exakte Ergebnisse verzichtet, um den Algorithmus noch schneller zu machen.
+Es ist hierbei zu beachten, dass effektiv keine günstigere Distanz-Rechnung durchgeführt wurde, sondern es wurde auf gewisse Garantien bei der bisherigen Distanz-Berechnung verzichtet, da diese für den Algorithmus keinen Unterschied machen. Im Folgenden wird auf exakte Ergebnisse verzichtet, um den Algorithmus noch schneller zu machen.
 
 _Welchen Einfluss hat `fastmath` und wieso?_
 
-Wie bereits erwähnt ermöglicht die Annotation `fastmath=True`, auf Genauigkeit zu verzichten im Austausch für schnellere Laufzeiten. Als Beispiel ist folgender Ausschnitt aus dem Assembly der regulären `sqrtf`-Variante und der `sqrtf`-Variante mit `fastmath=True` gegeben.
+Wie bereits erwähnt ermöglicht die Annotation `fastmath=True` auf Genauigkeit zu verzichten, im Austausch für schnellere Laufzeiten. Als Beispiel ist folgender Ausschnitt aus dem Assembly der regulären `sqrtf`-Variante und der `sqrtf`-Variante mit `fastmath=True` gegeben.
 
 ```diff
 $L__BB0_6:
@@ -374,7 +377,7 @@ Für die Laufzeit ergeben sich folgende Unterschiede.
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_naive_euclidean_sqrt_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png)  | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_sqrt_fast_resolution=128,256,512,1024,2048_points=64,128,256,512.png)  |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_sqrt_naive_euclidean_sqrt_fast_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_sqrt_naive_euclidean_sqrt_fast_resolution=128_points=64,128,256,512.png) |
 
-Die Laufzeit hat sich durch den Einsatz der `fastmath=True` Annotation deutlich verbessert. Für den Fall `Resolution=2048` und `Point-count=512` hat sich die Laufzeit im Vergleich zur initialen Implementation aus _Aufgabe 3_ ungefähr halbiert.
+Die Laufzeit hat sich durch den Einsatz der `fastmath=True` Annotation deutlich verbessert. Für den Fall `Resolution=2048` und `Point-count=512` hat sich die Laufzeit, im Vergleich zur initialen Implementation aus _Aufgabe 3_, ungefähr halbiert.
 
 _Welchen Einfluss hat schlicht $a^2 + b^2$ und wieso?_
 
@@ -400,7 +403,7 @@ $L__BB0_6:
 	selp.b64 	%rd75, %rd76, %rd75, %p24;
 ```
 
-Diese Änderung erscheint auf den ersten Blick ernüchternd, jedoch ist die `sqrt.rn.f32` eine aufwendige Operation und diese Operation einzusparen macht einen großen Unterschied.
+Diese Änderung erscheint auf den ersten Blick ernüchternd, jedoch ist die `sqrt.rn.f32` eine aufwendige Operation und diese Operation einzusparen, macht einen großen Unterschied.
 
 In dem bisherigen Assembly hat der Compiler Loop-Unrolling durchgeführt mit bis zu vier Iterationen der Schleife. Durch das verzichten auf `sqrt.rn.f32` scheint der Compiler bis zu acht Iterationen der Schleife aufzurollen.
 
@@ -437,7 +440,7 @@ An dieser Stelle ist es erneut interessant die Ausgabe von `ncu` zu betrachten:
           could be reduced or moved to look-up tables.
 ```
 
-Hierbei weist `ncu` darauf hin, dass der Algorithmus viele Berechnungen durchführt und vergleichsweise wenig Speicherauslastung hat. Den Vorschlag die Anzahl an Berechnungen zu verringern oder Ergebnisse zwischenzuspeichern funktioniert für diesen Algorithmus leider jedoch nicht. Die Ausgabe von `ncu` wollen wir an dieser Stelle nicht ignorieren, jedoch wird erst im nächsten Abschnitt die Speicherauslastung optimiert. Vorab betrachten wir noch die Kombination aus Quadratischer-Euklidischer-Distanz und `fastmath=True`.
+Hierbei weist `ncu` darauf hin, dass der Algorithmus viele Berechnungen durchführt und vergleichsweise wenig Speicherauslastung hat. Den Vorschlag die Anzahl an Berechnungen zu verringern oder Ergebnisse zwischenzuspeichern funktioniert für diesen Algorithmus jedoch leider nicht. Die Ausgabe von `ncu` wollen wir an dieser Stelle nicht ignorieren, jedoch wird erst im nächsten Abschnitt die Speicherauslastung optimiert. Vorab betrachten wir noch die Kombination aus Quadratischer-Euklidischer-Distanz und `fastmath=True`.
 
 Das Verwenden von `fastmath=True` für die neue Distanz-Funktion hat nur minimale Auswirkungen, da im Algorithmus nur noch Divisionen, die nur selten durchgeführt werden, beschleunigt werden, wie folgende Diagramme zeigen.
 
@@ -450,21 +453,21 @@ Das Verwenden von `fastmath=True` für die neue Distanz-Funktion hat nur minimal
 
 _Wie wurden Daten in der Naiven Implementation geladen?_
 
-Die Naive Implementation iteriert in jedem Thread mit einer Schleife über die Punkte. Das bedeutet jeder Thread greift in den globalen Speicher für jeden Punkt.
+Die Naive Implementation iteriert in jedem Thread mit einer Schleife über die Punkte. Das bedeutet jeder Thread greift in den globalen Speicher für jeden einzelnen Punkt.
 
 _Was kann beim Laden der Daten verbessert werden?_
 
-Da in der Naiven Implementation zu jedem Zeitpunkt bekannt ist, welcher Punkt als nächstes benötigt wird, wäre es möglich die Daten in mehreren Bündeln (Batch-Processing) zu verarbeiten. Das bedeutet, dass ein Teil der Daten gleichzeitig geladen wird und danach gleichzeitig verarbeitet wird.
+Da in der Naiven Implementation zu jedem Zeitpunkt bekannt ist, welcher Punkt als nächstes benötigt wird, wäre es möglich die Daten in mehreren Bündeln (Batch-Processing) zu verarbeiten. Das bedeutet, dass ein Teil der Daten gleichzeitig geladen und danach gleichzeitig verarbeitet wird.
 
 _Wie können die Daten ins Shared Memory geladen und mit einem Grid-Stride-Loop verarbeitet werden?_
 
-Der gewählte Ansatz besteht darin eine feste Konstante `GRID_STRIDE_SIZE` zu definieren. Auf diese weise kann ein `cuda.shared.array` definiert und im Kernel zugegriffen werden. Dieser hat wie die Punkte Eingabe auch zwei Dimensionen, nämlich `GRID_STRIDE_SIZE` und `2`. Nun werden die ersten `GRID_STRIDE_SIZE` Punkte in das Shared Memory geschrieben. Hierbei werden `2 * GRID_STRIDE_SIZE` Threads benötigt, da für jeden Punkt ein `x` und ein `y` geladen werden muss. Je zwei aufeinander folgende Threads laden also die Daten für einen Punkt. Threads die keinen Punkt berechnen sollen warten beziehungsweise falls keine Punkte mehr vorhanden sind wird `np.inf` ins Shared Memory geschrieben, um Fehler bei Rechnungen zu vermeiden. Bevor lesend auf das Shared Memory zugegriffen werden kann, muss `cuda.syncthreads()` aufgerufen werden, um Race-Conditions zu vermeiden. Nun können alle Threads aus dem Block durch das Array iterieren und Distanzen berechnen. Falls ein neuer Nächster Nachbar entdeckt wurde, muss der korrekte Index des Punktes berechnet werden (Der Index in das Shared Memory Array wäre nicht korrekt). Zuletzt muss erneut `cuda.syncthreads()` aufgerufen werden, bevor die Schleife sich wiederholt, erneut um Race-Conditions zu vermeiden.
+Der gewählte Ansatz besteht darin eine feste Konstante `GRID_STRIDE_SIZE` zu definieren. Auf diese Weise kann ein `cuda.shared.array` definiert und im Kernel zugegriffen werden. Dieses Array hat, wie die Punkte Eingabe, ebenfalls zwei Dimensionen. Nämlich `GRID_STRIDE_SIZE` und `2`. Nun werden die ersten `GRID_STRIDE_SIZE` Punkte in das Shared Memory geschrieben. Hierbei werden `2 * GRID_STRIDE_SIZE` Threads benötigt, da für jeden Punkt ein `x` und ein `y` geladen werden muss. Je zwei aufeinander folgende Threads laden also die Daten für einen Punkt. Threads, welche keinen Punkt berechnen sollen, warten. Falls keine weiteren Punkte vorhanden sind, wird `np.inf` ins Shared Memory geschrieben, um Fehler bei Rechnungen zu vermeiden. Bevor lesend auf das Shared Memory zugegriffen werden kann, muss `cuda.syncthreads()` aufgerufen werden, um Race-Conditions zu vermeiden. Nun können alle Threads aus dem Block durch das Array iterieren und Distanzen berechnen. Falls ein neuer nächster Nachbar entdeckt wurde, muss der korrekte Index des Punktes berechnet werden (Der Index in das Shared Memory Array wäre nicht korrekt). Zuletzt muss erneut `cuda.syncthreads()` aufgerufen werden, bevor die Schleife sich wiederholt, erneut um Race-Conditions zu vermeiden.
 
-Ein weiteres Detail ist, dass ein early-exit nicht mehr möglich ist für Threads die Pixel außerhalb des Diagram berechnen. Das liegt daran, dass Threads neben dem Pixel auch Punkte laden müssen. Es kann also sein, dass ein Thread zwar außerhalb des Diagram liegt, aber trotzdem Punkte für andere Threads laden muss. Erst nachdem keine Punkte mehr geladen werden müssen ist ein exit für diese Threads möglich beziehungsweise nötig.
+Ein weiteres Detail ist, dass ein early-exit nicht mehr möglich ist für Threads, die Pixel außerhalb des Diagramms berechnen. Das liegt daran, dass Threads neben dem Pixel-Berechnen auch Punkte laden müssen. Es kann also sein, dass ein Thread zwar außerhalb des Diagramms liegt, aber trotzdem Punkte für andere Threads laden muss. Erst nachdem keine Punkte mehr geladen werden müssen, ist ein exit für diese Threads möglich beziehungsweise nötig.
 
 _Welchen Einfluss hat das Laden der Daten ins Shared Memory und Verarbeiten mit einem Grid-Stride-Loop und wieso?_
 
-Um den Einfluss der Shared Memory Verarbeitung mit Grid-Stride-Loop besser darzustellen wird im folgenden mit der naiven Implementation aus _Aufgabe 3_ verglichen. Die Distanz-Berechnung wird für beide Varianten mit `cuda.libdevice.hypotf` durchgeführt um vergleichbare Resultate zu erhalten.
+Um den Einfluss der Shared Memory Verarbeitung mit Grid-Stride-Loop besser darzustellen, wird im Folgenden mit der naiven Implementation aus _Aufgabe 3_ verglichen. Die Distanz-Berechnung wird für beide Varianten mit `cuda.libdevice.hypotf` durchgeführt, um vergleichbare Resultate zu erhalten.
 
 Die Größe `GRID_STRIDE_SIZE` ist natürlich maßgeblich für die Laufzeit, beispielsweise führt ein `GRID_STRIDE_SIZE=128` zu schlechterer performance. Mit `GRID_STRIDE_SIZE=8` haben wir die besten Ergebnisse erzielt. In den folgenden Analysen gilt deswegen stets `GRID_STRIDE_SIZE=8`.
 
@@ -475,9 +478,9 @@ Ein Blick auf das Assembly zeigt, dass der Compiler wegen der Konstante `GRID_ST
 | ![](../data/performance_matrix_NVIDIA-GeForce-RTX-5070_grid_stride_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png)   | ![](../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_grid_stride_euclidean_hypot_resolution=128,256,512,1024,2048_points=64,128,256,512.png)   |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_hypot_grid_stride_euclidean_hypot_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_hypot_grid_stride_euclidean_hypot_resolution=128_points=64,128,256,512.png) |
 
-Es ist zusehen, dass im Vergleich zur Naiven Variante bei höherer Auflösung und Punkt-Anzahl deutlich Laufzeit eingespart wurde. Interessanterweise ist zu sehen, dass der Algorithmus für kleine Eingaben langsamer geworden ist. Der Grund hierfür ist vermutlich darauf zurückzuführen, dass mehr Overhead durch das Shared-Memory beziehungsweise das Loop-Unrolling entstanden ist. Erst bei größeren Eingaben fällt dieser Overhead weg.
+Es ist zu sehen, dass im Vergleich zur Naiven Variante, bei höherer Auflösung und Punkt-Anzahl deutlich Laufzeit eingespart wurde. Interessanterweise ist zu sehen, dass der Algorithmus für kleine Eingaben langsamer geworden ist. Der Grund hierfür ist vermutlich darauf zurückzuführen, dass mehr Overhead durch das Shared-Memory, beziehungsweise das Loop-Unrolling entstanden ist. Erst bei größeren Eingaben fällt dieser Overhead weg.
 
-Ein Blick auf die `ncu` Ausgabe zeigt, dass trotz der langsameren Distanz-Berechnung die `Compute (SM) Throughput` so hoch wie noch bei keiner anderen Implementation liegt.
+Ein Blick auf die `ncu` Ausgabe zeigt, dass trotz der langsameren Distanz-Berechnung die `Compute (SM) Throughput` so hoch, wie noch bei keiner anderen Implementation liegt.
 
 ```
     Section: GPU Speed Of Light Throughput
@@ -505,7 +508,7 @@ Es ist zu beachten das wie bei den anderen `ncu` Ausgaben stets der Fall `resolu
 
 _Wie können die Daten innerhalb eines Warp geladen und mit `shfl_sync` verarbeitet werden werden?_
 
-Das Verfahren hat starke Ähnlichkeit mit dem vorherigen Ansatz. In diesem Fall werden Daten nicht mehr auf auf Block-Ebene geladen, sondern auf Warp-Ebene. Da Threads in einem Warp synchron ablaufen ist kein Aufruf von `cuda.syncthreads()` mehr nötig. Ein Nachteil hierbei ist, dass nun jeder Warp die Daten laden muss. Da nun kein `cuda.shared.array` vorhanden ist, muss eine lokale Variable definiert werden, welches auf ähnliche Weise verwendet wird. Die Variable wurde `point_component_warp_value` benannt und wird für jeden zweiten Thread eines Warp die `x`-Komponente und für jeden anderen Thread des Warp die `y`-Komponente laden. Falls ein Punkt nicht vorhanden ist, werden die Komponenten jeweils auf `np.inf` gesetzt um Fehler bei Rechnungen zu vermeiden. Wenn ein Warp nun die Variable `point_component_warp_value` eines jeden Thread befüllt wurden 16 `x`- und 16 `y`-Komponenten geladen, da es insgesamt 32 Threads pro Warp sind. Nun kann mit `cuda.shfl_sync` auf einen beliebigen Wert eines anderen Thread des gleichen Warp zugegriffen werden. Mit `cuda.shfl_sync(0xFFFFFFFF, point_component_warp_value, index)` und `cuda.shfl_sync(0xFFFFFFFF, point_component_warp_value, index + 1)` werden die Komponenten eines Punkt geladen und es kann die Distanz-Rechnung durchgeführt werden. Die beiden `cuda.shfl_sync` Aufrufe werden 16-mal wiederholt, bis alle die vom Warp geladenen Punkte verarbeitet sind. Danach können die nächsten Punkte geladen werden, erneut ohne ein Aufruf von `cuda.syncthreads()`, da die Threads eines Warp synchron ablaufen.
+Das folgende Verfahren hat starke Ähnlichkeit mit dem vorherigen Ansatz. In diesem Fall werden Daten nicht mehr auf Block-Ebene, sondern auf Warp-Ebene geladen. Da Threads in einem Warp synchron ablaufen, ist kein Aufruf von `cuda.syncthreads()` mehr nötig. Ein Nachteil hierbei ist, dass nun jeder Warp die Daten laden muss. Da nun kein `cuda.shared.array` vorhanden ist, muss eine lokale Variable definiert werden, welches auf ähnliche Weise verwendet wird. Die Variable wurde `point_component_warp_value` benannt und wird für jeden zweiten Thread eines Warp die `x`-Komponente und für jeden anderen Thread des Warp die `y`-Komponente laden. Falls ein Punkt nicht vorhanden ist, werden die Komponenten jeweils auf `np.inf` gesetzt um Fehler bei Rechnungen zu vermeiden. Wenn die Variable `point_component_warp_value` für jeden Thread eines Warp gesetzt wurde, wurden 16 `x`- und 16 `y`-Komponenten geladen, da es insgesamt 32 Threads pro Warp sind. Nun kann mit `cuda.shfl_sync` auf einen beliebigen Wert eines anderen Thread des gleichen Warp zugegriffen werden. Mit `cuda.shfl_sync(0xFFFFFFFF, point_component_warp_value, index)` und `cuda.shfl_sync(0xFFFFFFFF, point_component_warp_value, index + 1)` werden die Komponenten eines Punkt geladen und es kann die Distanz-Rechnung durchgeführt werden. Die beiden `cuda.shfl_sync` Aufrufe werden 16-mal wiederholt, bis alle die vom Warp geladenen Punkte verarbeitet sind. Danach können die nächsten Punkte geladen werden, erneut ohne ein Aufruf von `cuda.syncthreads()`, da die Threads eines Warp synchron ablaufen.
 
 Wie auch beim vorherigen Ansatz ist ein early-exit nicht möglich aus den gleichen Gründen.
 
@@ -524,7 +527,7 @@ Es ist zu sehen, dass diese Variante ebenfalls schneller arbeitet, als die initi
 
 _Wie verhalten sich die Kernel durch den Einsatz von schnelleren Distanz-Berechnungen und effizienterem Laden von Daten?_
 
-Wir haben nun die Berechnungen (Compute) und die Speicherzugriffe (Memory) separat voneinander optimiert. Nun möchten wir die beiden Optimierungen zusammenführen. Von der Distanz-Berechnung wählen wir die Square-Euclidean Variante mit `fastmath=True` und kombinieren diese mit je der Grid-Stride-Loop mit Shared-Memory als auch Warp mit `shfl_sync`. Der Grund hierfür ist, dass bei den Speicher-Optimierungen nicht eindeutig (nicht immer) eine Methode schneller als eine andere war.
+Wir haben nun die Berechnungen (Compute) und die Speicherzugriffe (Memory) separat voneinander optimiert. Nun möchten wir die beiden Optimierungen zusammenführen. Von der Distanz-Berechnung wählen wir die Square-Euclidean Variante mit `fastmath=True` und kombinieren diese mit je der Grid-Stride-Loop mit Shared-Memory als auch Warp mit `shfl_sync`. Der Grund hierfür ist, dass bei den Speicher-Optimierungen keine Methode eindeutig schneller als eine andere war.
 
 Folgende Diagramme geben die Laufzeiten wieder.
 
@@ -559,7 +562,7 @@ Interessanterweise hat sich in der `ncu` Ausgabe ebenfalls eine deutliche Verbes
           Start by analyzing workloads in the Compute Workload Analysis section.
 ```
 
-Die `Compute (SM) Throughput` beziehungsweise `Memory Throughput` Metrik liegt nun fast beim Maximum und ist erneut so hoch wie bei keiner der bisherigen Analysen. Ebenso ist die Anzahl an Rechenzyklen so niedrig wie bei keinem der anderen Implementationen.
+Die `Compute (SM) Throughput` beziehungsweise `Memory Throughput` Metrik liegt nun fast beim Maximum und ist erneut so hoch wie bei keiner der bisherigen Analysen. Ebenso ist die Anzahl an Rechenzyklen so niedrig wie bei keiner der anderen Implementationen.
 
 Dieser Algorithmus ist nun möglichst effizient implementiert. Im folgenden wollen wir betrachten, ob durch einen alternativen Algorithmus beziehungsweise Ansatz eine weitere Verbesserung der Laufzeit möglich ist.
 
@@ -567,12 +570,12 @@ Dieser Algorithmus ist nun möglichst effizient implementiert. Im folgenden woll
 
 > [!NOTE]
 >
-> - Für die Diastanzberechnung wird im Folgenden die quadrierte euklidische Distanz - beziehungsweise im Exkurs die Manhattan-Distanz - verwendet.
+> - Für die Diastanzberechnung wird im Folgenden die quadrierte euklidische Distanz beziehungsweise im Exkurs die Manhattan-Distanz verwendet.
 > - Der in den vorherigen Aufgaben verwendete Algorithmus wird im Folgenden teilweise referenziert und verwendet. Dabei wird er als _"Pixel-Algorithmus"_ bezeichnet.
 
 Der Jump Flooding Algorithmus (JFA) wurde im Jahr 2006 von **Guodong Rong** und **Tiow-Seng Tan** auf der Computergrafik-Konferenz _ACM Symposium on Interactive 3D Graphics and Games (I3D)_ in Redwood City vorgestellt (vgl. [Jump Flooding in GPU](https://www.comp.nus.edu.sg/~tants/jfa/i3d06.pdf)). Die Autoren konzipierten den Algorithmus gezielt für die parallele Architektur von GPUs, um geometrische Probleme wie die Berechnung von Voronoi-Diagrammen oder Distanzfeldern zu lösen.
 
-## Aufgabe 6a - Beschreibung und naive Implementation
+## Aufgabe 6a - Beschreibung und initiale Implementation
 
 _Wie funktioniert der Algorithmus?_
 
