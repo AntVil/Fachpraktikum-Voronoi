@@ -704,13 +704,13 @@ Da in _Aufgabe 2_ entschieden wurde, CUDA-Events für die Laufzeitmessung zu ver
 **Variante 1: Events pro Iteration mit Synchronisierung:**
 
 ```python
-kernel_time: float = 0.0
+total_ms: float = 0.0
 while k >= 1:
     kernel_start.record()
     kernel[blocks_per_grid, threads_per_block](grid_in, grid_out, k, resolution)
     kernel_end.record()
     cuda.synchronize()
-    kernel_time += kernel_start.elapsed_time(kernel_end)
+    total_ms += kernel_start.elapsed_time(kernel_end)
     grid_in, grid_out = grid_out, grid_in
     k //= 2
 ```
@@ -761,7 +761,7 @@ $$O(\log_2(N))$$
 
 Auch in den unteren Linien-Diagrammen (Performance-Plots bei einer festen Auflösung von $128 \times 128$) wird dieses Verhalten bei genauerer Betrachtung deutlich. Obwohl die Kurve auf den ersten Blick stark schwankt, zeigt ein Blick auf die Zahlen der Y-Achse, dass sich die Werte in einem kleinen Wertebereich bewegen. Die visuellen Schwankungen resultieren aus der automatischen Skalierung des Diagramms, welches auf die Kurve _"herangezoomt"_ hat. In absoluten Zahlen ausgedrückt sind diese Schwankungen vernachlässigbar und bestätigen die Unabhängigkeit von der Punkteanzahl.
 
-Die folgenden Diagramme zeigen die gemessenen Kernellaufzeiten für die **Mannhatten-Distanz**:
+Die folgenden Diagramme zeigen die gemessenen Kernellaufzeiten für die **Manhattan-Distanz**:
 
 ```bash
 uv run .\src\task7.py jfa_manhattan
@@ -804,7 +804,21 @@ uv run .\src\task6b.py naive-jfa-step-analysis
 
 <td>
 
-...
+Device: NVIDIA GeForce RTX 5070 | Resolution: 2048 | Seeds: 512
+
+| Step size ($k$) | Naive square euclidean | Naive manhattan |
+| --- | --- | --- |
+| 1024 | 0.3194 ms | 0.3713 ms |
+| 512 | 0.1705 ms | 0.1591 ms |
+| 256 | 0.1574 ms | 0.1495 ms |
+| 128 | 0.1541 ms | 0.1515 ms |
+| 64 | 0.1567 ms | 0.1381 ms |
+| 32 | 0.1978 ms | 0.1415 ms |
+| 16 | 0.1751 ms | 0.1407 ms |
+| 8 | 0.1598 ms | 0.1506 ms |
+| 4 | 0.1508 ms | 0.1437 ms |
+| 2 | 0.1440 ms | 0.1267 ms |
+| 1 | 0.1296 ms | 0.1393 ms |
 
 </td>
 <td>
