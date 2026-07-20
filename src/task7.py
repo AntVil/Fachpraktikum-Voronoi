@@ -98,7 +98,6 @@ def main() -> None:
         else:
             resolution_size_index = 0
 
-
         kernel_performance_analysis_compare(
             kernels=list(map(lambda k: kernels_dictionary[k], parts)),
             plot_identifier=identifier,

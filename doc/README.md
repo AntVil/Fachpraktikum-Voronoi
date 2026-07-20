@@ -126,7 +126,7 @@ Folgende Animation gibt an, wie das Ergebnis nach jeder Iteration, also Hinzunah
 Aus dieser Animation ist ersichtlich, dass jeder Pixel immer den bisherigen nächsten Nachbar verwaltet und inkrementell weitere Punkte hinzunimmt. In der beistehenden Animation sind die Distanzen zu sehen. Hierbei ist zu erkennen, dass die Distanzen sich mit jeder Iterationen verringern (oder gleich bleiben).
 
 > [!note]
-> Die berechneten Distanzen wurden aus dem Wertebereich $0$ bis $\sqrt{2}$,  in den Wertebereich $0$ bis $255$ abgebildet. Zur besseren Visualisierung wurden die Distanzen mit dem Faktor $4$ hoch-skaliert und an der oberen Grenze abgeschnitten. Die Begründung hierfür ist, dass auch bei den letzten Iterationen der Animation noch Änderungen mit bloßem Auge zu erkennen sind. Für andere Animationen der Distanzen wird ebenfalls mit dem gleichen Faktor hoch-skaliert, um Vergleiche zu ermöglichen.
+> Die berechneten Distanzen wurden aus dem Wertebereich $0$ bis $\sqrt{2}$, in den Wertebereich $0$ bis $255$ abgebildet. Zur besseren Visualisierung wurden die Distanzen mit dem Faktor $4$ hoch-skaliert und an der oberen Grenze abgeschnitten. Die Begründung hierfür ist, dass auch bei den letzten Iterationen der Animation noch Änderungen mit bloßem Auge zu erkennen sind. Für andere Animationen der Distanzen wird ebenfalls mit dem gleichen Faktor hoch-skaliert, um Vergleiche zu ermöglichen.
 
 _Wieso arbeitet der Algorithmus korrekt?_
 
@@ -807,18 +807,18 @@ uv run .\src\task6b.py naive-jfa-step-analysis
 Device: NVIDIA GeForce RTX 5070 | Resolution: 2048 | Seeds: 512
 
 | Step size ($k$) | Naive square euclidean | Naive manhattan |
-| --- | --- | --- |
-| 1024 | 0.3194 ms | 0.3713 ms |
-| 512 | 0.1705 ms | 0.1591 ms |
-| 256 | 0.1574 ms | 0.1495 ms |
-| 128 | 0.1541 ms | 0.1515 ms |
-| 64 | 0.1567 ms | 0.1381 ms |
-| 32 | 0.1978 ms | 0.1415 ms |
-| 16 | 0.1751 ms | 0.1407 ms |
-| 8 | 0.1598 ms | 0.1506 ms |
-| 4 | 0.1508 ms | 0.1437 ms |
-| 2 | 0.1440 ms | 0.1267 ms |
-| 1 | 0.1296 ms | 0.1393 ms |
+| --------------- | ---------------------- | --------------- |
+| 1024            | 0.3194 ms              | 0.3713 ms       |
+| 512             | 0.1705 ms              | 0.1591 ms       |
+| 256             | 0.1574 ms              | 0.1495 ms       |
+| 128             | 0.1541 ms              | 0.1515 ms       |
+| 64              | 0.1567 ms              | 0.1381 ms       |
+| 32              | 0.1978 ms              | 0.1415 ms       |
+| 16              | 0.1751 ms              | 0.1407 ms       |
+| 8               | 0.1598 ms              | 0.1506 ms       |
+| 4               | 0.1508 ms              | 0.1437 ms       |
+| 2               | 0.1440 ms              | 0.1267 ms       |
+| 1               | 0.1296 ms              | 0.1393 ms       |
 
 </td>
 <td>
@@ -1109,11 +1109,11 @@ Abschließend werden die besten Algorithmen gemeinsam betrachtet und gegenüberg
 
 Der Pixel-Algorithmus ist vor allem bei einer geringen Punktemenge sehr schnell und weist eine deutlich bessere Laufzeit als der JFA auf. Mit zunehmender Anzahl von Punkten im Diagramm nimmt die Laufzeit jedoch quadratisch zu. Ab einer bestimmten Anzahl greift die JFA-Charakteristik und der JFA ist schneller. Dieser Übergang erfolgt je nach Implementierung des Pixel-Algorithmus zu einem späteren Zeitpunkt, aber irgendwann wird der Schnittpunkt zwingend erreicht.
 
-Das gleiche Diagramm wurde für die Bildgröße $2048 \times 2048$ erstellt um diesen Schnittpunkt zu zeigen.
+Das gleiche Diagramm wurde für die Bildgröße $2048 \times 2048$ erstellt, um diesen Schnittpunkt zu zeigen.
 
-RTX 5070                                                                                             | GTX 1660 Ti                                                                                             |
-|-|-|
-|![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_final_resolution=2048_points=64,128,256,512.png)||
+| RTX 5070                                                                                              | GTX 1660 Ti                                                                                              |
+| ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_final_resolution=2048_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_final_resolution=2048_points=64,128,256,512.png) |
 
 _Welche der Optimierungen hat den größten Laufzeit-gewinn erbracht?_
 
