@@ -60,7 +60,7 @@ Für die Berechnung des Voronoi-Diagramms sind folgende Parameter definiert:
 | **Punkte**        | Ein Array, das die 2D-Koordinaten der im Raum verteilten Punkte enthält | `float32` / `int32` |
 | **Ausgabe-Grid**  | Das resultierende zweidimensionale Bildraster/Voronoi-Diagramm          | `int32`             |
 
-Für Punkte wurden die Daten-Typen `float32`, beziehungsweise `int32` gewählt, da es gewisse Algorithmen gibt, welche auf `int32` angewiesen sind (siehe _Aufgabe 6_). Andere Algorithmen können sowohl `int32`, als auch `float32` verarbeiten. Da es an einigen Stellen vorteilhaft ist `float32` Werte zu haben, wird als alternativer Daten-Typ auch `float32` erlaubt.
+Für Punkte wurden die Daten-Typen `float32`, beziehungsweise `int32` gewählt, da es gewisse Algorithmen gibt, welche auf `int32` angewiesen sind (siehe _Aufgabe 6_). Andere Algorithmen können konzeptionell sowohl `int32`, als auch `float32` verarbeiten. Da es an einigen Stellen vorteilhaft ist `float32` Werte zu haben, wird `float32` verwendet wenn möglich.
 
 Für manchen Algorithmen werden zusätzliche Eingaben erlaubt, welche für die Berechnung nötig sind. Dies betrifft erneut die Algorithmen aus _Aufgabe 6_.
 

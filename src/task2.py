@@ -260,6 +260,8 @@ def create_kernel_performance_plot(
     if plot_identifier is None:
         plot_identifier = "_".join(map(lambda x: x[0].replace(" ", "-"), performances))
 
+    fig.tight_layout()
+
     # plt.show()
     plt.savefig(
         os.path.join(
@@ -301,6 +303,8 @@ def create_kernel_performance_matrix(
     ax.set_yticklabels(list(map(lambda x: str(x), resolution_sizes)))
 
     fig.colorbar(plot, ax=ax)
+
+    fig.tight_layout()
 
     # plt.show()
     plt.savefig(
