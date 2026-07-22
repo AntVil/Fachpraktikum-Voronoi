@@ -32,7 +32,6 @@ RESOLUTION_SIZES: np.ndarray[tuple[int], np.dtype[np.int64]] = np.array([
     # 2**15,  # 32768
     # 2**16,  # 65536
 ], dtype=np.int64)
-# TODO: 2^16 might be a bit big; We will see ...
 
 # Different values for the seeds (points) in the diagram
 POINT_COUNTS: np.ndarray[tuple[int], np.dtype[np.int64]] = np.array([
@@ -43,7 +42,6 @@ POINT_COUNTS: np.ndarray[tuple[int], np.dtype[np.int64]] = np.array([
     # 2**10,
     # 2**10,
     # 2**11,
-    # TODO: Define values
 ], dtype=np.int64)
 
 
@@ -388,7 +386,6 @@ class JFAPingPongAoSAlgorithm(MeasurableKernel[tuple[tuple[int, int], tuple[int,
         step_size = np.int32(grid_read.shape[0] // 2)
 
         while step_size >= 1:
-            # TODO: passing `grid.shape[0]` shouldn't be necessary, the underlying kernels could probably be adjusted accordingly
             self.kernel[blocks, threads](grid_read, grid_write, step_size, np.int32(grid_read.shape[0])) # type: ignore
 
             grid_read, grid_write = grid_write, grid_read
@@ -442,7 +439,6 @@ class JFAPingPongSoAAlgorithm(MeasurableKernel[tuple[tuple[int, int], tuple[int,
         step_size = np.int32(grid_read.shape[0] // 2)
 
         while step_size >= 1:
-            # TODO: passing `grid.shape[0]` shouldn't be necessary, the underlying kernels could probably be adjusted accordingly
             self.kernel[blocks, threads](grid_read, grid_write, step_size, np.int32(grid_read.shape[1])) # type: ignore
 
             grid_read, grid_write = grid_write, grid_read
