@@ -960,8 +960,6 @@ Auch hier zeigt sich wieder die typische JFA-Charakteristik bezüglich der Laufz
 
 Die von [ncu erzeugte Datei](../data/ncu_NVIDIA-GeForce-RTX-5070_jfa_shared_square_euclidean_resolution=2048_points=512.log) unterstreicht das. In den Iterationen 1 bis 8 meldet ncu ein Memory-Bound-Problem, da hier noch der naive Ansatz über VRAM als Fallback verwendet wird (vgl. ncu Analse der naiven Implementation). Ab Iteration 9 (Schrittweite 4) greift die Shared-Memory-Pipeline, und ncu meldet nun eine höhere Compute- als Memory-Auslastung. Das zeigt zwar, dass der Shared-Memory-Ansatz hier den ursprünglichen Speicher-Engpass auf die Recheneinheiten verlagert, dieser Effekt jedoch durch den zusätzlichen Rechenaufwand (Indexberechnung via Ganzzahl-Division/Modulo, Synchronisationsbarriere) wieder kompensiert wird, wodurch unterm Strich keine Laufzeitverbesserung gegenüber der naiven Implementierung entsteht.
 
-<!-- Abschließend lässt sich festhalten, dass die Optimierung mittels Shared Memory beim JFA **keinen Performancegewinn** erzielt hat. Dies liegt vor allem an der Natur des Algorithmus selbst: Ein softwareseitiges Caching im Shared Memory ist konzeptionell überhaupt erst bei kleinen Schrittweiten möglich. Doch selbst bei diesen konnte kein Gewinn erzielt werden. Hier ist die Redundanz der Speicherzugriffe innerhalb eines Thread-Blocks nicht hoch genug, um den zusätzlichen Overhead für das kollaborative Laden, die Thread-Synchronisation und die Indexberechnung mittels Division und Modulo zu kompensieren. -->
-
 Um dem Problem der interleaved 3D-Struktur (_Bank Conflicts_) nachzugehen, wird im folgenden Abschnitt ein alternatives Datenlayout betrachtet. Da der Shared-Memory-Ansatz gegenüber der naiven Implementierung keine relevante Laufzeitverbesserung brachte, wird wieder die naive, ursprüngliche Implementierung verwendet, wobei das zugrunde liegende Problem gleich bleibt.
 
 **Datenlayout optimieren**
@@ -1021,8 +1019,6 @@ Ein Vergleich der Messdaten mit der naiven quadratischen euklidischen Implementi
 - Das theoretische _Memory Coalescing_ von SoA setzt voraus, dass die Threads **lückenlos** auf benachbarte Adressen zugreifen. Beim JFA ist dies durch die variierenden Sprungweiten (`step_size`) in der horizontalen und insbesondere in der vertikalen Dimension (Zeilensprünge) über die meisten Iterationen hinweg nicht gegeben. Da die Threads dadurch ohnehin nicht zusammenhängende Speichersegmente anfordern müssen, kann der Strukturvorteil von SoA nicht greifen.
 
 Die [ncu-Datei](../data/ncu_NVIDIA-GeForce-RTX-5070_jfa_soa_square_euclidean_resolution=2048_points=512.log) zeigt, dass in der Iteration 1 bis 3 der Speicher mehr ausgelastet ist als der Compute. Ab Iteration 4 bis zum Ende meldet ncu dann, dass beide Aspekte gut ausgeglichen sind (_Compute and Memory are well-balanced_).
-
-<!-- TODO: Erklärung wieso? -->
 
 **Shuffle**
 
@@ -1104,7 +1100,7 @@ Es ist zu sehen, dass für die Eingabe-Größen `512` und `2048` des Raster eine
 Abschließend werden die besten Algorithmen gemeinsam betrachtet und gegenübergestellt. Die folgenden Diagramme zeigen die Laufzeiten der jeweiligen Kernel für eine feste Bildgröße von $128 \times 128$ und eine variierende Anzahl an Punkten:
 
 ```bash
-uv run .\src\task7.py compare-naive_euclidean_hypot-naive_euclidean_sqrt_fast-warp_shfl_euclidean_hypot-warp_shfl_square_euclidean_fast-jfa_square_euclidean-jfa_inout_square_euclidean final
+uv run .\src\task7.py compare-naive_euclidean_hypot-naive_square_euclidean_fast-grid_stride_square_euclidean_fast-warp_shfl_square_euclidean_fast-jfa_square_euclidean-jfa_inout_square_euclidean final
 ```
 
 | RTX 5070                                                                                             | GTX 1660 Ti                                                                                             |
@@ -1116,7 +1112,7 @@ Der Pixel-Algorithmus ist vor allem bei einer geringen Punktemenge sehr schnell 
 Um diesen Schnittpunkt zu zeigen, wurde das gleiche Diagramm für die Bildgröße $2048 \times 2048$ erstellt:
 
 ```bash
-uv run .\src\task7.py compare-2048-naive_euclidean_hypot-naive_euclidean_sqrt_fast-warp_shfl_euclidean_hypot-warp_shfl_square_euclidean_fast-jfa_square_euclidean-jfa_inout_square_euclidean final
+uv run .\src\task7.py compare-2048-naive_euclidean_hypot-naive_square_euclidean_fast-grid_stride_square_euclidean_fast-warp_shfl_square_euclidean_fast-jfa_square_euclidean-jfa_inout_square_euclidean final
 ```
 
 | RTX 5070                                                                                              | GTX 1660 Ti                                                                                              |
@@ -1125,9 +1121,17 @@ uv run .\src\task7.py compare-2048-naive_euclidean_hypot-naive_euclidean_sqrt_fa
 
 _Welche der Optimierungen hat den größten Laufzeit-gewinn erbracht?_
 
+Wie in den Abschnitten zur Optimierung der naiven euklidischen Implementierung ([Aufgabe3](#aufgabe-3---naive-implementation), [Aufgabe4](#aufgabe-4---optimierung-durch-billigere-distanz-prüfung), [Aufgabe5](#aufgabe-5---effizienteres-laden-von-daten)) bereits erläutert, zeigen auch die abschließenden Diagramme, dass sich durch den Einsatz eine weniger aufwändige Berechnung der reinen quadratischen euklidischen Distanz (ohne Wurzel) sowie durch die Annotation `fastmath=True` Performancesteigerungen erzielen lassen. Durch Shared Memory und Warp-Shuffle konnte außerdem eine weitere Reduzierung der Laufzeit erzielt werden.
+
+Abschließend lässt sich für den JFA festhalten, dass sich durch die Optimierung mittels Shared Memory, dem alternativen Structure of Arrays Layout und dem In-Out-Ansatz **kein Performancegewinn** erzielen ließ. Teilweise scheinen die Anpassungen sogar das Gegenteil zu bewirken und die Laufzeit zu verschlechtern. Dies liegt vor allem an der Natur des Algorithmus selbst: Die iterative Steuerung und die verstreuten Datenzugriffe erschweren eine Optimierung deutlich. Dies wurde auch in der Diskussion über einen möglichen Einsatz von Shuffle noch einmal deutlich.
+
 _Wie viel schneller ist die Finale Implementation im Vergleich zur Naiven Implementation?_
 
+TODO...
+
 _Ausblick_
+
+TODO...
 
 # Anhang
 
