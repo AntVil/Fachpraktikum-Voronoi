@@ -589,7 +589,7 @@ Der Jump Flooding Algorithmus wird nun in mehreren Schritten iterativ ausgeführ
 
 Nach jeder Iteration wird die Schrittweite $k$ halbiert ($k = \frac{k}{2}$), bis der Wert **1** erreicht und berechnet wurde.
 
-Aufgrund dieser fortlaufenden Halbierung ist es **zwingend erforderlich**, dass das Grid eine Auflösung mit einer Zweierpotenz ($2^m$) besitzt. Für rechteckige Grids müsste man das schrittweise Halbieren der Schrittweite entlang der längeren Kante durchführen.
+Aufgrund dieser fortlaufenden Halbierung besitzt das Grid häufig eine Auflösung mit einer Zweierpotenz ($2^m$). Für rechteckige Grids müsste man das schrittweise Halbieren der Schrittweite entlang der längeren Kante durchführen.
 
 _Wie wird der JFA implementiert?_
 
