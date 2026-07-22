@@ -1103,13 +1103,21 @@ Es ist zu sehen, dass für die Eingabe-Größen `512` und `2048` des Raster eine
 
 Abschließend werden die besten Algorithmen gemeinsam betrachtet und gegenübergestellt. Die folgenden Diagramme zeigen die Laufzeiten der jeweiligen Kernel für eine feste Bildgröße von $128 \times 128$ und eine variierende Anzahl an Punkten:
 
+```bash
+uv run .\src\task7.py compare-naive_euclidean_hypot-naive_euclidean_sqrt_fast-warp_shfl_euclidean_hypot-warp_shfl_square_euclidean_fast-jfa_square_euclidean-jfa_inout_square_euclidean final
+```
+
 | RTX 5070                                                                                             | GTX 1660 Ti                                                                                             |
 | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | ![](../data/performance_plot_NVIDIA-GeForce-RTX-5070_final_resolution=128_points=64,128,256,512.png) | ![](../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_final_resolution=128_points=64,128,256,512.png) |
 
-Der Pixel-Algorithmus ist vor allem bei einer geringen Punktemenge sehr schnell und weist eine deutlich bessere Laufzeit als der JFA auf. Mit zunehmender Anzahl von Punkten im Diagramm nimmt die Laufzeit jedoch quadratisch zu. Ab einer bestimmten Anzahl greift die JFA-Charakteristik und der JFA ist schneller. Dieser Übergang erfolgt je nach Implementierung des Pixel-Algorithmus zu einem späteren Zeitpunkt, aber irgendwann wird der Schnittpunkt zwingend erreicht.
+Der Pixel-Algorithmus ist vor allem bei einer geringen Punktemenge sehr schnell und weist eine deutlich bessere Laufzeit als der JFA auf. Mit zunehmender Anzahl von Punkten im Diagramm nimmt die Laufzeit jedoch zu. Ab einer bestimmten Anzahl greift die JFA-Charakteristik und der JFA ist schneller. Dieser Übergang erfolgt je nach Implementierung des Pixel-Algorithmus zu einem späteren Zeitpunkt, aber irgendwann wird der Schnittpunkt zwingend erreicht.
 
-Das gleiche Diagramm wurde für die Bildgröße $2048 \times 2048$ erstellt, um diesen Schnittpunkt zu zeigen.
+Um diesen Schnittpunkt zu zeigen, wurde das gleiche Diagramm für die Bildgröße $2048 \times 2048$ erstellt:
+
+```bash
+uv run .\src\task7.py compare-2048-naive_euclidean_hypot-naive_euclidean_sqrt_fast-warp_shfl_euclidean_hypot-warp_shfl_square_euclidean_fast-jfa_square_euclidean-jfa_inout_square_euclidean final
+```
 
 | RTX 5070                                                                                              | GTX 1660 Ti                                                                                              |
 | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
