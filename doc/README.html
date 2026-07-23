@@ -388,10 +388,10 @@ enthält</td>
 <p>Für Punkte wurden die Daten-Typen <code>float32</code>,
 beziehungsweise <code>int32</code> gewählt, da es gewisse Algorithmen
 gibt, welche auf <code>int32</code> angewiesen sind (siehe <em>Aufgabe
-6</em>). Andere Algorithmen können sowohl <code>int32</code>, als auch
-<code>float32</code> verarbeiten. Da es an einigen Stellen vorteilhaft
-ist <code>float32</code> Werte zu haben, wird als alternativer Daten-Typ
-auch <code>float32</code> erlaubt.</p>
+6</em>). Andere Algorithmen können konzeptionell sowohl
+<code>int32</code>, als auch <code>float32</code> verarbeiten. Da es an
+einigen Stellen vorteilhaft ist <code>float32</code> Werte zu haben,
+wird <code>float32</code> verwendet wenn möglich.</p>
 <p>Für manchen Algorithmen werden zusätzliche Eingaben erlaubt, welche
 für die Berechnung nötig sind. Dies betrifft erneut die Algorithmen aus
 <em>Aufgabe 6</em>.</p>
@@ -1282,9 +1282,9 @@ src="../data/performance_matrix_NVIDIA-GeForce-GTX-1660-Ti_warp_shfl_euclidean_h
 </tr>
 <tr class="even">
 <td><img
-src="../data/performance_plot_NVIDIA-GeForce-RTX-5070_euclidean_hypot_warp_shfl_euclidean_hypot_resolution=128_points=64,128,256,512.png" /></td>
+src="../data/performance_plot_NVIDIA-GeForce-RTX-5070_naive_euclidean_hypot_warp_shfl_euclidean_hypot_resolution=128_points=64,128,256,512.png" /></td>
 <td><img
-src="../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_euclidean_hypot_warp_shfl_euclidean_hypot_resolution=128_points=64,128,256,512.png" /></td>
+src="../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_naive_euclidean_hypot_warp_shfl_euclidean_hypot_resolution=128_points=64,128,256,512.png" /></td>
 </tr>
 </tbody>
 </table>
@@ -1422,11 +1422,10 @@ des bereits gespeicherten Punkte, werden die neuen, näheren Koordinaten
 class="math inline">k</span> halbiert (<span class="math inline">k =
 \frac{k}{2}</span>), bis der Wert <strong>1</strong> erreicht und
 berechnet wurde.</p>
-<p>Aufgrund dieser fortlaufenden Halbierung ist es <strong>zwingend
-erforderlich</strong>, dass das Grid eine Auflösung mit einer
-Zweierpotenz (<span class="math inline">2^m</span>) besitzt. Für
-rechteckige Grids müsste man das schrittweise Halbieren der Schrittweite
-entlang der längeren Kante durchführen.</p>
+<p>Aufgrund dieser fortlaufenden Halbierung besitzt das Grid häufig eine
+Auflösung mit einer Zweierpotenz (<span class="math inline">2^m</span>).
+Für rechteckige Grids müsste man das schrittweise Halbieren der
+Schrittweite entlang der längeren Kante durchführen.</p>
 <p><em>Wie wird der JFA implementiert?</em></p>
 <p>In dieser <strong>ersten naiven</strong> Implementation wird das Grid
 als 3D-Array der Form <code>shape=(resolution, resolution, 2)</code> vom
@@ -1847,11 +1846,11 @@ Schrittweite:</p>
 <p>Vergleicht man diese ca. <strong>1,516 ms</strong> mit dem in der
 Performancemessung (<a
 href="../data/performance_matrix_NVIDIA-GeForce-RTX-5070_jfa_square_euclidean_resolution=128,256,512,1024,2048_points=64,128,256,512.png">Heatmap</a>)
-ermittelten Gesamtwert von <strong>1,525 ms</strong> (Auflösung=<span
+ermittelten Gesamtwert von <strong>1,540 ms</strong> (Auflösung=<span
 class="math inline">2048</span>, Punkte=<span
 class="math inline">512</span>, quadratische euklidische Distanz,
 <code>RTX 5070</code>), zeigt sich eine sehr hohe Übereinstimmung. Die
-geringe Differenz von rund <strong>0,09 ms</strong> lässt sich auf den
+geringe Differenz von rund <strong>0,024 ms</strong> lässt sich auf den
 CPU- und Synchronisations-Overhead zurückführen, der mit steigender
 Iterationsanzahl leicht zunimmt. Dies verifiziert, dass die verwendete
 Methode zur Leistungsmessung valide arbeitet.</p>
@@ -1862,25 +1861,26 @@ Iterationen ausgewogen (NCU meldet: <em>“Compute and Memory are
 well-balanced”</em>), der überwiegende Hinweis ist jedoch, dass der
 Speicher stärker genutzt wird als der Compute: <em>“Memory is more
 heavily utilized than Compute”</em>. Bei der Manhattan-Distanz ist dies
-noch deutlicher zu erkennen. Der Durchsatz des Speichers (<em>Memory
-Throughput</em>) liegt in der ersten Iteration bei <code>81,08 %</code>
-und sinkt in den späteren Verläufen leicht auf Werte um die
-<code>70 %</code>. Im Gegensatz dazu starten die Recheneinheiten
-(<em>Compute (SM) Throughput</em>) bei lediglich <code>30,42 %</code>
-und erreichen zum Ende hin <code>65,21 %</code>. Ausschlaggebend ist
-hierbei die Auslastung der Caches L1 und L2. Zu Beginn des Algorithmus
-ist die Schrittweite sehr groß. Benachbarte Threads eines Warps fragen
-Pixeldaten ab, die im globalen Speicher weit auseinanderliegen. Die
-Caches können diese verstreuten Daten kaum puffern, weshalb die
-Recheneinheiten auf Daten warten müssen und blockieren. Bei kleinen
-Schrittweiten am Ende des Algorithmus liegen die benötigten Nachbarpixel
-im Speicher hingegen nah beieinander. Das zeigt auch der <em>L1/TEX
-Cache Throughput</em> bzw. <em>L2 Cache Throughput</em>: Zu Beginn ist
-die Aulastung bei <code>23,00 %</code> bzw. <code>30,82 %</code> und
-erreicht im Laufe des JFA maximale Werte von <code>55,06 %</code> bzw.
-<code>66,95 %</code>. Dadurch kann der Zugriff auf den globalen VRAM
-reduziert und die Rechenauslastung teilweise erhöht werden.
-Nichtsdestotrotz dominieren die Speicherzugriffe die Kernellaufzeit
+noch deutlicher zu erkennen.</p>
+<p>Der Durchsatz des Speichers (<em>Memory Throughput</em>) liegt in der
+ersten Iteration bei <code>81,08 %</code> und sinkt in den späteren
+Verläufen leicht auf Werte um die <code>70 %</code>. Im Gegensatz dazu
+starten die Recheneinheiten (<em>Compute (SM) Throughput</em>) bei
+lediglich <code>30,42 %</code> und erreichen zum Ende hin
+<code>65,21 %</code>. Ausschlaggebend ist hierbei die Auslastung der
+Caches L1 und L2. Zu Beginn des Algorithmus ist die Schrittweite sehr
+groß. Benachbarte Threads eines Warps fragen Pixeldaten ab, die im
+globalen Speicher weit auseinanderliegen. Die Caches können diese
+verstreuten Daten kaum puffern, weshalb die Recheneinheiten auf Daten
+warten müssen und blockieren. Bei kleinen Schrittweiten am Ende des
+Algorithmus liegen die benötigten Nachbarpixel im Speicher hingegen nah
+beieinander. Das zeigt auch der <em>L1/TEX Cache Throughput</em> bzw.
+<em>L2 Cache Throughput</em>: Zu Beginn ist die Aulastung bei
+<code>23,00 %</code> bzw. <code>30,82 %</code> und erreicht im Laufe des
+JFA maximale Werte von <code>55,06 %</code> bzw. <code>66,95 %</code>.
+Dadurch kann der Zugriff auf den globalen VRAM reduziert und die
+Rechenauslastung teilweise erhöht werden. Nichtsdestotrotz dominieren
+die Speicherzugriffe die Kernellaufzeit
 (<strong>memory-bound</strong>).</p>
 <p><em>Wie verhält sich die Kernel-Laufzeit bei jedem
 Iterationsschritt?</em></p>
@@ -2339,7 +2339,6 @@ durch den zusätzlichen Rechenaufwand (Indexberechnung via
 Ganzzahl-Division/Modulo, Synchronisationsbarriere) wieder kompensiert
 wird, wodurch unterm Strich keine Laufzeitverbesserung gegenüber der
 naiven Implementierung entsteht.</p>
-<!-- Abschließend lässt sich festhalten, dass die Optimierung mittels Shared Memory beim JFA **keinen Performancegewinn** erzielt hat. Dies liegt vor allem an der Natur des Algorithmus selbst: Ein softwareseitiges Caching im Shared Memory ist konzeptionell überhaupt erst bei kleinen Schrittweiten möglich. Doch selbst bei diesen konnte kein Gewinn erzielt werden. Hier ist die Redundanz der Speicherzugriffe innerhalb eines Thread-Blocks nicht hoch genug, um den zusätzlichen Overhead für das kollaborative Laden, die Thread-Synchronisation und die Indexberechnung mittels Division und Modulo zu kompensieren. -->
 <p>Um dem Problem der interleaved 3D-Struktur (<em>Bank Conflicts</em>)
 nachzugehen, wird im folgenden Abschnitt ein alternatives Datenlayout
 betrachtet. Da der Shared-Memory-Ansatz gegenüber der naiven
@@ -2481,7 +2480,6 @@ zeigt, dass in der Iteration 1 bis 3 der Speicher mehr ausgelastet ist
 als der Compute. Ab Iteration 4 bis zum Ende meldet ncu dann, dass beide
 Aspekte gut ausgeglichen sind (<em>Compute and Memory are
 well-balanced</em>).</p>
-<!-- TODO: Erklärung wieso? -->
 <p><strong>Shuffle</strong></p>
 <p>Beim Shuffle können Daten von Threads innerhalb desselben Warps
 direkt ausgetauscht werden, ohne den Umweg über Shared oder Global
@@ -2693,11 +2691,13 @@ Speichern mit
 <code>FileNotFoundError: [Errno 2] No such file or directory: ...</code>
 fehl, weil der gesamte Pfad zu lang ist.</p>
 </blockquote>
-<p>Abschließend werden die besten Algorithmen gemeinsam betrachtet und
+<p>Abschließend werden ausgewählte Algorithmen gemeinsam betrachtet und
 gegenübergestellt. Die folgenden Diagramme zeigen die Laufzeiten der
 jeweiligen Kernel für eine feste Bildgröße von <span
 class="math inline">128 \times 128</span> und eine variierende Anzahl an
 Punkten:</p>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run .<span class="dt">\s</span>rc<span class="dt">\t</span>ask7.py compare-naive_euclidean_hypot-naive_square_euclidean_fast-grid_stride_square_euclidean_fast-warp_shfl_square_euclidean_fast-jfa_square_euclidean-jfa_inout_square_euclidean final</span></code></pre></div>
 <table>
 <colgroup>
 <col style="width: 49%" />
@@ -2721,16 +2721,18 @@ src="../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_final_resolution=128_po
 <p>Der Pixel-Algorithmus ist vor allem bei einer geringen Punktemenge
 sehr schnell und weist eine deutlich bessere Laufzeit als der JFA auf.
 Mit zunehmender Anzahl von Punkten im Diagramm nimmt die Laufzeit jedoch
-quadratisch zu. Ab einer bestimmten Anzahl greift die JFA-Charakteristik
-und der JFA ist schneller. Dieser Übergang erfolgt je nach
-Implementierung des Pixel-Algorithmus zu einem späteren Zeitpunkt, aber
-irgendwann wird der Schnittpunkt zwingend erreicht.</p>
-<p>Das gleiche Diagramm wurde für die Bildgröße <span
-class="math inline">2048 \times 2048</span> erstellt um diesen
-Schnittpunkt zu zeigen.</p>
+zu. Ab einer bestimmten Anzahl greift die JFA-Charakteristik und der JFA
+ist schneller. Dieser Übergang erfolgt je nach Implementierung des
+Pixel-Algorithmus zu einem späteren Zeitpunkt, aber irgendwann wird der
+Schnittpunkt zwingend erreicht.</p>
+<p>Um diesen Schnittpunkt zu zeigen, wurde das gleiche Diagramm für die
+Bildgröße <span class="math inline">2048 \times 2048</span>
+erstellt:</p>
+<div class="sourceCode" id="cb27"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run .<span class="dt">\s</span>rc<span class="dt">\t</span>ask7.py compare-2048-naive_euclidean_hypot-naive_square_euclidean_fast-grid_stride_square_euclidean_fast-warp_shfl_square_euclidean_fast-jfa_square_euclidean-jfa_inout_square_euclidean final</span></code></pre></div>
 <table>
 <colgroup>
-<col style="width: 50%" />
+<col style="width: 49%" />
 <col style="width: 50%" />
 </colgroup>
 <thead>
@@ -2743,15 +2745,39 @@ Schnittpunkt zu zeigen.</p>
 <tr class="odd">
 <td><img
 src="../data/performance_plot_NVIDIA-GeForce-RTX-5070_final_resolution=2048_points=64,128,256,512.png" /></td>
-<td></td>
+<td><img
+src="../data/performance_plot_NVIDIA-GeForce-GTX-1660-Ti_final_resolution=2048_points=64,128,256,512.png" /></td>
 </tr>
 </tbody>
 </table>
 <p><em>Welche der Optimierungen hat den größten Laufzeit-gewinn
 erbracht?</em></p>
-<p><em>Wie viel schneller ist die Finale Implementation im Vergleich zur
-Naiven Implementation?</em></p>
+<p>Wie in den Abschnitten zur Optimierung der naiven euklidischen
+Implementierung (<a
+href="#aufgabe-3---naive-implementation">Aufgabe3</a>, <a
+href="#aufgabe-4---optimierung-durch-billigere-distanz-prüfung">Aufgabe4</a>,
+<a href="#aufgabe-5---effizienteres-laden-von-daten">Aufgabe5</a>)
+bereits erläutert, zeigen auch die abschließenden Diagramme, dass sich
+durch den Einsatz einer weniger aufwendigen Berechnung der reinen
+quadratischen euklidischen Distanz (ohne Wurzel) sowie durch die
+Annotation <code>fastmath=True</code> Performancesteigerungen erzielen
+lassen. Durch Shared Memory und Warp-Shuffle konnte außerdem eine
+weitere Reduzierung der Laufzeit erzielt werden.</p>
+<p>Abschließend lässt sich für den JFA festhalten, dass sich durch die
+Optimierung mittels Shared Memory, dem alternativen Structure of Arrays
+Layout (SoA) und dem In-Out-Ansatz kein Performancegewinn erzielen ließ.
+Teilweise scheinen die Anpassungen sogar das Gegenteil zu bewirken und
+die Laufzeit zu verschlechtern. Dies liegt vor allem an der Natur des
+Algorithmus selbst: Die iterative Steuerung und die verstreuten
+Datenzugriffe erschweren eine Optimierung deutlich. Dies wurde auch in
+der Diskussion über einen möglichen Einsatz von Warp-Shuffle noch einmal
+deutlich.</p>
 <p><em>Ausblick</em></p>
+<p>Während zukünftige Optimierungen des JFA primär auf algorithmischer
+Ebene wie bei JFA+ und JFA* ansetzen, stößt die pixelbasierte Variante
+bereits an die Hardware-Limits von Speicher und Compute. Ein
+signifikanter Performance-Sprung ist bei Letzterem eventuell nur noch
+durch grundlegend neue Berechnungsansätze denkbar.</p>
 <h1 id="anhang">Anhang</h1>
 <blockquote>
 <p>[!NOTE] <strong>Einschränkung bei Keyword (Named)-Arguments in
