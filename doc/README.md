@@ -1099,7 +1099,7 @@ Es ist zu sehen, dass für die Eingabe-Größen `512` und `2048` des Raster eine
 >
 > Windows begrenzt Pfade auf [260 Zeichen](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=registry). Da die Dateinamenerstellung der Performanceplots in Aufgabe 7 diese Grenze überschreiten können, wurde die Option eines Identifiers eingeführt - in diesem Fall `final`. Ohne diesen schlägt das Speichern mit `FileNotFoundError: [Errno 2] No such file or directory: ...` fehl, weil der gesamte Pfad zu lang ist.
 
-Abschließend werden die besten Algorithmen gemeinsam betrachtet und gegenübergestellt. Die folgenden Diagramme zeigen die Laufzeiten der jeweiligen Kernel für eine feste Bildgröße von $128 \times 128$ und eine variierende Anzahl an Punkten:
+Abschließend werden ausgewählte Algorithmen gemeinsam betrachtet und gegenübergestellt. Die folgenden Diagramme zeigen die Laufzeiten der jeweiligen Kernel für eine feste Bildgröße von $128 \times 128$ und eine variierende Anzahl an Punkten:
 
 ```bash
 uv run .\src\task7.py compare-naive_euclidean_hypot-naive_square_euclidean_fast-grid_stride_square_euclidean_fast-warp_shfl_square_euclidean_fast-jfa_square_euclidean-jfa_inout_square_euclidean final
@@ -1123,17 +1123,13 @@ uv run .\src\task7.py compare-2048-naive_euclidean_hypot-naive_square_euclidean_
 
 _Welche der Optimierungen hat den größten Laufzeit-gewinn erbracht?_
 
-Wie in den Abschnitten zur Optimierung der naiven euklidischen Implementierung ([Aufgabe3](#aufgabe-3---naive-implementation), [Aufgabe4](#aufgabe-4---optimierung-durch-billigere-distanz-prüfung), [Aufgabe5](#aufgabe-5---effizienteres-laden-von-daten)) bereits erläutert, zeigen auch die abschließenden Diagramme, dass sich durch den Einsatz eine weniger aufwändige Berechnung der reinen quadratischen euklidischen Distanz (ohne Wurzel) sowie durch die Annotation `fastmath=True` Performancesteigerungen erzielen lassen. Durch Shared Memory und Warp-Shuffle konnte außerdem eine weitere Reduzierung der Laufzeit erzielt werden.
+Wie in den Abschnitten zur Optimierung der naiven euklidischen Implementierung ([Aufgabe3](#aufgabe-3---naive-implementation), [Aufgabe4](#aufgabe-4---optimierung-durch-billigere-distanz-prüfung), [Aufgabe5](#aufgabe-5---effizienteres-laden-von-daten)) bereits erläutert, zeigen auch die abschließenden Diagramme, dass sich durch den Einsatz einer weniger aufwendigen Berechnung der reinen quadratischen euklidischen Distanz (ohne Wurzel) sowie durch die Annotation `fastmath=True` Performancesteigerungen erzielen lassen. Durch Shared Memory und Warp-Shuffle konnte außerdem eine weitere Reduzierung der Laufzeit erzielt werden.
 
-Abschließend lässt sich für den JFA festhalten, dass sich durch die Optimierung mittels Shared Memory, dem alternativen Structure of Arrays Layout und dem In-Out-Ansatz **kein Performancegewinn** erzielen ließ. Teilweise scheinen die Anpassungen sogar das Gegenteil zu bewirken und die Laufzeit zu verschlechtern. Dies liegt vor allem an der Natur des Algorithmus selbst: Die iterative Steuerung und die verstreuten Datenzugriffe erschweren eine Optimierung deutlich. Dies wurde auch in der Diskussion über einen möglichen Einsatz von Shuffle noch einmal deutlich.
-
-_Wie viel schneller ist die Finale Implementation im Vergleich zur Naiven Implementation?_
-
-TODO...
+Abschließend lässt sich für den JFA festhalten, dass sich durch die Optimierung mittels Shared Memory, dem alternativen Structure of Arrays Layout (SoA) und dem In-Out-Ansatz kein Performancegewinn erzielen ließ. Teilweise scheinen die Anpassungen sogar das Gegenteil zu bewirken und die Laufzeit zu verschlechtern. Dies liegt vor allem an der Natur des Algorithmus selbst: Die iterative Steuerung und die verstreuten Datenzugriffe erschweren eine Optimierung deutlich. Dies wurde auch in der Diskussion über einen möglichen Einsatz von Warp-Shuffle noch einmal deutlich.
 
 _Ausblick_
 
-TODO...
+Während zukünftige Optimierungen des JFA primär auf algorithmischer Ebene wie bei JFA+ und JFA\* ansetzen, stößt die pixelbasierte Variante bereits an die Hardware-Limits von Speicher und Compute. Ein signifikanter Performance-Sprung ist bei Letzterem eventuell nur noch durch grundlegend neue Berechnungsansätze denkbar.
 
 # Anhang
 
